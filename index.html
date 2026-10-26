@@ -374,7 +374,15 @@ if(window.visualViewport){
   vv.addEventListener("resize",fit);vv.addEventListener("scroll",fit);fit();
 }
 el("input").addEventListener("focus",()=>{setTimeout(()=>{const f=el("feed");if(f)f.scrollTop=f.scrollHeight;el("input").scrollIntoView({block:"nearest"});},300);});
-if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+// 서비스워커: 새 버전 자동 감지 → 자동 새로고침(구버전 고착 방지)
+if("serviceWorker"in navigator){
+  let reloaded=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloaded)return;reloaded=true;location.reload();});
+  navigator.serviceWorker.register("sw.js").then(reg=>{
+    reg.update();
+    setInterval(()=>reg.update(),60000);
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
