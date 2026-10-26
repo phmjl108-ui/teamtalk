@@ -30,7 +30,7 @@ button{font-family:inherit}
 .ch .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ch .act{opacity:0;font-size:14px;padding:2px 4px;border-radius:6px}
 .ch .act:hover{background:var(--hover)}
-.badge{background:var(--accent);color:#fff;font-size:12px;font-weight:600;min-width:20px;height:20px;padding:0 6px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0}
+.badge{background:var(--accent);color:#fff;font-size:12px;font-weight:600;line-height:1;min-width:20px;height:20px;padding:0 6px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;text-align:center;margin-left:8px;flex-shrink:0;font-variant-numeric:tabular-nums}
 .ch:hover .act,.ch.on .act{opacity:.7}
 .addch{margin:6px 10px;padding:10px;border-radius:10px;cursor:pointer;font-size:15px;color:var(--accent);text-align:center}
 .addch:hover{background:var(--hover)}
@@ -245,8 +245,8 @@ function renderCh(){
     const del=document.createElement("span");del.className="act";del.textContent="🗑";del.title="채널 삭제";
     del.onclick=e=>{e.stopPropagation();deleteChannel(name);};
     d.appendChild(nm);
-    const u=unreadOf(name);if(u>0&&name!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
     d.appendChild(ed);d.appendChild(del);
+    const u=unreadOf(name);if(u>0&&name!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
     d.onclick=()=>{openCh(name);closeDrawer();};
     w.appendChild(d);
   });
