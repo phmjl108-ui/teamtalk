@@ -1,6 +1,6 @@
 {
-  "name": "팀톡",
-  "short_name": "팀톡",
+  "name": "소곤",
+  "short_name": "소곤",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

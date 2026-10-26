@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<title>팀톡</title>
+<title>소곤</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="팀톡">
+<meta name="apple-mobile-web-app-title" content="소곤">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <style>
@@ -41,7 +41,7 @@ button{font-family:inherit}
 .top .titwrap{flex:1;min-width:0;text-align:center}
 .top h2{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top small{color:var(--muted);display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.iconbtn{background:none;border:0;color:var(--accent);border-radius:8px;padding:7px 8px;cursor:pointer;font-size:15px;white-space:nowrap}
+.iconbtn{background:none;border:0;color:var(--accent);border-radius:8px;padding:7px 8px;min-height:40px;cursor:pointer;font-size:15px;white-space:nowrap}
 .iconbtn:active{opacity:.5}
 .iconbtn.me{font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;gap:6px}
 .mini{width:24px;height:24px;border-radius:50%;background:var(--accent);background-size:cover;background-position:center;flex-shrink:0}
@@ -71,10 +71,12 @@ button{font-family:inherit}
 .pchip img{width:40px;height:40px;object-fit:cover;border-radius:6px;display:block}
 .pchip .x{position:absolute;top:-7px;right:-7px;background:#ff3b30;color:#fff;border-radius:50%;width:18px;height:18px;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .composer{border-top:.5px solid var(--line);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);padding:8px 12px;padding-bottom:calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:flex-end}
-.composer .attach{background:transparent;border:0;color:var(--accent);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:30px;font-weight:300;flex-shrink:0;line-height:1;padding:0}
-.composer #input{flex:1;padding:8px 14px;min-height:36px;max-height:120px;border:.5px solid var(--line);border-radius:18px;background:var(--bg);color:var(--txt);font-size:17px;font-family:inherit;line-height:1.3;resize:none;overflow-y:auto}
+.composer .attach{background:transparent;border:0;color:var(--accent);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:30px;font-weight:300;flex-shrink:0;line-height:1;padding:0}
+.composer #input{flex:1;padding:8px 14px;min-height:40px;max-height:120px;border:.5px solid var(--line);border-radius:18px;background:var(--bg);color:var(--txt);font-size:17px;font-family:inherit;line-height:1.3;resize:none;overflow-y:auto;scrollbar-width:none}
+.composer #input::-webkit-scrollbar{display:none;width:0;height:0}
+.composer #input::-webkit-resizer{display:none}
 .composer #input:focus{outline:none;border-color:var(--accent)}
-.composer .send{width:36px;height:36px;border:0;border-radius:50%;background:var(--accent);color:#fff;cursor:pointer;font-size:0;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center}
+.composer .send{width:40px;height:40px;border:0;border-radius:50%;background:var(--accent);color:#fff;cursor:pointer;font-size:0;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center}
 .composer .send::after{content:"↑";font-size:19px;font-weight:700;line-height:1}
 .composer .send:disabled{background:var(--muted-3)}
 .empty{color:var(--muted);text-align:center;margin:auto;font-size:15px;line-height:1.6}
@@ -121,6 +123,22 @@ button{font-family:inherit}
 .newslist{list-style:none;padding:0;margin:4px 0 14px}
 .newslist li{font-size:14px;line-height:1.5;color:var(--txt);padding:10px 2px;border-bottom:.5px solid var(--line)}
 .newslist li:last-child{border-bottom:0}
+.pinbar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg-2);border-bottom:.5px solid var(--line);font-size:13px;color:var(--txt);cursor:pointer}
+.pinbar .pintxt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pinbar .pinx{color:var(--muted);font-size:15px;padding:0 2px}
+.banner{padding:10px 14px;text-align:center;font-size:13px;color:#fff;background:var(--red,#FF3B30)}
+.msg .pinbtn{opacity:0;background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 4px;align-self:center}
+.msg:hover .pinbtn{opacity:.55}
+.admincard{max-width:560px;max-height:85vh;display:flex;flex-direction:column}
+.adminbar{display:flex;gap:8px;margin-bottom:10px}
+.adminbar input{flex:1;margin:0;padding:9px 12px;border:.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--txt);font-size:14px}
+.adminbody{flex:1;overflow:auto;max-height:58vh;border:.5px solid var(--line);border-radius:12px;padding:10px;font-size:13px;line-height:1.5;background:var(--bg)}
+.adminbody .agrp{font-weight:700;color:var(--accent);margin:12px 0 4px;position:sticky;top:-10px;background:var(--bg);padding:4px 0}
+.adminbody .arow{padding:5px 2px;border-bottom:.5px solid var(--line);word-break:break-word}
+.adminbody .arow b{color:var(--txt)}
+.adminbody .at{color:var(--muted);font-size:11px}
+.ment{color:var(--accent);font-weight:600}
+.msg.me .bub .ment{color:#fff;text-decoration:underline}
 @media(max-width:720px){
   .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
   .side.open{transform:translateX(0)} .ham{display:block} .msg{max-width:86%}
@@ -131,21 +149,24 @@ button{font-family:inherit}
 <body>
 <div class="scrim" id="scrim"></div>
 <nav class="side" id="side">
-  <div class="brand"><span class="dot"></span><span>팀톡</span></div>
+  <div class="brand"><span class="dot"></span><span>소곤</span></div>
   <div class="chlist" id="chlist"></div>
   <div class="addch" id="addch">+ 채널 추가</div>
 </nav>
 <main class="main">
   <div class="top">
-    <button class="ham" id="ham" aria-label="채널">☰</button>
+    <button class="ham" id="ham" aria-label="채널 목록 열기">☰</button>
     <div class="titwrap"><h2 id="chName" title="채널 설정"># 일반</h2><small id="chSub"></small></div>
-    <button class="iconbtn" id="helpBtn" title="설치·알림 안내">ℹ️</button>
+    <button class="iconbtn" id="adminBtn" style="display:none" title="관리자" aria-label="관리자 화면">🛡️</button>
+    <button class="iconbtn" id="helpBtn" title="설치·알림 안내" aria-label="설치·알림 안내">ℹ️</button>
     <button class="iconbtn" id="notifBtn" style="display:none">🔔 알림 켜기</button>
     <button class="iconbtn" id="shareBtn">🔗 공유</button>
     <button class="iconbtn me" id="nameBtn"><span class="mini" id="miniAv"></span><span id="myName">나</span></button>
     <button class="iconbtn" id="themeBtn">🌓</button>
   </div>
+  <div class="pinbar" id="pinBar" style="display:none"></div>
   <div class="feed" id="feed"></div>
+  <div class="banner" id="banNote" style="display:none">🚫 관리자에 의해 채팅이 금지되었습니다.</div>
   <div class="typing" id="typing"></div>
   <div class="attachstrip" id="attachStrip"></div>
   <form class="composer" id="composer">
@@ -159,7 +180,7 @@ button{font-family:inherit}
 <input type="file" id="profileFile" accept="image/*" style="display:none">
 
 <div class="ov show" id="setup"><div class="card">
-  <h3>팀톡 입장</h3>
+  <h3>소곤 입장</h3>
   <p>대화명을 입력하고 입장하세요. 같은 앱을 연 사람끼리 실시간으로 대화됩니다.</p>
   <input type="text" id="nick" placeholder="대화명 (예: 홍길동)">
   <div class="err" id="cfgErr"></div>
@@ -199,6 +220,7 @@ button{font-family:inherit}
   <div class="pavwrap"><div class="pav" id="peerAv" style="cursor:default"></div></div>
   <h3 id="peerName">사용자</h3>
   <button id="peerDM">💬 1:1 대화 시작</button>
+  <button class="ghost" id="peerBan" style="display:none">🚫 채팅 금지</button>
   <button class="ghost" id="peerClose">닫기</button>
 </div></div>
 
@@ -212,6 +234,7 @@ button{font-family:inherit}
     <p class="gnote">설치하고 알림을 켜면, 안 보고 있는 채널·1:1 대화에 새 메시지가 오면 <b>윈도우·폰 알림</b>으로 알려줍니다.</p>
   </div>
   <button id="guideNotif">🔔 지금 알림 켜기</button>
+  <button class="ghost" id="guideData">🔒 데이터 정책 보기</button>
   <button class="ghost" id="guideClose">닫기</button>
 </div></div>
 
@@ -220,6 +243,25 @@ button{font-family:inherit}
   <p style="text-align:center">이번에 이런 기능이 추가됐어요</p>
   <ul class="newslist" id="newsList"></ul>
   <button id="newsClose">확인</button>
+</div></div>
+
+<div class="ov" id="adminOv"><div class="card admincard" style="text-align:left">
+  <h3 style="text-align:center">🛡️ 관리자 · 전체 기록</h3>
+  <div class="adminbar"><input type="text" id="adminSearch" placeholder="검색(이름·내용)"><button class="ghost" id="adminRefresh" style="width:auto;margin:0;padding:8px 12px">새로고침</button></div>
+  <div id="adminBody" class="adminbody">불러오는 중…</div>
+  <button class="ghost" id="adminClose">닫기</button>
+</div></div>
+
+<div class="ov" id="dataOv"><div class="card" style="text-align:left">
+  <h3 style="text-align:center">🔒 데이터 정책</h3>
+  <div class="guide">
+    <p class="gstep"><b>어디에 저장되나요</b><br>메시지·프로필·사진·파일은 Firebase 실시간 DB에 저장됩니다. 테스트 모드(공개)라 <b>키를 아는 사람은 접근할 수 있어</b> 암호화된 비밀 대화가 아닙니다. 민감정보(주민번호·비밀번호·카드번호)는 올리지 마세요.</p>
+    <p class="gstep"><b>누가 볼 수 있나요</b><br>채널 메시지는 들어온 사람 모두, 1:1 대화는 두 당사자. 관리자(혜밍웨이)는 운영을 위해 전체 기록을 볼 수 있습니다.</p>
+    <p class="gstep"><b>운영 시간 &amp; 자동 삭제</b><br>대화는 <b>오전 6시~오후 11시</b>에만 할 수 있습니다. <b>매일 밤 11시에 모든 대화 내용이 사라집니다.</b> 단, <b>채널 목록과 1:1 대화 목록은 유지</b>되고 대화 내용만 비워집니다. 남기고 싶은 내용은 미리 저장해 두세요.</p>
+    <p class="gstep"><b>삭제</b><br>내 메시지는 삭제 버튼으로 지울 수 있고, 채널 삭제 시 그 안의 메시지도 함께 삭제됩니다. 지운 데이터는 복구되지 않습니다.</p>
+    <p class="gnote">문의나 삭제 요청은 관리자(혜밍웨이)에게 1:1 대화로 보내주세요.</p>
+  </div>
+  <button class="ghost" id="dataClose">닫기</button>
 </div></div>
 
 <div class="viewer" id="viewer">
@@ -271,7 +313,7 @@ function watchKey(k,title){
     if(!w.primed){w.primed=true;lastKeyOf[k]=key;if(seenKey[k]===undefined)seenKey[k]=key;else if(key&&key!==seenKey[k]&&k!==cur&&!unreadN[k])unreadN[k]=1;renderCh();return;}
     if(key&&(!lastKeyOf[k]||key>lastKeyOf[k])){
       lastKeyOf[k]=key;const viewing=(k===cur&&!document.hidden);
-      if(viewing){seenKey[k]=key;unreadN[k]=0;}
+      if(viewing){seenKey[k]=key;unreadN[k]=0;if(!isMineMsg(msg)&&msg&&msg.t&&me&&msg.t.indexOf("@"+me)>=0)toast("멘션 · "+((msg&&msg.u)||""),msg.t,k);}
       else if(!isMineMsg(msg)){unreadN[k]=(unreadN[k]||0)+1;notify(title+" · "+((msg&&msg.u)||""),msgPreview(msg),k);}
       saveUnread();renderCh();
     }
@@ -293,6 +335,9 @@ function boot(nick){
   db=firebase.database();
   me=nick; el("myName").textContent=me;
   el("input").disabled=false; el("composer").querySelector(".send").disabled=false;
+  refreshAdminBtn();
+  db.ref("banned").on("value",s=>{banned=s.val()||{};applyBan();});
+  maybePurge();applyBan();
   db.ref("profiles").on("value",s=>{profiles=s.val()||{};refreshMyAv();if(cur)renderFeed();renderCh();});
   db.ref("profiles/"+clientId).update({name:me,img:myImg||null});
   db.ref("dmIndex/"+clientId).on("value",s=>{dms=s.val()||{};syncWatchers();renderCh();});
@@ -341,6 +386,7 @@ function attachFeed(){
   if(unsub)unsub.off();
   const ref=db.ref(msgPath(cur)).limitToLast(300);unsub=ref;
   ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden)markSeen(cur);renderFeed();});
+  if(pinRef)pinRef.off();pinRef=db.ref("pinned/"+cur);pinRef.on("value",s=>renderPinBar(s.val()));
   listenTyping(cur);
 }
 function openCh(name){
@@ -383,9 +429,10 @@ function renderFeed(){
       if(a.kind==="image"){const im=document.createElement("img");im.className="photo";im.src=a.data;im.onclick=()=>openViewer(a.data,a.name||"image.jpg","image");col.appendChild(im);}
       else{const lk=document.createElement("div");lk.className="filechip";lk.textContent="📎 "+(a.name||"파일")+(a.size?" ("+fmtSize(a.size)+")":"");lk.onclick=()=>openViewer(a.data,a.name||"파일","file");col.appendChild(lk);}
     });
-    if(m.t){const b=document.createElement("div");b.className="bub";b.textContent=m.t;col.appendChild(b);}
+    if(m.t){const b=document.createElement("div");b.className="bub";renderText(b,m.t);col.appendChild(b);}
     row.appendChild(av);row.appendChild(col);
-    if(mine){const db2=document.createElement("button");db2.className="delbtn";db2.textContent="🗑";db2.title="삭제";db2.onclick=()=>deleteMsg(m.__key);row.appendChild(db2);}
+    const pb=document.createElement("button");pb.className="pinbtn";pb.textContent="📌";pb.title="고정";pb.setAttribute("aria-label","메시지 고정");pb.onclick=()=>pinMsg(m);row.appendChild(pb);
+    if(mine){const db2=document.createElement("button");db2.className="delbtn";db2.textContent="🗑";db2.title="삭제";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);row.appendChild(db2);}
     feed.appendChild(row);
   });
   feed.scrollTop=feed.scrollHeight;
@@ -393,7 +440,7 @@ function renderFeed(){
 function deleteMsg(key){if(!key||!db)return;if(!confirm("이 메시지를 삭제할까요?"))return;db.ref(msgPath(cur)+"/"+key).remove();}
 
 // 전송 (텍스트 + 첨부)
-el("composer").onsubmit=e=>{e.preventDefault();const v=el("input").value.trim();if((!v&&!pend.length)||!db)return;const msg={u:me,cid:clientId,t:v,ts:Date.now()};if(pend.length)msg.atts=pend.map(a=>a.kind==="image"?{kind:"image",data:a.data}:{kind:"file",data:a.data,name:a.name,size:a.size});db.ref(msgPath(cur)).push(msg);const prev=v||(pend.some(a=>a.kind==="image")?"사진":"파일");
+el("composer").onsubmit=e=>{e.preventDefault();if(banned&&banned[clientId]){applyBan();return;}const v=el("input").value.trim();if((!v&&!pend.length)||!db)return;const msg={u:me,cid:clientId,t:v,ts:Date.now()};if(pend.length)msg.atts=pend.map(a=>a.kind==="image"?{kind:"image",data:a.data}:{kind:"file",data:a.data,name:a.name,size:a.size});db.ref(msgPath(cur)).push(msg);const prev=v||(pend.some(a=>a.kind==="image")?"사진":"파일");
   if(isDM(cur)){const pid=curPeer?curPeer.id:dmPeerOf(cur);const t=Date.now();db.ref("dmIndex/"+clientId+"/"+pid).update({name:(curPeer&&curPeer.name)||(profiles[pid]&&profiles[pid].name)||"대화",ts:t});db.ref("dmIndex/"+pid+"/"+clientId).update({name:me,ts:t});}
   else{bumpSeq(cur);db.ref("meta/"+cur+"/last").set({u:me,t:prev.slice(0,40),ts:Date.now()});}
   pend=[];renderPend();el("input").value="";autoGrow();stopTyping();};
@@ -427,7 +474,7 @@ window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 el("nameBtn").onclick=()=>{el("pName").value=me;const pv=el("pavPreview");if(myImg){pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}else{pv.style.backgroundImage="";pv.textContent=init(me);}el("pErr").textContent="";el("profileOv").classList.add("show");};
 el("pavPreview").onclick=()=>el("profileFile").click();
 el("profileFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{myImg=await shrink(f,160,0.7);const pv=el("pavPreview");pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}catch(err){el("pErr").textContent="사진을 불러오지 못했습니다.";}};
-el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;el("myName").textContent=me;try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref(msgPath(cur)).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
+el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;el("myName").textContent=me;refreshAdminBtn();applyBan();try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref(msgPath(cur)).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
 el("pClose").onclick=()=>el("profileOv").classList.remove("show");
 
 // 상대 프로필 보기 → 1:1 대화
@@ -440,6 +487,9 @@ function openPeer(cid,name){
   const b=el("peerDM");
   if(pid&&pid!==clientId){b.style.display="";b.onclick=()=>{el("peerOv").classList.remove("show");openDM(pid,nm);closeDrawer();};}
   else{b.style.display="none";}
+  const bb=el("peerBan");
+  if(isAdmin()&&pid&&pid!==clientId){const isB=!!(banned&&banned[pid]);bb.style.display="";bb.textContent=isB?"✅ 채팅 금지 해제":"🚫 채팅 금지";bb.onclick=()=>{db.ref("banned/"+pid).set(isB?null:true);el("peerOv").classList.remove("show");};}
+  else bb.style.display="none";
   el("peerOv").classList.add("show");
 }
 el("peerClose").onclick=()=>el("peerOv").classList.remove("show");
@@ -477,11 +527,79 @@ el("guideNotif").onclick=()=>{el("guideOv").classList.remove("show");if(el("noti
 function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){localStorage.setItem(LS+"_onboard","1");setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
 
 // 기능 업데이트 공지 (버전 올릴 때마다 모든 사용자에게 1회) — 관리자 전용 기능은 목록에 넣지 않음
-const NEWS_VER=1;
-const NEWS=["💬  상대 프로필 보기 · 1:1 대화(DM)","↵  Shift+Enter 줄바꿈","🖼  사진·파일을 앱 안에서 바로 미리보기","📱  설치·알림 켜는 법 안내"];
+const NEWS_VER=2;
+const NEWS=["🏷️  앱 이름이 '소곤'으로 바뀌었어요","🙋  같은 이름으로 들어오면 내 프로필·대화 그대로","@  멘션하면 상대에게 알림이 가요","📌  중요한 메시지는 상단에 고정","🌙  대화는 오전 6시~밤 11시, 매일 밤 자동 정리(채널·1:1 목록은 유지)"];
 function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;localStorage.setItem(LS+"_news",String(NEWS_VER));const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
 el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
 el("newsOv").onclick=e=>{if(e.target===el("newsOv"))el("newsOv").classList.remove("show");};
+
+// ===== 관리자(혜밍웨이) / 채팅 금지 / 고정 / 멘션 / 데이터 정책 =====
+let banned={}, adminData=[], pinRef=null;
+const ADMIN_NAME="혜밍웨이";
+function isAdmin(){return me===ADMIN_NAME;}
+function refreshAdminBtn(){el("adminBtn").style.display=isAdmin()?"":"none";}
+
+// 채팅 금지
+const OPEN_H=6, CLOSE_H=23; // 대화 가능 06:00~23:00
+function inWindow(){const h=new Date().getHours();return h>=OPEN_H&&h<CLOSE_H;}
+function applyBan(){
+  const b=!!(banned&&banned[clientId]), off=!inWindow();
+  const note=el("banNote"),inp=el("input"),snd=el("composer").querySelector(".send");
+  if(b){note.textContent="🚫 관리자에 의해 채팅이 금지되었습니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
+  else if(off){note.textContent="🌙 대화는 오전 6시~오후 11시에만 가능해요. 지난 대화는 매일 밤 11시에 사라집니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
+  else if(me){note.style.display="none";inp.disabled=false;snd.disabled=false;inp.placeholder="메시지 입력…  (Shift+Enter 줄바꿈)";}
+}
+// 매일 밤 11시: 모든 대화 휘발(채널·1:1 목록은 유지). 접속 중인 한 클라이언트가 하루 1회 수행.
+function nightTag(){const d=new Date();if(d.getHours()<OPEN_H)d.setDate(d.getDate()-1);return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+async function maybePurge(){
+  if(!db||inWindow())return;
+  try{
+    const tag=nightTag();
+    const res=await db.ref("policy/purgedNight").transaction(c=>c===tag?undefined:tag);
+    if(res.committed&&res.snapshot&&res.snapshot.val()===tag){
+      await db.ref().update({msg:null,dm:null,meta:null,pinned:null});
+    }
+  }catch(e){}
+}
+
+// 관리자 전체 기록 보기
+async function openAdmin(){
+  if(!isAdmin())return;
+  el("adminOv").classList.add("show");const body=el("adminBody");body.textContent="불러오는 중…";
+  try{
+    const [msgS,dmS]=await Promise.all([db.ref("msg").once("value"),db.ref("dm").once("value")]);
+    const msgAll=msgS.val()||{},dmAll=dmS.val()||{};adminData=[];
+    Object.keys(msgAll).forEach(ch=>{const ms=msgAll[ch]||{};Object.values(ms).forEach(m=>{if(m&&!m.sys)adminData.push({grp:"# "+ch,u:m.u,t:m.t||((m.img||m.atts)?"[첨부]":""),ts:m.ts});});});
+    Object.keys(dmAll).forEach(key=>{const ms=(dmAll[key]&&dmAll[key].msg)||{};Object.values(ms).forEach(m=>{if(m&&!m.sys)adminData.push({grp:"DM(1:1)",u:m.u,t:m.t||((m.img||m.atts)?"[첨부]":""),ts:m.ts});});});
+    renderAdmin(el("adminSearch").value||"");
+  }catch(e){body.textContent="불러오기 실패: "+e.message;}
+}
+function renderAdmin(q){
+  const body=el("adminBody");body.innerHTML="";q=(q||"").toLowerCase();
+  const rows=adminData.filter(r=>!q||((r.u||"").toLowerCase().indexOf(q)>=0||(r.t||"").toLowerCase().indexOf(q)>=0)).sort((a,b)=>a.grp<b.grp?-1:a.grp>b.grp?1:((a.ts||0)-(b.ts||0)));
+  if(!rows.length){body.textContent="표시할 기록이 없습니다.";return;}
+  let g=null;
+  rows.forEach(r=>{
+    if(r.grp!==g){g=r.grp;const h=document.createElement("div");h.className="agrp";h.textContent=g;body.appendChild(h);}
+    const d=document.createElement("div");d.className="arow";const b=document.createElement("b");b.textContent=r.u||"?";const sp=document.createElement("span");sp.textContent=" "+(r.t||"");const at=document.createElement("div");at.className="at";const dt=new Date(r.ts||0);at.textContent=isNaN(dt.getTime())?"":dt.toLocaleString();
+    d.appendChild(b);d.appendChild(sp);d.appendChild(at);body.appendChild(d);
+  });
+}
+el("adminBtn").onclick=openAdmin;el("adminClose").onclick=()=>el("adminOv").classList.remove("show");
+el("adminRefresh").onclick=openAdmin;el("adminSearch").addEventListener("input",e=>renderAdmin(e.target.value));
+el("adminOv").onclick=e=>{if(e.target===el("adminOv"))el("adminOv").classList.remove("show");};
+
+// 데이터 정책
+el("guideData").onclick=()=>{el("guideOv").classList.remove("show");el("dataOv").classList.add("show");};
+el("dataClose").onclick=()=>el("dataOv").classList.remove("show");
+el("dataOv").onclick=e=>{if(e.target===el("dataOv"))el("dataOv").classList.remove("show");};
+
+// 고정 메시지
+function pinMsg(m){if(!db||!cur)return;db.ref("pinned/"+cur).set({t:(m.t||"[첨부]").slice(0,120),u:m.u||"",key:m.__key||"",ts:Date.now()});}
+function renderPinBar(pin){const bar=el("pinBar");if(!pin){bar.style.display="none";bar.innerHTML="";return;}bar.style.display="";bar.innerHTML='<span>📌</span><span class="pintxt"></span><span class="pinx" title="고정 해제">✕</span>';bar.querySelector(".pintxt").textContent=(pin.u?pin.u+": ":"")+(pin.t||"");bar.querySelector(".pinx").onclick=e=>{e.stopPropagation();db.ref("pinned/"+cur).remove();};}
+
+// 멘션 하이라이트
+function renderText(container,text){const re=/(@[^\s@]{1,24})/g;let last=0,m;while((m=re.exec(text))){if(m.index>last)container.appendChild(document.createTextNode(text.slice(last,m.index)));const sp=document.createElement("span");sp.className="ment";sp.textContent=m[0];container.appendChild(sp);last=m.index+m[0].length;}if(last<text.length)container.appendChild(document.createTextNode(text.slice(last)));}
 
 // 채널 설정 모달 (만들기 / 이름변경 / 비밀번호)
 function openChanModal(name){
@@ -543,10 +661,11 @@ function shareLink(){return location.origin+location.pathname;}
 el("shareBtn").onclick=()=>{const url=shareLink();el("qrbox").innerHTML="";try{const c=document.createElement("canvas");el("qrbox").appendChild(c);new QRious({element:c,value:url,size:200,level:"M"});}catch(e){el("qrbox").textContent="QR 생성 실패";}el("shareUrl").value=url;el("shareOv").classList.add("show");};
 el("shareClose").onclick=()=>el("shareOv").classList.remove("show");
 el("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(shareLink());el("copyBtn").textContent="복사됨 ✓";setTimeout(()=>el("copyBtn").textContent="링크 복사",1500);}catch(e){el("shareUrl").select();document.execCommand("copy");}};
-el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");maybeOnboard();if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
+async function resolveIdentity(nick){try{const snap=await db.ref("profiles").once("value");const profs=snap.val()||{};const f=Object.entries(profs).find(([k,v])=>v&&v.name===nick);if(f){clientId=f[0];try{localStorage.setItem(LS+"_cid",clientId)}catch(e){}if(f[1]&&f[1].img)myImg=f[1].img;}}catch(e){}}
+el("connect").onclick=async()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{if(!firebase.apps.length)firebase.initializeApp(FB);db=firebase.database();await resolveIdentity(nick);const wasOnboarded=!!localStorage.getItem(LS+"_onboard");boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");if(wasOnboarded)showNews();else maybeOnboard();if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
 el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
-el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("팀톡","알림이 켜졌어요 🎉",cur);});};
+el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("소곤","알림이 켜졌어요 🎉",cur);});};
 updNotifBtn();
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
 try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null;boot(s.nick);el("setup").classList.remove("show");showNews();if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}}catch(e){}
@@ -557,6 +676,10 @@ if(window.visualViewport){
   vv.addEventListener("resize",fit);vv.addEventListener("scroll",fit);fit();
 }
 el("input").addEventListener("focus",()=>{setTimeout(()=>{const f=el("feed");if(f)f.scrollTop=f.scrollHeight;el("input").scrollIntoView({block:"nearest"});},300);});
+// 접근성: 아이콘 버튼 라벨 + 입력창 라벨
+try{el("attachBtn").setAttribute("aria-label","파일·이미지 첨부");el("themeBtn").setAttribute("aria-label","다크 모드 전환");el("shareBtn").setAttribute("aria-label","초대 링크 공유");el("nameBtn").setAttribute("aria-label","내 프로필");el("input").setAttribute("aria-label","메시지 입력");el("composer").querySelector(".send").setAttribute("aria-label","메시지 보내기");el("feed").setAttribute("role","log");el("feed").setAttribute("aria-live","polite");}catch(e){}
+// 운영 시간(06~23시) 및 밤 11시 대화 휘발을 1분마다 점검
+setInterval(()=>{if(me)applyBan();maybePurge();},60000);
 // 서비스워커: 새 버전 자동 감지 → 자동 새로고침(구버전 고착 방지)
 if("serviceWorker"in navigator){
   let reloaded=false;
