@@ -48,7 +48,8 @@ button{font-family:inherit}
 .feed{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:3px}
 .msg{display:flex;gap:7px;max-width:78%;align-items:flex-end;margin-top:9px}.msg.me{align-self:flex-end;flex-direction:row-reverse}
 .av{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
-.bub{background:var(--other);color:var(--txt);border:0;border-radius:18px;padding:8px 13px;font-size:16px;line-height:1.32;word-break:break-word}
+.bub{background:var(--other);color:var(--txt);border:0;border-radius:18px;padding:8px 13px;font-size:16px;line-height:1.32;word-break:break-word;white-space:pre-wrap}
+.msg .av{cursor:pointer}.msg .meta{cursor:pointer}
 .msg.me .bub{background:var(--me);color:var(--me-txt)}
 .photo{max-width:230px;max-height:280px;border-radius:16px;display:block;margin-bottom:4px;cursor:pointer}
 .filechip{display:inline-flex;align-items:center;gap:6px;background:var(--other);border:0;border-radius:14px;padding:9px 12px;font-size:14px;color:var(--txt);text-decoration:none;margin-bottom:4px;max-width:230px;word-break:break-all}
@@ -71,8 +72,8 @@ button{font-family:inherit}
 .pchip .x{position:absolute;top:-7px;right:-7px;background:#ff3b30;color:#fff;border-radius:50%;width:18px;height:18px;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .composer{border-top:.5px solid var(--line);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);padding:8px 12px;padding-bottom:calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:flex-end}
 .composer .attach{background:transparent;border:0;color:var(--accent);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:30px;font-weight:300;flex-shrink:0;line-height:1;padding:0}
-.composer input[type=text]{flex:1;padding:8px 14px;min-height:36px;border:.5px solid var(--line);border-radius:18px;background:var(--bg);color:var(--txt);font-size:17px}
-.composer input[type=text]:focus{outline:none;border-color:var(--accent)}
+.composer #input{flex:1;padding:8px 14px;min-height:36px;max-height:120px;border:.5px solid var(--line);border-radius:18px;background:var(--bg);color:var(--txt);font-size:17px;font-family:inherit;line-height:1.3;resize:none;overflow-y:auto}
+.composer #input:focus{outline:none;border-color:var(--accent)}
 .composer .send{width:36px;height:36px;border:0;border-radius:50%;background:var(--accent);color:#fff;cursor:pointer;font-size:0;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center}
 .composer .send::after{content:"↑";font-size:19px;font-weight:700;line-height:1}
 .composer .send:disabled{background:var(--muted-3)}
@@ -90,6 +91,7 @@ button{font-family:inherit}
 .pavwrap{display:flex;justify-content:center;margin-bottom:12px}
 .pav{width:88px;height:88px;border-radius:50%;background:var(--accent);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;color:#fff;font-size:32px;font-weight:600;cursor:pointer;position:relative}
 .pav::after{content:"📷";position:absolute;right:-2px;bottom:-2px;font-size:16px;background:var(--panel);border-radius:50%;padding:3px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#peerAv::after{content:none}
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15;display:none}.scrim.show{display:block}
 .toasts{position:fixed;bottom:84px;right:12px;z-index:60;display:flex;flex-direction:column;gap:8px;max-width:320px;width:calc(100% - 24px);pointer-events:none}
 .toast{pointer-events:auto;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border:.5px solid var(--line);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.16);padding:11px 30px 11px 14px;cursor:pointer;position:relative;animation:tin .22s ease}
@@ -98,6 +100,24 @@ button{font-family:inherit}
 .toast .tx{position:absolute;top:6px;right:9px;color:var(--muted);font-size:15px;line-height:1}
 @keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #notifBtn{color:#d6a000;border-color:#d6a000}
+.filechip{cursor:pointer}
+.ch .cav{width:26px;height:26px;border-radius:50%;background:var(--accent);background-size:cover;background-position:center;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+#peerDM{margin-bottom:0}
+.viewer{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.93);display:none;flex-direction:column}
+.viewer.show{display:flex}
+.vbar{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;color:#fff}
+.vname{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.9}
+.vdl{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:6px 10px;white-space:nowrap}
+.vclose{background:rgba(255,255,255,.15);border:0;color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0}
+.vbody{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:12px}
+.vbody img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.vbody video,.vbody audio{max-width:100%;max-height:100%}
+.vframe{width:100%;height:100%;border:0;background:#fff;border-radius:8px}
+.vtext{width:100%;max-width:820px;max-height:100%;overflow:auto;background:#fff;color:#111;border-radius:10px;padding:16px;font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Menlo,Consolas,monospace}
+.vnone{color:#fff;opacity:.85;text-align:center;font-size:15px;line-height:1.6;max-width:300px;white-space:pre-line}
+.guide{margin-bottom:14px}
+.guide .gstep{font-size:13px;line-height:1.6;color:var(--txt);margin:0 0 11px;padding-bottom:11px;border-bottom:.5px solid var(--line)}
+.guide .gnote{font-size:12.5px;line-height:1.6;color:var(--muted);margin:4px 0 0}
 @media(max-width:720px){
   .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
   .side.open{transform:translateX(0)} .ham{display:block} .msg{max-width:86%}
@@ -116,6 +136,7 @@ button{font-family:inherit}
   <div class="top">
     <button class="ham" id="ham" aria-label="채널">☰</button>
     <div class="titwrap"><h2 id="chName" title="채널 설정"># 일반</h2><small id="chSub"></small></div>
+    <button class="iconbtn" id="helpBtn" title="설치·알림 안내">ℹ️</button>
     <button class="iconbtn" id="notifBtn" style="display:none">🔔 알림 켜기</button>
     <button class="iconbtn" id="shareBtn">🔗 공유</button>
     <button class="iconbtn me" id="nameBtn"><span class="mini" id="miniAv"></span><span id="myName">나</span></button>
@@ -126,7 +147,7 @@ button{font-family:inherit}
   <div class="attachstrip" id="attachStrip"></div>
   <form class="composer" id="composer">
     <button type="button" class="attach" id="attachBtn" title="이미지·파일 첨부">＋</button>
-    <input type="text" id="input" placeholder="메시지 입력… (이미지 붙여넣기 가능)" autocomplete="off" disabled>
+    <textarea id="input" rows="1" placeholder="메시지 입력…  (Shift+Enter 줄바꿈)" autocomplete="off" disabled></textarea>
     <button type="submit" class="send" disabled>보내기</button>
   </form>
 </main>
@@ -140,6 +161,7 @@ button{font-family:inherit}
   <input type="text" id="nick" placeholder="대화명 (예: 홍길동)">
   <div class="err" id="cfgErr"></div>
   <button id="connect">입장하기</button>
+  <button class="ghost" id="setupGuide">📱 설치·알림 켜는 법 보기</button>
 </div></div>
 
 <div class="ov" id="shareOv"><div class="card">
@@ -170,6 +192,31 @@ button{font-family:inherit}
   <button class="ghost" id="chanClose">닫기</button>
 </div></div>
 
+<div class="ov" id="peerOv"><div class="card">
+  <div class="pavwrap"><div class="pav" id="peerAv" style="cursor:default"></div></div>
+  <h3 id="peerName">사용자</h3>
+  <button id="peerDM">💬 1:1 대화 시작</button>
+  <button class="ghost" id="peerClose">닫기</button>
+</div></div>
+
+<div class="ov" id="guideOv"><div class="card" style="text-align:left">
+  <h3 style="text-align:center">📱 앱 설치 &amp; 알림 켜기</h3>
+  <div class="guide">
+    <p class="gstep"><b>① 앱 설치 — PC (Chrome·Edge)</b><br>주소창 <b>오른쪽 끝의 설치 아이콘</b>(⊕ 또는 모니터+↓ 모양)을 클릭 → <b>설치</b>. 브라우저 창 없이 앱처럼 열립니다.</p>
+    <p class="gstep"><b>① 앱 설치 — 아이폰 (Safari)</b><br>하단 <b>공유</b> 버튼 → <b>홈 화면에 추가</b>.</p>
+    <p class="gstep"><b>① 앱 설치 — 안드로이드 (Chrome)</b><br>메뉴(⋮) → <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>.</p>
+    <p class="gstep"><b>② 알림 켜기</b><br>상단 <b>🔔 알림 켜기</b> 버튼 → <b>허용</b>. (버튼이 안 보이면 이미 켜진 상태입니다.)</p>
+    <p class="gnote">설치하고 알림을 켜면, 안 보고 있는 채널·1:1 대화에 새 메시지가 오면 <b>윈도우·폰 알림</b>으로 알려줍니다.</p>
+  </div>
+  <button id="guideNotif">🔔 지금 알림 켜기</button>
+  <button class="ghost" id="guideClose">닫기</button>
+</div></div>
+
+<div class="viewer" id="viewer">
+  <div class="vbar"><span class="vname" id="viewerName"></span><a class="vdl" id="viewerDl" download>⤓ 다운로드</a><button class="vclose" id="viewerClose">✕</button></div>
+  <div class="vbody" id="viewerBody"></div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
@@ -181,7 +228,7 @@ const init=s=>(s||"?").trim()[0]||"?";
 function hash(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
 function fmtSize(b){return b<1024?b+"B":b<1048576?Math.round(b/1024)+"KB":(b/1048576).toFixed(1)+"MB";}
 
-let db, me, myImg=null, cur="일반", chans={"일반":1}, profiles={}, unsub=null, typingRef=null, typingTimer=null, lastType=0, pend=[], prevMeta=null, chanEdit=null;
+let db, me, myImg=null, cur="일반", chans={"일반":1}, profiles={}, unsub=null, typingRef=null, typingTimer=null, lastType=0, pend=[], prevMeta=null, chanEdit=null, curPeer=null, dms={};
 let clientId;
 try{clientId=localStorage.getItem(LS+"_cid")||(crypto.randomUUID?crypto.randomUUID():"c"+Math.random().toString(36).slice(2));localStorage.setItem(LS+"_cid",clientId);}catch(e){clientId="c"+Math.random().toString(36).slice(2);}
 let unlocked=new Set();try{unlocked=new Set(JSON.parse(localStorage.getItem(LS+"_unlocked")||"[]"))}catch(e){}
@@ -198,25 +245,34 @@ function isMineMsg(m){return !!(m&&(m.cid?m.cid===clientId:m.u===me));}
 function attHas(m){return !!(m&&(m.img||(m.atts&&(Array.isArray(m.atts)?m.atts.length:Object.keys(m.atts).length))));}
 function msgPreview(m){return (m&&m.t)||(m&&m.img?"사진":(attHas(m)?"첨부":""));}
 function markSeen(name){unreadN[name]=0;if(lastKeyOf[name])seenKey[name]=lastKeyOf[name];saveUnread();}
-// 받는 쪽이 각 채널 메시지를 직접 감시 → 보낸 사람 버전과 무관하게 배지·알림이 뜸
-function watchAll(){
-  if(!db)return;
-  const names=Object.keys(chans);
-  Object.keys(watchers).forEach(n=>{if(!names.includes(n)){watchers[n].ref.off();delete watchers[n];}});
-  names.forEach(n=>{
-    if(watchers[n])return;
-    const ref=db.ref("msg/"+n).limitToLast(1);const w={ref:ref,primed:false};watchers[n]=w;
-    ref.on("value",s=>{
-      let key=null,msg=null;s.forEach(c=>{key=c.key;msg=c.val();});
-      if(!w.primed){w.primed=true;lastKeyOf[n]=key;if(seenKey[n]===undefined)seenKey[n]=key;else if(key&&key!==seenKey[n]&&n!==cur&&!unreadN[n])unreadN[n]=1;renderCh();return;}
-      if(key&&(!lastKeyOf[n]||key>lastKeyOf[n])){
-        lastKeyOf[n]=key;const viewing=(n===cur&&!document.hidden);
-        if(viewing){seenKey[n]=key;unreadN[n]=0;}
-        else if(!isMineMsg(msg)){unreadN[n]=(unreadN[n]||0)+1;notify("# "+n+" · "+((msg&&msg.u)||""),msgPreview(msg),n);}
-        saveUnread();renderCh();
-      }
-    });
+// DM 유틸: 두 clientId로 고유 키 생성(둘만 공유), 채널과 분리
+function isDM(k){return typeof k==="string"&&k.indexOf("dm_")===0;}
+function dmKey(a,b){return "dm_"+[a,b].sort().join("__");}
+function dmPeerOf(k){const s=k.slice(3).split("__");return s[0]===clientId?s[1]:s[0];}
+function msgPath(k){return isDM(k)?("dm/"+k+"/msg"):("msg/"+k);}
+function openKey(k){if(isDM(k)){const pid=dmPeerOf(k);openDM(pid,(dms[pid]&&dms[pid].name)||"대화");}else openCh(k);}
+
+// 받는 쪽이 각 대화 메시지를 직접 감시 → 보낸 사람 버전과 무관하게 배지·알림이 뜸
+function watchKey(k,title){
+  if(watchers[k])return;
+  const ref=db.ref(msgPath(k)).limitToLast(1);const w={ref:ref,primed:false};watchers[k]=w;
+  ref.on("value",s=>{
+    let key=null,msg=null;s.forEach(c=>{key=c.key;msg=c.val();});
+    if(!w.primed){w.primed=true;lastKeyOf[k]=key;if(seenKey[k]===undefined)seenKey[k]=key;else if(key&&key!==seenKey[k]&&k!==cur&&!unreadN[k])unreadN[k]=1;renderCh();return;}
+    if(key&&(!lastKeyOf[k]||key>lastKeyOf[k])){
+      lastKeyOf[k]=key;const viewing=(k===cur&&!document.hidden);
+      if(viewing){seenKey[k]=key;unreadN[k]=0;}
+      else if(!isMineMsg(msg)){unreadN[k]=(unreadN[k]||0)+1;notify(title+" · "+((msg&&msg.u)||""),msgPreview(msg),k);}
+      saveUnread();renderCh();
+    }
   });
+}
+function syncWatchers(){
+  if(!db)return;
+  const keys=Object.keys(chans).concat(Object.keys(dms).map(pid=>dmKey(clientId,pid)));
+  Object.keys(watchers).forEach(k=>{if(!keys.includes(k)){watchers[k].ref.off();delete watchers[k];}});
+  Object.keys(chans).forEach(n=>watchKey(n,"# "+n));
+  Object.keys(dms).forEach(pid=>watchKey(dmKey(clientId,pid),dms[pid].name||"대화"));
 }
 
 function shrink(file,maxW,q){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{let w=im.width,h=im.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/jpeg",q));};im.onerror=rej;im.src=fr.result;};fr.onerror=rej;fr.readAsDataURL(file);});}
@@ -227,10 +283,11 @@ function boot(nick){
   db=firebase.database();
   me=nick; el("myName").textContent=me;
   el("input").disabled=false; el("composer").querySelector(".send").disabled=false;
-  db.ref("profiles").on("value",s=>{profiles=s.val()||{};refreshMyAv();if(cur)renderFeed();});
+  db.ref("profiles").on("value",s=>{profiles=s.val()||{};refreshMyAv();if(cur)renderFeed();renderCh();});
   db.ref("profiles/"+clientId).update({name:me,img:myImg||null});
+  db.ref("dmIndex/"+clientId).on("value",s=>{dms=s.val()||{};syncWatchers();renderCh();});
   let opened=false;
-  db.ref("channels").on("value",s=>{chans=s.val()||{};if(!Object.keys(chans).length)chans={"일반":1};watchAll();if(!opened){opened=true;const st=(lastCur&&chans[lastCur])?lastCur:Object.keys(chans)[0];openCh(st);}else if(!chans[cur]){openCh(Object.keys(chans)[0]);}renderCh();});
+  db.ref("channels").on("value",s=>{chans=s.val()||{};if(!Object.keys(chans).length)chans={"일반":1};syncWatchers();if(!opened){opened=true;const st=(lastCur&&chans[lastCur])?lastCur:Object.keys(chans)[0];openCh(st);}else if(!isDM(cur)&&!chans[cur]){openCh(Object.keys(chans)[0]);}renderCh();});
 }
 function refreshMyAv(){const p=profiles[clientId];const a=el("miniAv");if(p&&p.img){a.style.backgroundImage="url("+p.img+")";}else a.style.backgroundImage="";}
 function closeDrawer(){el("side").classList.remove("open");el("scrim").classList.remove("show");}
@@ -251,19 +308,47 @@ function renderCh(){
     d.onclick=()=>{openCh(name);closeDrawer();};
     w.appendChild(d);
   });
+  const pids=Object.keys(dms);
+  if(pids.length){
+    const lab=document.createElement("div");lab.className="chlab";lab.textContent="다이렉트";w.appendChild(lab);
+    pids.sort((a,b)=>((dms[b].ts||0)-(dms[a].ts||0))).forEach(pid=>{
+      const key=dmKey(clientId,pid);const nm=(dms[pid]&&dms[pid].name)||"대화";
+      const d=document.createElement("div");d.className="ch"+(key===cur?" on":"");
+      const av=document.createElement("span");av.className="cav";const pr=profiles[pid];
+      if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else av.textContent=init(nm);
+      const sp=document.createElement("span");sp.className="nm";sp.textContent=nm;
+      d.appendChild(av);d.appendChild(sp);
+      const u=unreadOf(key);if(u>0&&key!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
+      d.onclick=()=>{openDM(pid,nm);closeDrawer();};
+      w.appendChild(d);
+    });
+  }
 }
 
 let currentArr=[];
+function attachFeed(){
+  el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
+  if(unsub)unsub.off();
+  const ref=db.ref(msgPath(cur)).limitToLast(300);unsub=ref;
+  ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden)markSeen(cur);renderFeed();});
+  listenTyping(cur);
+}
 function openCh(name){
   const pw=chanPw(name);
   if(pw && !unlocked.has(name)){const inp=prompt('🔒 "'+name+'" 채널 비밀번호');if(inp===null)return;if(hash(inp)!==pw){alert("비밀번호가 틀렸습니다.");return;}unlocked.add(name);saveUnlocked();}
   if(cur&&db&&cur!==name)db.ref("typing/"+cur+"/"+clientId).remove();
-  cur=name;try{localStorage.setItem(LS+"_cur",name)}catch(e){}el("chName").textContent="# "+name;markSeen(name);renderCh();
-  el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
-  if(unsub)unsub.off();
-  const ref=db.ref("msg/"+name).limitToLast(300);unsub=ref;
-  ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden)markSeen(name);renderFeed();});
-  listenTyping(name);
+  cur=name;curPeer=null;try{localStorage.setItem(LS+"_cur",name)}catch(e){}
+  el("chName").textContent="# "+name;el("chName").title="채널 설정";
+  markSeen(name);renderCh();attachFeed();
+}
+function openDM(peerId,peerName){
+  if(!peerId||peerId===clientId){alert("자기 자신과는 1:1 대화를 할 수 없어요.");return;}
+  const key=dmKey(clientId,peerId);const nm=peerName||(profiles[peerId]&&profiles[peerId].name)||"대화";
+  if(cur&&db&&cur!==key)db.ref("typing/"+cur+"/"+clientId).remove();
+  cur=key;curPeer={id:peerId,name:nm};try{localStorage.setItem(LS+"_cur",key)}catch(e){}
+  el("chName").textContent=nm;el("chName").title="1:1 대화";
+  db.ref("dmIndex/"+clientId+"/"+peerId).update({name:nm,ts:Date.now()});
+  markSeen(key);renderCh();attachFeed();
 }
 function attArray(m){return Array.isArray(m.atts)?m.atts:(m.atts?Object.values(m.atts):[]);}
 function renderFeed(){
@@ -280,12 +365,13 @@ function renderFeed(){
     let p=profiles[m.cid];
     if(!(p&&p.img)){const byName=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(byName)p=byName;}
     if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else av.textContent=init(m.u);
+    av.onclick=()=>openPeer(m.cid,m.u);
     const col=document.createElement("div");
-    const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;col.appendChild(meta);
-    if(m.img){const im=document.createElement("img");im.className="photo";im.src=m.img;im.onclick=()=>window.open(m.img,"_blank");col.appendChild(im);}
+    const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;meta.onclick=()=>openPeer(m.cid,m.u);col.appendChild(meta);
+    if(m.img){const im=document.createElement("img");im.className="photo";im.src=m.img;im.onclick=()=>openViewer(m.img,"image.jpg","image");col.appendChild(im);}
     attArray(m).forEach(a=>{
-      if(a.kind==="image"){const im=document.createElement("img");im.className="photo";im.src=a.data;im.onclick=()=>window.open(a.data,"_blank");col.appendChild(im);}
-      else{const lk=document.createElement("a");lk.className="filechip";lk.href=a.data;lk.download=a.name||"file";lk.textContent="📎 "+(a.name||"파일")+(a.size?" ("+fmtSize(a.size)+")":"");col.appendChild(lk);}
+      if(a.kind==="image"){const im=document.createElement("img");im.className="photo";im.src=a.data;im.onclick=()=>openViewer(a.data,a.name||"image.jpg","image");col.appendChild(im);}
+      else{const lk=document.createElement("div");lk.className="filechip";lk.textContent="📎 "+(a.name||"파일")+(a.size?" ("+fmtSize(a.size)+")":"");lk.onclick=()=>openViewer(a.data,a.name||"파일","file");col.appendChild(lk);}
     });
     if(m.t){const b=document.createElement("div");b.className="bub";b.textContent=m.t;col.appendChild(b);}
     row.appendChild(av);row.appendChild(col);
@@ -294,10 +380,13 @@ function renderFeed(){
   });
   feed.scrollTop=feed.scrollHeight;
 }
-function deleteMsg(key){if(!key||!db)return;if(!confirm("이 메시지를 삭제할까요?"))return;db.ref("msg/"+cur+"/"+key).remove();}
+function deleteMsg(key){if(!key||!db)return;if(!confirm("이 메시지를 삭제할까요?"))return;db.ref(msgPath(cur)+"/"+key).remove();}
 
 // 전송 (텍스트 + 첨부)
-el("composer").onsubmit=e=>{e.preventDefault();const v=el("input").value.trim();if((!v&&!pend.length)||!db)return;const msg={u:me,cid:clientId,t:v,ts:Date.now()};if(pend.length)msg.atts=pend.map(a=>a.kind==="image"?{kind:"image",data:a.data}:{kind:"file",data:a.data,name:a.name,size:a.size});db.ref("msg/"+cur).push(msg);const prev=v||(pend.some(a=>a.kind==="image")?"사진":"파일");bumpSeq(cur);db.ref("meta/"+cur+"/last").set({u:me,t:prev.slice(0,40),ts:Date.now()});pend=[];renderPend();el("input").value="";stopTyping();};
+el("composer").onsubmit=e=>{e.preventDefault();const v=el("input").value.trim();if((!v&&!pend.length)||!db)return;const msg={u:me,cid:clientId,t:v,ts:Date.now()};if(pend.length)msg.atts=pend.map(a=>a.kind==="image"?{kind:"image",data:a.data}:{kind:"file",data:a.data,name:a.name,size:a.size});db.ref(msgPath(cur)).push(msg);const prev=v||(pend.some(a=>a.kind==="image")?"사진":"파일");
+  if(isDM(cur)){const pid=curPeer?curPeer.id:dmPeerOf(cur);const t=Date.now();db.ref("dmIndex/"+clientId+"/"+pid).update({name:(curPeer&&curPeer.name)||(profiles[pid]&&profiles[pid].name)||"대화",ts:t});db.ref("dmIndex/"+pid+"/"+clientId).update({name:me,ts:t});}
+  else{bumpSeq(cur);db.ref("meta/"+cur+"/last").set({u:me,t:prev.slice(0,40),ts:Date.now()});}
+  pend=[];renderPend();el("input").value="";autoGrow();stopTyping();};
 
 // 첨부(이미지+파일) / 클립보드 붙여넣기 / 미리보기
 el("attachBtn").onclick=()=>el("attachFile").click();
@@ -319,8 +408,8 @@ function stopTyping(){clearTimeout(typingTimer);if(db&&cur)db.ref("typing/"+cur+
 function listenTyping(name){if(typingRef)typingRef.off();typingRef=db.ref("typing/"+name);typingRef.on("value",s=>{const now=Date.now();const names=[];s.forEach(c=>{const v=c.val();if(c.key!==clientId&&v&&v.ts>now-5000)names.push(v.name);});const box=el("typing");if(!names.length){box.classList.remove("show");box.textContent="";return;}box.classList.add("show");box.innerHTML='<span class="tdots"><i></i><i></i><i></i></span>';const who=(names.length<=2?names.join(", "):names.length+"명");const t=document.createElement("span");t.textContent=who+"님이 입력 중";box.appendChild(t);});}
 
 // 알림
-function toast(title,body,ch){const w=el("toasts");if(!w)return;const d=document.createElement("div");d.className="toast";d.innerHTML='<span class="tx">×</span><div class="tt"></div><div class="tb"></div>';d.querySelector(".tt").textContent=title;d.querySelector(".tb").textContent=body||"";d.querySelector(".tx").onclick=e=>{e.stopPropagation();d.remove();};d.onclick=()=>{if(ch)openCh(ch);d.remove();};w.appendChild(d);while(w.children.length>4)w.firstChild.remove();setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},6000);}
-async function notify(title,body,ch){toast(title,body,ch);if(!("Notification"in window)||Notification.permission!=="granted")return;const opts={body:body||"",tag:"tt-"+ch,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch}};try{if(navigator.serviceWorker){const reg=await navigator.serviceWorker.ready;if(reg&&reg.showNotification){await reg.showNotification(title,opts);return;}}}catch(e){}try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();if(ch)openCh(ch);n.close();};}catch(e){}}
+function toast(title,body,ch){const w=el("toasts");if(!w)return;const d=document.createElement("div");d.className="toast";d.innerHTML='<span class="tx">×</span><div class="tt"></div><div class="tb"></div>';d.querySelector(".tt").textContent=title;d.querySelector(".tb").textContent=body||"";d.querySelector(".tx").onclick=e=>{e.stopPropagation();d.remove();};d.onclick=()=>{if(ch)openKey(ch);d.remove();};w.appendChild(d);while(w.children.length>4)w.firstChild.remove();setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},6000);}
+async function notify(title,body,ch){toast(title,body,ch);if(!("Notification"in window)||Notification.permission!=="granted")return;const opts={body:body||"",tag:"tt-"+ch,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch}};try{if(navigator.serviceWorker){const reg=await navigator.serviceWorker.ready;if(reg&&reg.showNotification){await reg.showNotification(title,opts);return;}}}catch(e){}try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();if(ch)openKey(ch);n.close();};}catch(e){}}
 function updNotifBtn(){const b=el("notifBtn");if(!b)return;if(!("Notification"in window)){b.style.display="none";return;}const p=Notification.permission;if(p==="granted"){b.style.display="none";}else if(p==="denied"){b.style.display="";b.textContent="🔕 알림 차단됨";b.title="주소창 자물쇠 → 알림 → 허용 으로 바꾼 뒤 새로고침하세요";}else{b.style.display="";b.textContent="🔔 알림 켜기";b.title="클릭하면 윈도우 알림을 켭니다";}}
 window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 
@@ -328,8 +417,54 @@ window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 el("nameBtn").onclick=()=>{el("pName").value=me;const pv=el("pavPreview");if(myImg){pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}else{pv.style.backgroundImage="";pv.textContent=init(me);}el("pErr").textContent="";el("profileOv").classList.add("show");};
 el("pavPreview").onclick=()=>el("profileFile").click();
 el("profileFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{myImg=await shrink(f,160,0.7);const pv=el("pavPreview");pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}catch(err){el("pErr").textContent="사진을 불러오지 못했습니다.";}};
-el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;el("myName").textContent=me;try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref("msg/"+cur).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
+el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;el("myName").textContent=me;try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref(msgPath(cur)).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
 el("pClose").onclick=()=>el("profileOv").classList.remove("show");
+
+// 상대 프로필 보기 → 1:1 대화
+function openPeer(cid,name){
+  let pid=cid;
+  if(!pid&&name){const f=Object.entries(profiles).find(([k,v])=>v&&v.name===name);if(f)pid=f[0];}
+  const prof=(pid&&profiles[pid])||{};const nm=prof.name||name||"사용자";
+  const av=el("peerAv");if(prof.img){av.style.backgroundImage="url("+prof.img+")";av.textContent="";}else{av.style.backgroundImage="";av.textContent=init(nm);}
+  el("peerName").textContent=nm;
+  const b=el("peerDM");
+  if(pid&&pid!==clientId){b.style.display="";b.onclick=()=>{el("peerOv").classList.remove("show");openDM(pid,nm);closeDrawer();};}
+  else{b.style.display="none";}
+  el("peerOv").classList.add("show");
+}
+el("peerClose").onclick=()=>el("peerOv").classList.remove("show");
+el("peerOv").onclick=e=>{if(e.target===el("peerOv"))el("peerOv").classList.remove("show");};
+
+// 파일/이미지 앱 내 미리보기(라이트박스)
+function openViewer(data,name,kind){
+  if(!data)return;
+  const mime=(String(data).match(/^data:([^;,]+)/)||[])[1]||"";
+  const body=el("viewerBody");body.innerHTML="";
+  el("viewerName").textContent=name||"";el("viewerDl").href=data;el("viewerDl").download=name||"file";
+  if(kind==="image"||/^image\//.test(mime)){const im=document.createElement("img");im.src=data;body.appendChild(im);}
+  else if(mime==="application/pdf"){const f=document.createElement("iframe");f.className="vframe";f.src=data;body.appendChild(f);}
+  else if(/^video\//.test(mime)){const v=document.createElement("video");v.src=data;v.controls=true;body.appendChild(v);}
+  else if(/^audio\//.test(mime)){const a=document.createElement("audio");a.src=data;a.controls=true;body.appendChild(a);}
+  else if(/^text\//.test(mime)||/(json|xml|csv|javascript|html|svg)/.test(mime)){const pre=document.createElement("pre");pre.className="vtext";pre.textContent="불러오는 중…";body.appendChild(pre);fetch(data).then(r=>r.text()).then(t=>pre.textContent=t.slice(0,300000)).catch(()=>pre.textContent="미리볼 수 없습니다.");}
+  else{const d=document.createElement("div");d.className="vnone";d.textContent="이 형식은 미리보기를 지원하지 않습니다.\n아래 '다운로드'로 확인하세요.";body.appendChild(d);}
+  el("viewer").classList.add("show");
+}
+function closeViewer(){el("viewer").classList.remove("show");el("viewerBody").innerHTML="";}
+el("viewerClose").onclick=closeViewer;
+el("viewer").onclick=e=>{if(e.target===el("viewer"))closeViewer();};
+
+// 입력창 자동 높이 + Shift+Enter 줄바꿈 / Enter 전송
+function autoGrow(){const t=el("input");t.style.height="auto";t.style.height=Math.min(t.scrollHeight,120)+"px";}
+el("input").addEventListener("input",autoGrow);
+el("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(el("composer").requestSubmit)el("composer").requestSubmit();else el("composer").dispatchEvent(new Event("submit",{cancelable:true}));}});
+
+// 설치·알림 안내 가이드
+el("helpBtn").onclick=()=>el("guideOv").classList.add("show");
+el("setupGuide").onclick=()=>el("guideOv").classList.add("show");
+el("guideClose").onclick=()=>el("guideOv").classList.remove("show");
+el("guideOv").onclick=e=>{if(e.target===el("guideOv"))el("guideOv").classList.remove("show");};
+el("guideNotif").onclick=()=>{el("guideOv").classList.remove("show");if(el("notifBtn").onclick)el("notifBtn").onclick();};
+function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){localStorage.setItem(LS+"_onboard","1");setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
 
 // 채널 설정 모달 (만들기 / 이름변경 / 비밀번호)
 function openChanModal(name){
@@ -346,7 +481,7 @@ function openChanModal(name){
   el("chanOv").classList.add("show");
 }
 el("addch").onclick=()=>openChanModal(null);
-el("chName").onclick=()=>openChanModal(cur);
+el("chName").onclick=()=>{if(isDM(cur)){openPeer(curPeer&&curPeer.id,curPeer&&curPeer.name);}else openChanModal(cur);};
 el("chanClose").onclick=()=>el("chanOv").classList.remove("show");
 el("chanSave").onclick=async()=>{
   const nm=el("chanName").value.trim();const pw=el("chanPwInput").value.trim();
@@ -391,7 +526,7 @@ function shareLink(){return location.origin+location.pathname;}
 el("shareBtn").onclick=()=>{const url=shareLink();el("qrbox").innerHTML="";try{const c=document.createElement("canvas");el("qrbox").appendChild(c);new QRious({element:c,value:url,size:200,level:"M"});}catch(e){el("qrbox").textContent="QR 생성 실패";}el("shareUrl").value=url;el("shareOv").classList.add("show");};
 el("shareClose").onclick=()=>el("shareOv").classList.remove("show");
 el("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(shareLink());el("copyBtn").textContent="복사됨 ✓";setTimeout(()=>el("copyBtn").textContent="링크 복사",1500);}catch(e){el("shareUrl").select();document.execCommand("copy");}};
-el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
+el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");maybeOnboard();if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
 el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
 el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("팀톡","알림이 켜졌어요 🎉",cur);});};

@@ -1,5 +1,5 @@
 // 팀톡 서비스워커 — 설치/오프라인 셸 캐시 (네트워크 우선)
-const CACHE = "teamtalk-v12";
+const CACHE = "teamtalk-v13";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
