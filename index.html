@@ -221,7 +221,7 @@ function openCh(name){
   el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
   if(unsub)unsub.off();
   const ref=db.ref("msg/"+name).limitToLast(300);unsub=ref;
-  ref.on("value",s=>{currentArr=[];s.forEach(c=>currentArr.push(Object.assign({__key:c.key},c.val())));if(!document.hidden)markSeen(name);renderFeed();});
+  ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden)markSeen(name);renderFeed();});
   listenTyping(name);
 }
 function attArray(m){return Array.isArray(m.atts)?m.atts:(m.atts?Object.values(m.atts):[]);}
