@@ -11,56 +11,60 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,"Segoe UI","Malgun Gothic",sans-serif;height:100vh;height:100dvh;display:flex;overflow:hidden}
 button{font-family:inherit}
-.side{width:230px;background:var(--side);color:var(--side-txt);display:flex;flex-direction:column;flex-shrink:0;z-index:20}
+.side{width:240px;background:var(--side);color:var(--side-txt);display:flex;flex-direction:column;flex-shrink:0;z-index:20}
 .brand{padding:16px;font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.1)}
 .dot{width:10px;height:10px;border-radius:3px;background:var(--accent)}
 .chlist{flex:1;overflow:auto;padding:8px 6px}
 .chlab{font-size:11px;text-transform:uppercase;opacity:.6;padding:10px 10px 4px}
-.ch{padding:9px 10px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:6px;opacity:.85}
+.ch{padding:9px 8px 9px 10px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:4px;opacity:.85}
 .ch:hover{background:rgba(255,255,255,.08)}.ch.on{background:rgba(255,255,255,.16);opacity:1;font-weight:600}
 .ch .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ch .edit{opacity:0;font-size:13px;padding:2px}.ch:hover .edit,.ch.on .edit{opacity:.7}
+.ch .act{opacity:0;font-size:13px;padding:2px 3px;border-radius:5px}
+.ch .act:hover{background:rgba(255,255,255,.18)}
+.badge{background:#ff3b30;color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0}
+.ch:hover .act,.ch.on .act{opacity:.75}
 .addch{margin:6px 10px;padding:9px 10px;border:1px dashed rgba(255,255,255,.25);border-radius:8px;cursor:pointer;font-size:13px;opacity:.7;text-align:center}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.top{padding:12px 14px;border-top:env(safe-area-inset-top) solid transparent;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:10px}
+.top{padding:12px 14px;border-top:env(safe-area-inset-top) solid transparent;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:8px}
 .ham{display:none;background:none;border:0;font-size:22px;color:var(--txt);cursor:pointer;padding:0 2px;line-height:1}
 .top .titwrap{flex:1;min-width:0}
 .top h2{margin:0;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
 .top small{color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iconbtn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:7px 10px;cursor:pointer;font-size:13px;white-space:nowrap}
-.iconbtn.me{color:var(--accent);border-color:var(--accent);font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.iconbtn.me{color:var(--accent);border-color:var(--accent);font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;gap:6px}
+.mini{width:20px;height:20px;border-radius:6px;background:var(--accent);background-size:cover;background-position:center;flex-shrink:0}
 .feed{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
 .msg{display:flex;gap:10px;max-width:74%}.msg.me{align-self:flex-end;flex-direction:row-reverse}
-.av{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.av{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
 .bub{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:9px 12px;font-size:15px;line-height:1.45;word-break:break-word}
 .msg.me .bub{background:var(--me);color:var(--me-txt);border-color:transparent}
+.photo{max-width:230px;max-height:280px;border-radius:12px;display:block;margin-bottom:4px;cursor:pointer;border:1px solid var(--line)}
 .meta{font-size:11px;color:var(--muted);margin-bottom:3px}.msg.me .meta{text-align:right}
 .sysmsg{align-self:center;background:var(--sys);color:var(--muted);font-size:12.5px;padding:5px 12px;border-radius:20px;max-width:85%;text-align:center}
-.composer{border-top:1px solid var(--line);background:var(--panel);padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px}
-.composer input{flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--txt);font-size:16px}
-.composer input:focus{outline:2px solid var(--accent);border-color:transparent}
-.composer button{padding:0 18px;border:0;border-radius:11px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
+.typing{display:none;padding:3px 16px 0;font-size:12px;color:var(--muted);font-style:italic}
+.composer{border-top:1px solid var(--line);background:var(--panel);padding:10px 12px;padding-bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center}
+.composer .attach{background:var(--bg);border:1px solid var(--line);color:var(--muted);width:42px;height:44px;border-radius:11px;cursor:pointer;font-size:18px;flex-shrink:0}
+.composer input[type=text]{flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--txt);font-size:16px}
+.composer input[type=text]:focus{outline:2px solid var(--accent);border-color:transparent}
+.composer .send{padding:0 18px;height:44px;border:0;border-radius:11px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
 .empty{color:var(--muted);text-align:center;margin:auto;font-size:14px;line-height:1.6}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:40}
 .ov.show{display:flex}
 .card{background:var(--panel);border-radius:16px;padding:22px;max-width:360px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center}
 .card h3{margin:0 0 6px}.card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 14px}
-.card input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--txt);font-size:16px;margin-bottom:10px}
+.card input[type=text],.card input[type=password]{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--txt);font-size:16px;margin-bottom:10px}
 .card button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
 .card .ghost{background:transparent;color:var(--muted);border:1px solid var(--line);margin-top:8px}
-.err{color:#d6455b;font-size:12px;margin-bottom:10px}
-#qrbox{display:flex;justify-content:center;margin:6px 0 12px}
-#qrbox canvas{border-radius:10px}
-.linkrow{display:flex;gap:6px;margin-bottom:6px}
-.linkrow input{margin:0;font-size:12px}
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15;display:none}
-.scrim.show{display:block}
+.err{color:#d6455b;font-size:12px;margin-bottom:10px;min-height:1px}
+#qrbox{display:flex;justify-content:center;margin:6px 0 12px}#qrbox canvas{border-radius:10px}
+.linkrow{display:flex;gap:6px;margin-bottom:6px}.linkrow input{margin:0;font-size:12px}
+.pavwrap{display:flex;justify-content:center;margin-bottom:12px}
+.pav{width:84px;height:84px;border-radius:22px;background:var(--accent);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;font-weight:700;cursor:pointer;position:relative}
+.pav::after{content:"📷";position:absolute;right:-4px;bottom:-4px;font-size:16px;background:var(--panel);border-radius:50%;padding:2px}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15;display:none}.scrim.show{display:block}
 @media(max-width:720px){
   .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
-  .side.open{transform:translateX(0)}
-  .ham{display:block}
-  .msg{max-width:86%}
-  .iconbtn.lbl{padding:7px 9px}
+  .side.open{transform:translateX(0)} .ham{display:block} .msg{max-width:86%}
 }
 </style>
 </head>
@@ -76,33 +80,44 @@ button{font-family:inherit}
     <button class="ham" id="ham" aria-label="채널">☰</button>
     <div class="titwrap"><h2 id="chName" title="채널 이름 변경"># 일반</h2><small id="chSub"></small></div>
     <button class="iconbtn" id="shareBtn">🔗 공유</button>
-    <button class="iconbtn me" id="nameBtn">●</button>
+    <button class="iconbtn me" id="nameBtn"><span class="mini" id="miniAv"></span><span id="myName">나</span></button>
     <button class="iconbtn" id="themeBtn">🌓</button>
   </div>
   <div class="feed" id="feed"></div>
-  <form class="composer" id="composer"><input id="input" placeholder="메시지 입력…" autocomplete="off" disabled><button type="submit" disabled>보내기</button></form>
+  <div class="typing" id="typing"></div>
+  <form class="composer" id="composer">
+    <button type="button" class="attach" id="attachBtn" title="사진 첨부">🖼</button>
+    <input type="text" id="input" placeholder="메시지 입력…" autocomplete="off" disabled>
+    <button type="submit" class="send" disabled>보내기</button>
+  </form>
 </main>
+<input type="file" id="photoFile" accept="image/*" style="display:none">
+<input type="file" id="profileFile" accept="image/*" style="display:none">
 
-<div class="ov show" id="setup">
-  <div class="card">
-    <h3>팀톡 입장</h3>
-    <p>대화명을 입력하고 입장하세요. 같은 앱을 연 사람끼리 실시간으로 대화됩니다.</p>
-    <input id="nick" placeholder="대화명 (예: 홍길동)">
-    <div class="err" id="cfgErr"></div>
-    <button id="connect">입장하기</button>
-  </div>
-</div>
+<div class="ov show" id="setup"><div class="card">
+  <h3>팀톡 입장</h3>
+  <p>대화명을 입력하고 입장하세요. 같은 앱을 연 사람끼리 실시간으로 대화됩니다.</p>
+  <input type="text" id="nick" placeholder="대화명 (예: 홍길동)">
+  <div class="err" id="cfgErr"></div>
+  <button id="connect">입장하기</button>
+</div></div>
 
-<div class="ov" id="shareOv">
-  <div class="card">
-    <h3>초대 링크</h3>
-    <p>이 QR을 찍거나 링크를 보내면 누구나 들어올 수 있어요.</p>
-    <div id="qrbox"></div>
-    <div class="linkrow"><input id="shareUrl" readonly></div>
-    <button id="copyBtn">링크 복사</button>
-    <button class="ghost" id="shareClose">닫기</button>
-  </div>
-</div>
+<div class="ov" id="shareOv"><div class="card">
+  <h3>초대 링크</h3><p>이 QR을 찍거나 링크를 보내면 누구나 들어올 수 있어요.</p>
+  <div id="qrbox"></div>
+  <div class="linkrow"><input type="text" id="shareUrl" readonly></div>
+  <button id="copyBtn">링크 복사</button>
+  <button class="ghost" id="shareClose">닫기</button>
+</div></div>
+
+<div class="ov" id="profileOv"><div class="card">
+  <h3>내 프로필</h3>
+  <div class="pavwrap"><div class="pav" id="pavPreview"></div></div>
+  <input type="text" id="pName" placeholder="대화명">
+  <div class="err" id="pErr"></div>
+  <button id="pSave">저장</button>
+  <button class="ghost" id="pClose">닫기</button>
+</div></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -112,93 +127,144 @@ const LS="teamtalk_fb";
 const FB={databaseURL:"https://ymx-ae932-default-rtdb.firebaseio.com"};
 const el=id=>document.getElementById(id);
 const init=s=>(s||"?").trim()[0]||"?";
-let db, me, cur="일반", chans={"일반":1}, unsub=null;
+// 간단 해시(cyrb53) — 보안이 아닌 UI 잠금용
+function hash(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
+
+let db, me, myImg=null, cur="일반", chans={"일반":1}, profiles={}, unsub=null, typingRef=null, typingTimer=null, lastType=0;
+let clientId;
+try{clientId=localStorage.getItem(LS+"_cid")||(crypto.randomUUID?crypto.randomUUID():"c"+Math.random().toString(36).slice(2));localStorage.setItem(LS+"_cid",clientId);}catch(e){clientId="c"+Math.random().toString(36).slice(2);}
+let unlocked=new Set();try{unlocked=new Set(JSON.parse(localStorage.getItem(LS+"_unlocked")||"[]"))}catch(e){}
+function saveUnlocked(){try{localStorage.setItem(LS+"_unlocked",JSON.stringify([...unlocked]))}catch(e){}}
+function chanPw(name){const v=chans[name];return (v&&typeof v==="object"&&v.pw)?v.pw:null;}
+let meta={}, seenSeq={};try{seenSeq=JSON.parse(localStorage.getItem(LS+"_seen")||"{}")}catch(e){}
+function saveSeen(){try{localStorage.setItem(LS+"_seen",JSON.stringify(seenSeq))}catch(e){}}
+function unreadOf(name){const sq=(meta[name]&&meta[name].seq)||0;if(seenSeq[name]===undefined)return 0;return Math.max(0,sq-seenSeq[name]);}
+function bumpSeq(ch){db.ref("meta/"+ch+"/seq").transaction(n=>(n||0)+1);}
+function markSeen(name){if(meta[name])seenSeq[name]=(meta[name].seq)||0;saveSeen();}
+
+// 이미지 리사이즈/압축 → dataURL
+function shrink(file,maxW,q){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{let w=im.width,h=im.height;if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);res(c.toDataURL("image/jpeg",q));};im.onerror=rej;im.src=fr.result;};fr.onerror=rej;fr.readAsDataURL(file);});}
 
 function boot(nick){
   if(!firebase.apps.length)firebase.initializeApp(FB);
   db=firebase.database();
-  me=nick; el("nameBtn").textContent="● "+me;
-  el("input").disabled=false; el("composer").querySelector("button").disabled=false;
+  me=nick; el("myName").textContent=me;
+  el("input").disabled=false; el("composer").querySelector(".send").disabled=false;
+  db.ref("profiles").on("value",s=>{profiles=s.val()||{};refreshMyAv();if(cur)rerenderCurrent();});
+  db.ref("profiles/"+clientId).update({name:me,img:myImg||null});
   db.ref("channels").on("value",s=>{chans=Object.assign({"일반":1},s.val()||{});renderCh();});
+  db.ref("meta").on("value",s=>{meta=s.val()||{};Object.keys(meta).forEach(n=>{if(seenSeq[n]===undefined)seenSeq[n]=(meta[n]&&meta[n].seq)||0;});if(meta[cur])seenSeq[cur]=(meta[cur].seq)||0;saveSeen();renderCh();});
   openCh(cur);
 }
+function refreshMyAv(){const p=profiles[clientId];const a=el("miniAv");if(p&&p.img){a.style.backgroundImage="url("+p.img+")";}else a.style.backgroundImage="";}
 function closeDrawer(){el("side").classList.remove("open");el("scrim").classList.remove("show");}
+
 function renderCh(){
   const w=el("chlist");w.innerHTML='<div class="chlab">채널</div>';
   Object.keys(chans).forEach(name=>{
+    const locked=!!chanPw(name);
     const d=document.createElement("div");d.className="ch"+(name===cur?" on":"");
-    const nm=document.createElement("span");nm.className="nm";nm.textContent="# "+name;
-    const ed=document.createElement("span");ed.className="edit";ed.textContent="✎";ed.title="채널 이름 변경";
+    const nm=document.createElement("span");nm.className="nm";nm.textContent=(locked?"🔒 ":"# ")+name;
+    const ed=document.createElement("span");ed.className="act";ed.textContent="✎";ed.title="이름 변경";
     ed.onclick=e=>{e.stopPropagation();renameChannel(name);};
-    d.appendChild(nm);d.appendChild(ed);
+    const del=document.createElement("span");del.className="act";del.textContent="🗑";del.title="채널 삭제";
+    del.onclick=e=>{e.stopPropagation();deleteChannel(name);};
+    d.appendChild(nm);
+    const u=unreadOf(name);if(u>0&&name!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
+    d.appendChild(ed);d.appendChild(del);
     d.onclick=()=>{openCh(name);closeDrawer();};
     w.appendChild(d);
   });
 }
+
+let currentArr=[];
 function openCh(name){
-  cur=name;el("chName").firstChild&&(el("chName").textContent="# "+name);renderCh();
+  const pw=chanPw(name);
+  if(pw && !unlocked.has(name)){
+    const inp=prompt('🔒 "'+name+'" 채널 비밀번호');
+    if(inp===null)return;
+    if(hash(inp)!==pw){alert("비밀번호가 틀렸습니다.");return;}
+    unlocked.add(name);saveUnlocked();
+  }
+  if(cur&&db&&cur!==name)db.ref("typing/"+cur+"/"+clientId).remove();
+  cur=name;el("chName").textContent="# "+name;markSeen(name);renderCh();
   el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
   if(unsub)unsub.off();
-  const ref=db.ref("msg/"+name).limitToLast(300);unsub=ref;const feed=el("feed");
-  ref.on("value",s=>{
-    const arr=Object.values(s.val()||{});
-    const talk=arr.filter(m=>!m.sys);
-    el("chSub").textContent=talk.length?talk.length+"개 메시지":"첫 메시지를 남겨보세요";
-    feed.innerHTML="";
-    if(!arr.length){feed.innerHTML='<div class="empty">아직 메시지가 없어요.</div>';return}
-    arr.forEach(m=>{
-      if(m.sys){const s=document.createElement("div");s.className="sysmsg";s.textContent=m.t;feed.appendChild(s);return;}
-      const mine=m.u===me;const d=document.createElement("div");d.className="msg"+(mine?" me":"");
-      d.innerHTML='<div class="av">'+init(m.u)+'</div><div><div class="meta">'+m.u+'</div><div class="bub"></div></div>';
-      d.querySelector(".bub").textContent=m.t;feed.appendChild(d);
-    });
-    feed.scrollTop=feed.scrollHeight;
+  const ref=db.ref("msg/"+name).limitToLast(300);unsub=ref;
+  ref.on("value",s=>{currentArr=[];s.forEach(c=>currentArr.push(c.val()));renderFeed();});
+  listenTyping(name);
+}
+function rerenderCurrent(){renderFeed();}
+function renderFeed(){
+  const feed=el("feed");const arr=currentArr;
+  const talk=arr.filter(m=>!m.sys);
+  el("chSub").textContent=talk.length?talk.length+"개 메시지":"첫 메시지를 남겨보세요";
+  feed.innerHTML="";
+  if(!arr.length){feed.innerHTML='<div class="empty">아직 메시지가 없어요.</div>';return;}
+  arr.forEach(m=>{
+    if(m.sys){const s=document.createElement("div");s.className="sysmsg";s.textContent=m.t;feed.appendChild(s);return;}
+    const mine=m.cid?m.cid===clientId:(m.u===me);
+    const row=document.createElement("div");row.className="msg"+(mine?" me":"");
+    const av=document.createElement("div");av.className="av";
+    const p=profiles[m.cid];
+    if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else av.textContent=init(m.u);
+    const col=document.createElement("div");
+    const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;col.appendChild(meta);
+    if(m.img){const im=document.createElement("img");im.className="photo";im.src=m.img;im.onclick=()=>window.open(m.img,"_blank");col.appendChild(im);}
+    if(m.t){const b=document.createElement("div");b.className="bub";b.textContent=m.t;col.appendChild(b);}
+    row.appendChild(av);row.appendChild(col);feed.appendChild(row);
   });
+  feed.scrollTop=feed.scrollHeight;
 }
-el("composer").onsubmit=e=>{e.preventDefault();const v=el("input").value.trim();if(!v||!db)return;db.ref("msg/"+cur).push({u:me,t:v,ts:Date.now()});el("input").value="";};
 
-// 1) 이름 변경 + 공지
-function changeName(){
-  const n=prompt("새 대화명",me);if(n===null)return;const nn=n.trim();if(!nn||nn===me)return;
-  const old=me;me=nn;el("nameBtn").textContent="● "+me;
-  try{localStorage.setItem(LS,JSON.stringify({nick:me}))}catch(e){}
-  db.ref("msg/"+cur).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});
+// 전송
+el("composer").onsubmit=e=>{e.preventDefault();const v=el("input").value.trim();if(!v||!db)return;db.ref("msg/"+cur).push({u:me,cid:clientId,t:v,ts:Date.now()});bumpSeq(cur);el("input").value="";stopTyping();};
+// 사진 첨부
+el("attachBtn").onclick=()=>el("photoFile").click();
+el("photoFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f||!db)return;try{const data=await shrink(f,900,0.55);const cap=el("input").value.trim();db.ref("msg/"+cur).push({u:me,cid:clientId,img:data,t:cap||"",ts:Date.now()});bumpSeq(cur);el("input").value="";stopTyping();}catch(err){alert("사진을 불러오지 못했습니다.");}};
+
+// 입력 중 표시
+el("input").addEventListener("input",()=>{if(!db||!me)return;const now=Date.now();if(now-lastType>900){lastType=now;const r=db.ref("typing/"+cur+"/"+clientId);r.set({name:me,ts:now});r.onDisconnect().remove();}clearTimeout(typingTimer);typingTimer=setTimeout(stopTyping,2500);});
+function stopTyping(){clearTimeout(typingTimer);if(db&&cur)db.ref("typing/"+cur+"/"+clientId).remove();}
+function listenTyping(name){
+  if(typingRef)typingRef.off();
+  typingRef=db.ref("typing/"+name);
+  typingRef.on("value",s=>{const now=Date.now();const names=[];s.forEach(c=>{const v=c.val();if(c.key!==clientId&&v&&v.ts>now-5000)names.push(v.name);});const box=el("typing");if(!names.length){box.style.display="none";box.textContent="";return;}box.style.display="block";box.textContent=(names.length<=2?names.join(", "):names.length+"명")+"님이 입력 중…";});
 }
-el("nameBtn").onclick=changeName;
 
-// 2) 채널 추가 / 이름 변경
-el("addch").onclick=()=>{const n=prompt("새 채널 이름");if(!n||!db)return;const k=n.trim();if(!k||chans[k])return;db.ref("channels/"+k).set(1);openCh(k);closeDrawer();};
-async function renameChannel(oldName){
-  const n=prompt('채널 이름 변경 ("'+oldName+'")',oldName);if(n===null)return;
-  const nn=n.trim();if(!nn||nn===oldName||chans[nn])return;
-  const snap=await db.ref("msg/"+oldName).once("value");
-  const up={};up["channels/"+nn]=1;up["channels/"+oldName]=null;up["msg/"+nn]=snap.val()||null;up["msg/"+oldName]=null;
-  await db.ref().update(up);
-  db.ref("msg/"+nn).push({sys:true,t:'채널 이름이 "'+oldName+'"에서 "'+nn+'"(으)로 변경되었습니다',ts:Date.now()});
-  openCh(nn);
+// 이름 변경 + 공지 (프로필 모달)
+el("nameBtn").onclick=()=>{el("pName").value=me;const pv=el("pavPreview");if(myImg){pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}else{pv.style.backgroundImage="";pv.textContent=init(me);}el("pErr").textContent="";el("profileOv").classList.add("show");};
+el("pavPreview").onclick=()=>el("profileFile").click();
+el("profileFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{myImg=await shrink(f,160,0.7);const pv=el("pavPreview");pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}catch(err){el("pErr").textContent="사진을 불러오지 못했습니다.";}};
+el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;el("myName").textContent=me;try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref("msg/"+cur).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
+el("pClose").onclick=()=>el("profileOv").classList.remove("show");
+
+// 채널 추가 / 이름변경 / 삭제
+el("addch").onclick=async()=>{const n=prompt("새 채널 이름");if(!n||!db)return;const k=n.trim();if(!k||chans[k])return;const p=prompt("채널 비밀번호 (없으면 비워두고 확인)");if(p&&p.trim()){db.ref("channels/"+k).set({pw:hash(p.trim())});unlocked.add(k);saveUnlocked();}else db.ref("channels/"+k).set(1);openCh(k);closeDrawer();};
+async function renameChannel(oldName){const n=prompt('채널 이름 변경 ("'+oldName+'")',oldName);if(n===null)return;const nn=n.trim();if(!nn||nn===oldName||chans[nn])return;const snap=await db.ref("msg/"+oldName).once("value");const mt=(await db.ref("meta/"+oldName).once("value")).val();const up={};up["channels/"+nn]=chans[oldName]||1;up["channels/"+oldName]=null;up["msg/"+nn]=snap.val()||null;up["msg/"+oldName]=null;up["meta/"+nn]=mt||null;up["meta/"+oldName]=null;await db.ref().update(up);if(unlocked.has(oldName)){unlocked.delete(oldName);unlocked.add(nn);saveUnlocked();}if(seenSeq[oldName]!==undefined){seenSeq[nn]=seenSeq[oldName];delete seenSeq[oldName];saveSeen();}db.ref("msg/"+nn).push({sys:true,t:'채널 이름이 "'+oldName+'"에서 "'+nn+'"(으)로 변경되었습니다',ts:Date.now()});openCh(nn);}
+async function deleteChannel(name){
+  if(name==="일반"){alert('기본 채널 "일반"은 삭제할 수 없어요.');return;}
+  const pw=chanPw(name);
+  if(pw){const inp=prompt('🔒 "'+name+'" 삭제하려면 비밀번호 입력');if(inp===null)return;if(hash(inp)!==pw){alert("비밀번호가 틀렸습니다.");return;}}
+  else{if(!confirm('"'+name+'" 채널을 삭제할까요? 메시지도 모두 사라집니다.'))return;}
+  const up={};up["channels/"+name]=null;up["msg/"+name]=null;up["typing/"+name]=null;up["meta/"+name]=null;
+  await db.ref().update(up);unlocked.delete(name);saveUnlocked();delete seenSeq[name];saveSeen();
+  if(cur===name)openCh("일반");
 }
 el("chName").onclick=()=>renameChannel(cur);
 
-// 3) 모바일 드로어
+// 모바일 드로어 / 공유 / 테마 / 입장
 el("ham").onclick=()=>{el("side").classList.toggle("open");el("scrim").classList.toggle("show");};
 el("scrim").onclick=closeDrawer;
-
-// 4) 공유 QR
 function shareLink(){return location.origin+location.pathname;}
-el("shareBtn").onclick=()=>{
-  const url=shareLink();el("qrbox").innerHTML="";
-  try{new QRious({element:(()=>{const c=document.createElement("canvas");el("qrbox").appendChild(c);return c;})(),value:url,size:200,level:"M"});}catch(e){el("qrbox").textContent="QR 생성 실패";}
-  el("shareUrl").value=url;el("shareOv").classList.add("show");
-};
+el("shareBtn").onclick=()=>{const url=shareLink();el("qrbox").innerHTML="";try{const c=document.createElement("canvas");el("qrbox").appendChild(c);new QRious({element:c,value:url,size:200,level:"M"});}catch(e){el("qrbox").textContent="QR 생성 실패";}el("shareUrl").value=url;el("shareOv").classList.add("show");};
 el("shareClose").onclick=()=>el("shareOv").classList.remove("show");
 el("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(shareLink());el("copyBtn").textContent="복사됨 ✓";setTimeout(()=>el("copyBtn").textContent="링크 복사",1500);}catch(e){el("shareUrl").select();document.execCommand("copy");}};
-
-// 입장 / 테마 / 자동입장
-el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick}));el("setup").classList.remove("show");}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
+el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
 el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
-try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){boot(s.nick);el("setup").classList.remove("show");}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null;boot(s.nick);el("setup").classList.remove("show");}}catch(e){}
 </script>
 </body>
 </html>
