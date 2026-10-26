@@ -78,9 +78,17 @@ button{font-family:inherit}
 .pav{width:84px;height:84px;border-radius:22px;background:var(--accent);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;font-weight:700;cursor:pointer;position:relative}
 .pav::after{content:"📷";position:absolute;right:-4px;bottom:-4px;font-size:16px;background:var(--panel);border-radius:50%;padding:2px}
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15;display:none}.scrim.show{display:block}
+.toasts{position:fixed;bottom:84px;right:12px;z-index:60;display:flex;flex-direction:column;gap:8px;max-width:320px;width:calc(100% - 24px);pointer-events:none}
+.toast{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.28);padding:10px 30px 10px 12px;cursor:pointer;position:relative;animation:tin .22s ease}
+.toast .tt{font-weight:700;font-size:13px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast .tb{font-size:13px;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.toast .tx{position:absolute;top:6px;right:9px;color:var(--muted);font-size:15px;line-height:1}
+@keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+#notifBtn{color:#d6a000;border-color:#d6a000}
 @media(max-width:720px){
   .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
   .side.open{transform:translateX(0)} .ham{display:block} .msg{max-width:86%}
+  #notifBtn{font-size:0;padding:7px 9px} #notifBtn::before{content:"🔔";font-size:15px}
 }
 </style>
 </head>
@@ -95,6 +103,7 @@ button{font-family:inherit}
   <div class="top">
     <button class="ham" id="ham" aria-label="채널">☰</button>
     <div class="titwrap"><h2 id="chName" title="채널 설정"># 일반</h2><small id="chSub"></small></div>
+    <button class="iconbtn" id="notifBtn" style="display:none">🔔 알림 켜기</button>
     <button class="iconbtn" id="shareBtn">🔗 공유</button>
     <button class="iconbtn me" id="nameBtn"><span class="mini" id="miniAv"></span><span id="myName">나</span></button>
     <button class="iconbtn" id="themeBtn">🌓</button>
@@ -108,6 +117,7 @@ button{font-family:inherit}
     <button type="submit" class="send" disabled>보내기</button>
   </form>
 </main>
+<div class="toasts" id="toasts"></div>
 <input type="file" id="attachFile" multiple style="display:none">
 <input type="file" id="profileFile" accept="image/*" style="display:none">
 
@@ -277,7 +287,9 @@ function stopTyping(){clearTimeout(typingTimer);if(db&&cur)db.ref("typing/"+cur+
 function listenTyping(name){if(typingRef)typingRef.off();typingRef=db.ref("typing/"+name);typingRef.on("value",s=>{const now=Date.now();const names=[];s.forEach(c=>{const v=c.val();if(c.key!==clientId&&v&&v.ts>now-5000)names.push(v.name);});const box=el("typing");if(!names.length){box.style.display="none";box.textContent="";return;}box.style.display="block";box.textContent=(names.length<=2?names.join(", "):names.length+"명")+"님이 입력 중…";});}
 
 // 알림
-function notify(title,body,ch){try{if(!("Notification"in window)||Notification.permission!=="granted")return;const n=new Notification(title,{body:body||"",tag:"tt-"+ch});n.onclick=()=>{window.focus();if(ch)openCh(ch);n.close();};}catch(e){}}
+function toast(title,body,ch){const w=el("toasts");if(!w)return;const d=document.createElement("div");d.className="toast";d.innerHTML='<span class="tx">×</span><div class="tt"></div><div class="tb"></div>';d.querySelector(".tt").textContent=title;d.querySelector(".tb").textContent=body||"";d.querySelector(".tx").onclick=e=>{e.stopPropagation();d.remove();};d.onclick=()=>{if(ch)openCh(ch);d.remove();};w.appendChild(d);while(w.children.length>4)w.firstChild.remove();setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},6000);}
+function notify(title,body,ch){toast(title,body,ch);try{if(("Notification"in window)&&Notification.permission==="granted"){const n=new Notification(title,{body:body||"",tag:"tt-"+ch,icon:"icon-192.png"});n.onclick=()=>{window.focus();if(ch)openCh(ch);n.close();};}}catch(e){}}
+function updNotifBtn(){const b=el("notifBtn");if(!b)return;if(!("Notification"in window)){b.style.display="none";return;}const p=Notification.permission;if(p==="granted"){b.style.display="none";}else if(p==="denied"){b.style.display="";b.textContent="🔕 알림 차단됨";b.title="주소창 자물쇠 → 알림 → 허용 으로 바꾼 뒤 새로고침하세요";}else{b.style.display="";b.textContent="🔔 알림 켜기";b.title="클릭하면 윈도우 알림을 켭니다";}}
 window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 
 // 프로필
@@ -347,11 +359,13 @@ function shareLink(){return location.origin+location.pathname;}
 el("shareBtn").onclick=()=>{const url=shareLink();el("qrbox").innerHTML="";try{const c=document.createElement("canvas");el("qrbox").appendChild(c);new QRious({element:c,value:url,size:200,level:"M"});}catch(e){el("qrbox").textContent="QR 생성 실패";}el("shareUrl").value=url;el("shareOv").classList.add("show");};
 el("shareClose").onclick=()=>el("shareOv").classList.remove("show");
 el("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(shareLink());el("copyBtn").textContent="복사됨 ✓";setTimeout(()=>el("copyBtn").textContent="링크 복사",1500);}catch(e){el("shareUrl").select();document.execCommand("copy");}};
-el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");if("Notification"in window&&Notification.permission==="default")Notification.requestPermission();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
+el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
 el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
+el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("팀톡","알림이 켜졌어요 🎉",cur);});};
+updNotifBtn();
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
-try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null;boot(s.nick);el("setup").classList.remove("show");if("Notification"in window&&Notification.permission==="default")Notification.requestPermission();}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null;boot(s.nick);el("setup").classList.remove("show");if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}}catch(e){}
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
