@@ -2,63 +2,88 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>팀톡</title>
 <style>
-:root{--bg:#f4f5f8;--panel:#fff;--side:#4b2e83;--side-txt:#e9e4f5;--txt:#1b1d21;--muted:#6b7280;--line:#e3e5ea;--me:#4b2e83;--me-txt:#fff;--accent:#6d49c7;}
-:root:not([data-theme="light"]){@media(prefers-color-scheme:dark){:root{--bg:#17181c;--panel:#1f2127;--side:#211733;--side-txt:#d9d2ec;--txt:#e9eaee;--muted:#9aa0aa;--line:#2c2f37;--me:#6d49c7;--me-txt:#fff;--accent:#8a67e0;}}}
-:root[data-theme="dark"]{--bg:#17181c;--panel:#1f2127;--side:#211733;--side-txt:#d9d2ec;--txt:#e9eaee;--muted:#9aa0aa;--line:#2c2f37;--me:#6d49c7;--me-txt:#fff;--accent:#8a67e0;}
+:root{--bg:#f4f5f8;--panel:#fff;--side:#4b2e83;--side-txt:#e9e4f5;--txt:#1b1d21;--muted:#6b7280;--line:#e3e5ea;--me:#4b2e83;--me-txt:#fff;--accent:#6d49c7;--sys:#eceaf4;}
+:root:not([data-theme="light"]){@media(prefers-color-scheme:dark){:root{--bg:#17181c;--panel:#1f2127;--side:#211733;--side-txt:#d9d2ec;--txt:#e9eaee;--muted:#9aa0aa;--line:#2c2f37;--me:#6d49c7;--me-txt:#fff;--accent:#8a67e0;--sys:#262233;}}}
+:root[data-theme="dark"]{--bg:#17181c;--panel:#1f2127;--side:#211733;--side-txt:#d9d2ec;--txt:#e9eaee;--muted:#9aa0aa;--line:#2c2f37;--me:#6d49c7;--me-txt:#fff;--accent:#8a67e0;--sys:#262233;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,"Segoe UI","Malgun Gothic",sans-serif;height:100vh;display:flex;overflow:hidden}
-.side{width:230px;background:var(--side);color:var(--side-txt);display:flex;flex-direction:column;flex-shrink:0}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,"Segoe UI","Malgun Gothic",sans-serif;height:100vh;height:100dvh;display:flex;overflow:hidden}
+button{font-family:inherit}
+.side{width:230px;background:var(--side);color:var(--side-txt);display:flex;flex-direction:column;flex-shrink:0;z-index:20}
 .brand{padding:16px;font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.1)}
 .dot{width:10px;height:10px;border-radius:3px;background:var(--accent)}
-.who{font-size:12px;opacity:.7;padding:8px 16px}
 .chlist{flex:1;overflow:auto;padding:8px 6px}
 .chlab{font-size:11px;text-transform:uppercase;opacity:.6;padding:10px 10px 4px}
-.ch{padding:7px 10px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;gap:6px;opacity:.85}
+.ch{padding:9px 10px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:6px;opacity:.85}
 .ch:hover{background:rgba(255,255,255,.08)}.ch.on{background:rgba(255,255,255,.16);opacity:1;font-weight:600}
-.addch{margin:6px 10px;padding:7px 10px;border:1px dashed rgba(255,255,255,.25);border-radius:7px;cursor:pointer;font-size:13px;opacity:.7;text-align:center}
+.ch .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch .edit{opacity:0;font-size:13px;padding:2px}.ch:hover .edit,.ch.on .edit{opacity:.7}
+.addch{margin:6px 10px;padding:9px 10px;border:1px dashed rgba(255,255,255,.25);border-radius:8px;cursor:pointer;font-size:13px;opacity:.7;text-align:center}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.top{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:space-between}
-.top h2{margin:0;font-size:16px}.top small{color:var(--muted)}
-.feed{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
-.msg{display:flex;gap:10px;max-width:72%}.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.top{padding:12px 14px;border-top:env(safe-area-inset-top) solid transparent;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:10px}
+.ham{display:none;background:none;border:0;font-size:22px;color:var(--txt);cursor:pointer;padding:0 2px;line-height:1}
+.top .titwrap{flex:1;min-width:0}
+.top h2{margin:0;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.top small{color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iconbtn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:7px 10px;cursor:pointer;font-size:13px;white-space:nowrap}
+.iconbtn.me{color:var(--accent);border-color:var(--accent);font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.feed{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:10px;max-width:74%}.msg.me{align-self:flex-end;flex-direction:row-reverse}
 .av{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-.bub{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;line-height:1.45;word-break:break-word}
+.bub{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:9px 12px;font-size:15px;line-height:1.45;word-break:break-word}
 .msg.me .bub{background:var(--me);color:var(--me-txt);border-color:transparent}
 .meta{font-size:11px;color:var(--muted);margin-bottom:3px}.msg.me .meta{text-align:right}
-.composer{border-top:1px solid var(--line);background:var(--panel);padding:12px;display:flex;gap:8px}
-.composer input{flex:1;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--txt);font-size:14px}
+.sysmsg{align-self:center;background:var(--sys);color:var(--muted);font-size:12.5px;padding:5px 12px;border-radius:20px;max-width:85%;text-align:center}
+.composer{border-top:1px solid var(--line);background:var(--panel);padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px}
+.composer input{flex:1;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--txt);font-size:16px}
 .composer input:focus{outline:2px solid var(--accent);border-color:transparent}
-.composer button{padding:0 18px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:14px}
-.theme{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px}
+.composer button{padding:0 18px;border:0;border-radius:11px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
 .empty{color:var(--muted);text-align:center;margin:auto;font-size:14px;line-height:1.6}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
-.card{background:var(--panel);border-radius:14px;padding:22px;max-width:440px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:40}
+.ov.show{display:flex}
+.card{background:var(--panel);border-radius:16px;padding:22px;max-width:360px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3);text-align:center}
 .card h3{margin:0 0 6px}.card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 14px}
-.card textarea,.card input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--txt);font-size:13px;margin-bottom:10px;font-family:inherit}
-.card textarea{min-height:120px;resize:vertical}
-.card button{width:100%;padding:11px;border:0;border-radius:9px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:14px}
+.card input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--txt);font-size:16px;margin-bottom:10px}
+.card button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
+.card .ghost{background:transparent;color:var(--muted);border:1px solid var(--line);margin-top:8px}
 .err{color:#d6455b;font-size:12px;margin-bottom:10px}
-@media(max-width:620px){.side{width:62px}.brand span,.chlab,.ch span,.addch,.who{display:none}.brand{justify-content:center}.msg{max-width:88%}}
+#qrbox{display:flex;justify-content:center;margin:6px 0 12px}
+#qrbox canvas{border-radius:10px}
+.linkrow{display:flex;gap:6px;margin-bottom:6px}
+.linkrow input{margin:0;font-size:12px}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15;display:none}
+.scrim.show{display:block}
+@media(max-width:720px){
+  .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
+  .side.open{transform:translateX(0)}
+  .ham{display:block}
+  .msg{max-width:86%}
+  .iconbtn.lbl{padding:7px 9px}
+}
 </style>
 </head>
 <body>
-<nav class="side">
+<div class="scrim" id="scrim"></div>
+<nav class="side" id="side">
   <div class="brand"><span class="dot"></span><span>팀톡</span></div>
-  <div class="who" id="who"></div>
   <div class="chlist" id="chlist"></div>
-  <div class="addch" id="addch">+ <span>채널 추가</span></div>
+  <div class="addch" id="addch">+ 채널 추가</div>
 </nav>
 <main class="main">
-  <div class="top"><div><h2 id="chName"># 일반</h2><small id="chSub"></small></div>
-    <button class="theme" id="themeBtn">🌓</button></div>
+  <div class="top">
+    <button class="ham" id="ham" aria-label="채널">☰</button>
+    <div class="titwrap"><h2 id="chName" title="채널 이름 변경"># 일반</h2><small id="chSub"></small></div>
+    <button class="iconbtn" id="shareBtn">🔗 공유</button>
+    <button class="iconbtn me" id="nameBtn">●</button>
+    <button class="iconbtn" id="themeBtn">🌓</button>
+  </div>
   <div class="feed" id="feed"></div>
   <form class="composer" id="composer"><input id="input" placeholder="메시지 입력…" autocomplete="off" disabled><button type="submit" disabled>보내기</button></form>
 </main>
 
-<div class="ov" id="setup">
+<div class="ov show" id="setup">
   <div class="card">
     <h3>팀톡 입장</h3>
     <p>대화명을 입력하고 입장하세요. 같은 앱을 연 사람끼리 실시간으로 대화됩니다.</p>
@@ -68,47 +93,61 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,"Segoe
   </div>
 </div>
 
+<div class="ov" id="shareOv">
+  <div class="card">
+    <h3>초대 링크</h3>
+    <p>이 QR을 찍거나 링크를 보내면 누구나 들어올 수 있어요.</p>
+    <div id="qrbox"></div>
+    <div class="linkrow"><input id="shareUrl" readonly></div>
+    <button id="copyBtn">링크 복사</button>
+    <button class="ghost" id="shareClose">닫기</button>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
 const LS="teamtalk_fb";
 const FB={databaseURL:"https://ymx-ae932-default-rtdb.firebaseio.com"};
 const el=id=>document.getElementById(id);
 const init=s=>(s||"?").trim()[0]||"?";
-let db, me, cur="일반", chans={"일반":1,"개발":1,"잡담":1}, unsub=null;
+let db, me, cur="일반", chans={"일반":1}, unsub=null;
 
 function boot(nick){
   if(!firebase.apps.length)firebase.initializeApp(FB);
   db=firebase.database();
-  me=nick;
-  el("who").textContent="● "+me;
+  me=nick; el("nameBtn").textContent="● "+me;
   el("input").disabled=false; el("composer").querySelector("button").disabled=false;
-  // 채널 목록 동기화
-  db.ref("channels").on("value",s=>{
-    const v=s.val()||{}; chans=Object.assign({"일반":1},v);
-    renderCh();
-  });
+  db.ref("channels").on("value",s=>{chans=Object.assign({"일반":1},s.val()||{});renderCh();});
   openCh(cur);
 }
+function closeDrawer(){el("side").classList.remove("open");el("scrim").classList.remove("show");}
 function renderCh(){
   const w=el("chlist");w.innerHTML='<div class="chlab">채널</div>';
   Object.keys(chans).forEach(name=>{
     const d=document.createElement("div");d.className="ch"+(name===cur?" on":"");
-    d.innerHTML='# <span>'+name+'</span>';d.onclick=()=>openCh(name);w.appendChild(d);
+    const nm=document.createElement("span");nm.className="nm";nm.textContent="# "+name;
+    const ed=document.createElement("span");ed.className="edit";ed.textContent="✎";ed.title="채널 이름 변경";
+    ed.onclick=e=>{e.stopPropagation();renameChannel(name);};
+    d.appendChild(nm);d.appendChild(ed);
+    d.onclick=()=>{openCh(name);closeDrawer();};
+    w.appendChild(d);
   });
 }
 function openCh(name){
-  cur=name;el("chName").textContent="# "+name;renderCh();
+  cur=name;el("chName").firstChild&&(el("chName").textContent="# "+name);renderCh();
   el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
   if(unsub)unsub.off();
-  const ref=db.ref("msg/"+name).limitToLast(200);unsub=ref;
-  const feed=el("feed");let first=true;
+  const ref=db.ref("msg/"+name).limitToLast(300);unsub=ref;const feed=el("feed");
   ref.on("value",s=>{
-    const all=s.val()||{};const arr=Object.values(all);
-    el("chSub").textContent=arr.length?arr.length+"개 메시지":"첫 메시지를 남겨보세요";
+    const arr=Object.values(s.val()||{});
+    const talk=arr.filter(m=>!m.sys);
+    el("chSub").textContent=talk.length?talk.length+"개 메시지":"첫 메시지를 남겨보세요";
     feed.innerHTML="";
     if(!arr.length){feed.innerHTML='<div class="empty">아직 메시지가 없어요.</div>';return}
     arr.forEach(m=>{
+      if(m.sys){const s=document.createElement("div");s.className="sysmsg";s.textContent=m.t;feed.appendChild(s);return;}
       const mine=m.u===me;const d=document.createElement("div");d.className="msg"+(mine?" me":"");
       d.innerHTML='<div class="av">'+init(m.u)+'</div><div><div class="meta">'+m.u+'</div><div class="bub"></div></div>';
       d.querySelector(".bub").textContent=m.t;feed.appendChild(d);
@@ -116,22 +155,50 @@ function openCh(name){
     feed.scrollTop=feed.scrollHeight;
   });
 }
-el("composer").onsubmit=e=>{
-  e.preventDefault();const v=el("input").value.trim();if(!v||!db)return;
-  db.ref("msg/"+cur).push({u:me,t:v,ts:Date.now()});el("input").value="";
+el("composer").onsubmit=e=>{e.preventDefault();const v=el("input").value.trim();if(!v||!db)return;db.ref("msg/"+cur).push({u:me,t:v,ts:Date.now()});el("input").value="";};
+
+// 1) 이름 변경 + 공지
+function changeName(){
+  const n=prompt("새 대화명",me);if(n===null)return;const nn=n.trim();if(!nn||nn===me)return;
+  const old=me;me=nn;el("nameBtn").textContent="● "+me;
+  try{localStorage.setItem(LS,JSON.stringify({nick:me}))}catch(e){}
+  db.ref("msg/"+cur).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});
+}
+el("nameBtn").onclick=changeName;
+
+// 2) 채널 추가 / 이름 변경
+el("addch").onclick=()=>{const n=prompt("새 채널 이름");if(!n||!db)return;const k=n.trim();if(!k||chans[k])return;db.ref("channels/"+k).set(1);openCh(k);closeDrawer();};
+async function renameChannel(oldName){
+  const n=prompt('채널 이름 변경 ("'+oldName+'")',oldName);if(n===null)return;
+  const nn=n.trim();if(!nn||nn===oldName||chans[nn])return;
+  const snap=await db.ref("msg/"+oldName).once("value");
+  const up={};up["channels/"+nn]=1;up["channels/"+oldName]=null;up["msg/"+nn]=snap.val()||null;up["msg/"+oldName]=null;
+  await db.ref().update(up);
+  db.ref("msg/"+nn).push({sys:true,t:'채널 이름이 "'+oldName+'"에서 "'+nn+'"(으)로 변경되었습니다',ts:Date.now()});
+  openCh(nn);
+}
+el("chName").onclick=()=>renameChannel(cur);
+
+// 3) 모바일 드로어
+el("ham").onclick=()=>{el("side").classList.toggle("open");el("scrim").classList.toggle("show");};
+el("scrim").onclick=closeDrawer;
+
+// 4) 공유 QR
+function shareLink(){return location.origin+location.pathname;}
+el("shareBtn").onclick=()=>{
+  const url=shareLink();el("qrbox").innerHTML="";
+  try{new QRious({element:(()=>{const c=document.createElement("canvas");el("qrbox").appendChild(c);return c;})(),value:url,size:200,level:"M"});}catch(e){el("qrbox").textContent="QR 생성 실패";}
+  el("shareUrl").value=url;el("shareOv").classList.add("show");
 };
-el("addch").onclick=()=>{const n=prompt("새 채널 이름");if(!n||!db)return;const k=n.trim();if(!k)return;db.ref("channels/"+k).set(1);openCh(k);};
-el("connect").onclick=()=>{
-  el("cfgErr").textContent="";
-  const nick=el("nick").value.trim();
-  if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}
-  try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick}));el("setup").style.display="none";}
-  catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}
-};
+el("shareClose").onclick=()=>el("shareOv").classList.remove("show");
+el("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(shareLink());el("copyBtn").textContent="복사됨 ✓";setTimeout(()=>el("copyBtn").textContent="링크 복사",1500);}catch(e){el("shareUrl").select();document.execCommand("copy");}};
+
+// 입장 / 테마 / 자동입장
+el("connect").onclick=()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick}));el("setup").classList.remove("show");}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
+el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
-// 저장된 대화명 있으면 자동 입장
-try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){boot(s.nick);el("setup").style.display="none";}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){boot(s.nick);el("setup").classList.remove("show");}}catch(e){}
 </script>
 </body>
 </html>
