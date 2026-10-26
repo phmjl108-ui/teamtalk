@@ -1,5 +1,5 @@
 // 팀톡 서비스워커 — 설치/오프라인 셸 캐시 (네트워크 우선)
-const CACHE = "teamtalk-v4";
+const CACHE = "teamtalk-v6";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -8,6 +8,14 @@ self.addEventListener("install", e => {
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+// 시스템 알림 클릭 → 앱 열기(이미 열려있으면 포커스)
+self.addEventListener("notificationclick", e => {
+  e.notification.close();
+  e.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then(ws => {
+    for (const w of ws) { if ("focus" in w) return w.focus(); }
+    if (clients.openWindow) return clients.openWindow("./");
+  }));
 });
 self.addEventListener("fetch", e => {
   const req = e.request;

@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>팀톡</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#4b2e83">
@@ -195,7 +195,7 @@ function boot(nick){
   db.ref("channels").on("value",s=>{chans=s.val()||{};if(!Object.keys(chans).length)chans={"일반":1};if(!opened){opened=true;const st=(lastCur&&chans[lastCur])?lastCur:Object.keys(chans)[0];openCh(st);}else if(!chans[cur]){openCh(Object.keys(chans)[0]);}renderCh();});
   db.ref("meta").on("value",s=>{
     meta=s.val()||{};
-    Object.keys(meta).forEach(n=>{if(seenSeq[n]===undefined)seenSeq[n]=(meta[n]&&meta[n].seq)||0;});
+    Object.keys(meta).forEach(n=>{if(seenSeq[n]===undefined)seenSeq[n]=prevMeta?((prevMeta[n]&&prevMeta[n].seq)||0):((meta[n]&&meta[n].seq)||0);});
     if(meta[cur]&&!document.hidden)seenSeq[cur]=(meta[cur].seq)||0;
     if(prevMeta){Object.keys(meta).forEach(n=>{const ns=(meta[n].seq)||0,os=(prevMeta[n]&&prevMeta[n].seq)||0;if(ns>os){const last=meta[n].last;if(last&&last.u!==me&&(document.hidden||cur!==n))notify(n+" · "+last.u,last.t,n);}});}
     prevMeta=meta;saveSeen();renderCh();
@@ -246,7 +246,8 @@ function renderFeed(){
     const mine=m.cid?m.cid===clientId:(m.u===me);
     const row=document.createElement("div");row.className="msg"+(mine?" me":"");
     const av=document.createElement("div");av.className="av";
-    const p=profiles[m.cid];
+    let p=profiles[m.cid];
+    if(!(p&&p.img)){const byName=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(byName)p=byName;}
     if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else av.textContent=init(m.u);
     const col=document.createElement("div");
     const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;col.appendChild(meta);
@@ -288,7 +289,7 @@ function listenTyping(name){if(typingRef)typingRef.off();typingRef=db.ref("typin
 
 // 알림
 function toast(title,body,ch){const w=el("toasts");if(!w)return;const d=document.createElement("div");d.className="toast";d.innerHTML='<span class="tx">×</span><div class="tt"></div><div class="tb"></div>';d.querySelector(".tt").textContent=title;d.querySelector(".tb").textContent=body||"";d.querySelector(".tx").onclick=e=>{e.stopPropagation();d.remove();};d.onclick=()=>{if(ch)openCh(ch);d.remove();};w.appendChild(d);while(w.children.length>4)w.firstChild.remove();setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},6000);}
-function notify(title,body,ch){toast(title,body,ch);try{if(("Notification"in window)&&Notification.permission==="granted"){const n=new Notification(title,{body:body||"",tag:"tt-"+ch,icon:"icon-192.png"});n.onclick=()=>{window.focus();if(ch)openCh(ch);n.close();};}}catch(e){}}
+async function notify(title,body,ch){toast(title,body,ch);if(!("Notification"in window)||Notification.permission!=="granted")return;const opts={body:body||"",tag:"tt-"+ch,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch}};try{if(navigator.serviceWorker){const reg=await navigator.serviceWorker.ready;if(reg&&reg.showNotification){await reg.showNotification(title,opts);return;}}}catch(e){}try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();if(ch)openCh(ch);n.close();};}catch(e){}}
 function updNotifBtn(){const b=el("notifBtn");if(!b)return;if(!("Notification"in window)){b.style.display="none";return;}const p=Notification.permission;if(p==="granted"){b.style.display="none";}else if(p==="denied"){b.style.display="";b.textContent="🔕 알림 차단됨";b.title="주소창 자물쇠 → 알림 → 허용 으로 바꾼 뒤 새로고침하세요";}else{b.style.display="";b.textContent="🔔 알림 켜기";b.title="클릭하면 윈도우 알림을 켭니다";}}
 window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 
@@ -366,6 +367,13 @@ el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우�
 updNotifBtn();
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
 try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null;boot(s.nick);el("setup").classList.remove("show");if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}}catch(e){}
+// 모바일: 키보드가 올라오면 앱 높이를 줄여 입력창이 키보드 위에 보이게
+if(window.visualViewport){
+  const vv=window.visualViewport;
+  const fit=()=>{document.body.style.height=vv.height+"px";};
+  vv.addEventListener("resize",fit);vv.addEventListener("scroll",fit);fit();
+}
+el("input").addEventListener("focus",()=>{setTimeout(()=>{const f=el("feed");if(f)f.scrollTop=f.scrollHeight;el("input").scrollIntoView({block:"nearest"});},300);});
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
