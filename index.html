@@ -118,6 +118,9 @@ button{font-family:inherit}
 .guide{margin-bottom:14px}
 .guide .gstep{font-size:13px;line-height:1.6;color:var(--txt);margin:0 0 11px;padding-bottom:11px;border-bottom:.5px solid var(--line)}
 .guide .gnote{font-size:12.5px;line-height:1.6;color:var(--muted);margin:4px 0 0}
+.newslist{list-style:none;padding:0;margin:4px 0 14px}
+.newslist li{font-size:14px;line-height:1.5;color:var(--txt);padding:10px 2px;border-bottom:.5px solid var(--line)}
+.newslist li:last-child{border-bottom:0}
 @media(max-width:720px){
   .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
   .side.open{transform:translateX(0)} .ham{display:block} .msg{max-width:86%}
@@ -210,6 +213,13 @@ button{font-family:inherit}
   </div>
   <button id="guideNotif">🔔 지금 알림 켜기</button>
   <button class="ghost" id="guideClose">닫기</button>
+</div></div>
+
+<div class="ov" id="newsOv"><div class="card" style="text-align:left">
+  <h3 style="text-align:center">✨ 업데이트 안내</h3>
+  <p style="text-align:center">이번에 이런 기능이 추가됐어요</p>
+  <ul class="newslist" id="newsList"></ul>
+  <button id="newsClose">확인</button>
 </div></div>
 
 <div class="viewer" id="viewer">
@@ -466,6 +476,13 @@ el("guideOv").onclick=e=>{if(e.target===el("guideOv"))el("guideOv").classList.re
 el("guideNotif").onclick=()=>{el("guideOv").classList.remove("show");if(el("notifBtn").onclick)el("notifBtn").onclick();};
 function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){localStorage.setItem(LS+"_onboard","1");setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
 
+// 기능 업데이트 공지 (버전 올릴 때마다 모든 사용자에게 1회) — 관리자 전용 기능은 목록에 넣지 않음
+const NEWS_VER=1;
+const NEWS=["💬  상대 프로필 보기 · 1:1 대화(DM)","↵  Shift+Enter 줄바꿈","🖼  사진·파일을 앱 안에서 바로 미리보기","📱  설치·알림 켜는 법 안내"];
+function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;localStorage.setItem(LS+"_news",String(NEWS_VER));const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
+el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
+el("newsOv").onclick=e=>{if(e.target===el("newsOv"))el("newsOv").classList.remove("show");};
+
 // 채널 설정 모달 (만들기 / 이름변경 / 비밀번호)
 function openChanModal(name){
   if(name){const pw=chanPw(name);if(pw&&!unlocked.has(name)){const inp=prompt('🔒 "'+name+'" 설정하려면 비밀번호 입력');if(inp===null)return;if(hash(inp)!==pw){alert("비밀번호가 틀렸습니다.");return;}unlocked.add(name);saveUnlocked();}}
@@ -532,7 +549,7 @@ el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-
 el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("팀톡","알림이 켜졌어요 🎉",cur);});};
 updNotifBtn();
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
-try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null;boot(s.nick);el("setup").classList.remove("show");if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null;boot(s.nick);el("setup").classList.remove("show");showNews();if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}}catch(e){}
 // 모바일: 키보드가 올라오면 앱 높이를 줄여 입력창이 키보드 위에 보이게
 if(window.visualViewport){
   const vv=window.visualViewport;
