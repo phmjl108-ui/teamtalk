@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>팀톡</title>
+<style>
+:root{--bg:#f4f5f8;--panel:#fff;--side:#4b2e83;--side-txt:#e9e4f5;--txt:#1b1d21;--muted:#6b7280;--line:#e3e5ea;--me:#4b2e83;--me-txt:#fff;--accent:#6d49c7;}
+:root:not([data-theme="light"]){@media(prefers-color-scheme:dark){:root{--bg:#17181c;--panel:#1f2127;--side:#211733;--side-txt:#d9d2ec;--txt:#e9eaee;--muted:#9aa0aa;--line:#2c2f37;--me:#6d49c7;--me-txt:#fff;--accent:#8a67e0;}}}
+:root[data-theme="dark"]{--bg:#17181c;--panel:#1f2127;--side:#211733;--side-txt:#d9d2ec;--txt:#e9eaee;--muted:#9aa0aa;--line:#2c2f37;--me:#6d49c7;--me-txt:#fff;--accent:#8a67e0;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,"Segoe UI","Malgun Gothic",sans-serif;height:100vh;display:flex;overflow:hidden}
+.side{width:230px;background:var(--side);color:var(--side-txt);display:flex;flex-direction:column;flex-shrink:0}
+.brand{padding:16px;font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+.dot{width:10px;height:10px;border-radius:3px;background:var(--accent)}
+.who{font-size:12px;opacity:.7;padding:8px 16px}
+.chlist{flex:1;overflow:auto;padding:8px 6px}
+.chlab{font-size:11px;text-transform:uppercase;opacity:.6;padding:10px 10px 4px}
+.ch{padding:7px 10px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;gap:6px;opacity:.85}
+.ch:hover{background:rgba(255,255,255,.08)}.ch.on{background:rgba(255,255,255,.16);opacity:1;font-weight:600}
+.addch{margin:6px 10px;padding:7px 10px;border:1px dashed rgba(255,255,255,.25);border-radius:7px;cursor:pointer;font-size:13px;opacity:.7;text-align:center}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:space-between}
+.top h2{margin:0;font-size:16px}.top small{color:var(--muted)}
+.feed{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:10px;max-width:72%}.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.av{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.bub{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;line-height:1.45;word-break:break-word}
+.msg.me .bub{background:var(--me);color:var(--me-txt);border-color:transparent}
+.meta{font-size:11px;color:var(--muted);margin-bottom:3px}.msg.me .meta{text-align:right}
+.composer{border-top:1px solid var(--line);background:var(--panel);padding:12px;display:flex;gap:8px}
+.composer input{flex:1;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--txt);font-size:14px}
+.composer input:focus{outline:2px solid var(--accent);border-color:transparent}
+.composer button{padding:0 18px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:14px}
+.theme{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px}
+.empty{color:var(--muted);text-align:center;margin:auto;font-size:14px;line-height:1.6}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+.card{background:var(--panel);border-radius:14px;padding:22px;max-width:440px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.card h3{margin:0 0 6px}.card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 14px}
+.card textarea,.card input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--txt);font-size:13px;margin-bottom:10px;font-family:inherit}
+.card textarea{min-height:120px;resize:vertical}
+.card button{width:100%;padding:11px;border:0;border-radius:9px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:14px}
+.err{color:#d6455b;font-size:12px;margin-bottom:10px}
+@media(max-width:620px){.side{width:62px}.brand span,.chlab,.ch span,.addch,.who{display:none}.brand{justify-content:center}.msg{max-width:88%}}
+</style>
+</head>
+<body>
+<nav class="side">
+  <div class="brand"><span class="dot"></span><span>팀톡</span></div>
+  <div class="who" id="who"></div>
+  <div class="chlist" id="chlist"></div>
+  <div class="addch" id="addch">+ <span>채널 추가</span></div>
+</nav>
+<main class="main">
+  <div class="top"><div><h2 id="chName"># 일반</h2><small id="chSub"></small></div>
+    <button class="theme" id="themeBtn">🌓</button></div>
+  <div class="feed" id="feed"></div>
+  <form class="composer" id="composer"><input id="input" placeholder="메시지 입력…" autocomplete="off" disabled><button type="submit" disabled>보내기</button></form>
+</main>
+
+<div class="ov" id="setup">
+  <div class="card">
+    <h3>팀톡 입장</h3>
+    <p>대화명을 입력하고 입장하세요. 같은 앱을 연 사람끼리 실시간으로 대화됩니다.</p>
+    <input id="nick" placeholder="대화명 (예: 홍길동)">
+    <div class="err" id="cfgErr"></div>
+    <button id="connect">입장하기</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/compat/firebase-app-compat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/compat/firebase-database-compat.min.js"></script>
+<script>
+const LS="teamtalk_fb";
+const FB={databaseURL:"https://ymx-ae932-default-rtdb.firebaseio.com"};
+const el=id=>document.getElementById(id);
+const init=s=>(s||"?").trim()[0]||"?";
+let db, me, cur="일반", chans={"일반":1,"개발":1,"잡담":1}, unsub=null;
+
+function boot(nick){
+  if(!firebase.apps.length)firebase.initializeApp(FB);
+  db=firebase.database();
+  me=nick;
+  el("who").textContent="● "+me;
+  el("input").disabled=false; el("composer").querySelector("button").disabled=false;
+  // 채널 목록 동기화
+  db.ref("channels").on("value",s=>{
+    const v=s.val()||{}; chans=Object.assign({"일반":1},v);
+    renderCh();
+  });
+  openCh(cur);
+}
+function renderCh(){
+  const w=el("chlist");w.innerHTML='<div class="chlab">채널</div>';
+  Object.keys(chans).forEach(name=>{
+    const d=document.createElement("div");d.className="ch"+(name===cur?" on":"");
+    d.innerHTML='# <span>'+name+'</span>';d.onclick=()=>openCh(name);w.appendChild(d);
+  });
+}
+function openCh(name){
+  cur=name;el("chName").textContent="# "+name;renderCh();
+  el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
+  if(unsub)unsub.off();
+  const ref=db.ref("msg/"+name).limitToLast(200);unsub=ref;
+  const feed=el("feed");let first=true;
+  ref.on("value",s=>{
+    const all=s.val()||{};const arr=Object.values(all);
+    el("chSub").textContent=arr.length?arr.length+"개 메시지":"첫 메시지를 남겨보세요";
+    feed.innerHTML="";
+    if(!arr.length){feed.innerHTML='<div class="empty">아직 메시지가 없어요.</div>';return}
+    arr.forEach(m=>{
+      const mine=m.u===me;const d=document.createElement("div");d.className="msg"+(mine?" me":"");
+      d.innerHTML='<div class="av">'+init(m.u)+'</div><div><div class="meta">'+m.u+'</div><div class="bub"></div></div>';
+      d.querySelector(".bub").textContent=m.t;feed.appendChild(d);
+    });
+    feed.scrollTop=feed.scrollHeight;
+  });
+}
+el("composer").onsubmit=e=>{
+  e.preventDefault();const v=el("input").value.trim();if(!v||!db)return;
+  db.ref("msg/"+cur).push({u:me,t:v,ts:Date.now()});el("input").value="";
+};
+el("addch").onclick=()=>{const n=prompt("새 채널 이름");if(!n||!db)return;const k=n.trim();if(!k)return;db.ref("channels/"+k).set(1);openCh(k);};
+el("connect").onclick=()=>{
+  el("cfgErr").textContent="";
+  const nick=el("nick").value.trim();
+  if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}
+  try{boot(nick);localStorage.setItem(LS,JSON.stringify({nick}));el("setup").style.display="none";}
+  catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}
+};
+el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
+try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
+// 저장된 대화명 있으면 자동 입장
+try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){boot(s.nick);el("setup").style.display="none";}}catch(e){}
+</script>
+</body>
+</html>
