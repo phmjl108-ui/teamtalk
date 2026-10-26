@@ -24,13 +24,13 @@ button{font-family:inherit}
 .dot{width:14px;height:14px;border-radius:5px;background:var(--accent)}
 .chlist{flex:1;overflow:auto;padding:8px 8px}
 .chlab{font-size:13px;color:var(--muted);padding:10px 10px 4px}
-.ch{padding:10px 10px;border-radius:10px;cursor:pointer;font-size:16px;display:flex;align-items:center;gap:6px;color:var(--txt)}
+.ch{position:relative;padding:10px 10px;border-radius:10px;cursor:pointer;font-size:16px;display:flex;align-items:center;gap:6px;color:var(--txt)}
 .ch:hover{background:var(--hover)}.ch.on{background:var(--sel);font-weight:600}
 .ch.on .nm{color:var(--accent)}
 .ch .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ch .act{opacity:0;font-size:14px;padding:2px 4px;border-radius:6px}
 .ch .act:hover{background:var(--hover)}
-.badge{background:var(--accent);color:#fff;font-size:12px;font-weight:600;line-height:1;min-width:20px;height:20px;padding:0 6px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;text-align:center;margin-left:8px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.badge{position:absolute;top:3px;right:5px;z-index:2;background:var(--accent);color:#fff;font-size:11px;font-weight:600;line-height:1;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;text-align:center;flex-shrink:0;font-variant-numeric:tabular-nums}
 .ch:hover .act,.ch.on .act{opacity:.7}
 .addch{margin:6px 10px;padding:10px;border-radius:10px;cursor:pointer;font-size:15px;color:var(--accent);text-align:center}
 .addch:hover{background:var(--hover)}
