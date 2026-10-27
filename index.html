@@ -64,8 +64,6 @@ button{font-family:inherit}
 .filechip{display:inline-flex;align-items:center;gap:6px;background:var(--other);border:0;border-radius:14px;padding:9px 12px;font-size:14px;color:var(--txt);text-decoration:none;margin-bottom:4px;max-width:230px;word-break:break-all}
 .msg.me .filechip{background:var(--me);color:#fff}
 .meta{font-size:11px;color:var(--muted-3);margin:0 6px 2px}.msg.me .meta{text-align:right}
-.delbtn{opacity:0;background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 4px;align-self:center}
-.msg:hover .delbtn{opacity:.55}
 .sysmsg{align-self:center;background:transparent;color:var(--muted);font-size:12px;font-weight:500;padding:8px 12px;max-width:85%;text-align:center}
 .typing{display:none;align-items:center;gap:7px;padding:4px 16px 2px;font-size:12px;color:var(--muted)}
 .typing.show{display:flex}
@@ -111,7 +109,6 @@ button{font-family:inherit}
 .toast .tx{position:absolute;top:6px;right:9px;color:var(--muted);font-size:15px;line-height:1}
 @keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .filechip{cursor:pointer}
-.msg .delbtn .icon,.msg .pinbtn .icon,.msg .repbtn .icon,.msg .qbtn .icon{width:16px;height:16px}
 .pinbar .icon{width:15px;height:15px;flex:none}
 .atab .icon{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
 .ch .cav{width:26px;height:26px;border-radius:50%;background:var(--accent);background-size:cover;background-position:center;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
@@ -152,8 +149,6 @@ button{font-family:inherit}
 .pinbar .pintxt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pinbar .pinx{color:var(--muted);font-size:15px;padding:0 2px}
 .banner{padding:10px 14px;text-align:center;font-size:13px;color:#fff;background:var(--red,#FF3B30)}
-.msg .pinbtn{opacity:0;background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 4px;align-self:center}
-.msg:hover .pinbtn{opacity:.55}
 .admincard{max-width:560px;max-height:85vh;display:flex;flex-direction:column}
 .adminbar{display:flex;gap:8px;margin-bottom:10px}
 .adminbar input{flex:1;margin:0;padding:9px 12px;border:0;border-radius:10px;background:var(--bg-2);color:var(--txt);font-size:14px}
@@ -193,9 +188,13 @@ button{font-family:inherit}
 .ch .star.fav{opacity:1;color:#ffb300}
 .ch .star .icon{width:16px;height:16px}
 .ch .act .icon{width:16px;height:16px}
-.msg .repbtn,.msg .qbtn{opacity:0;background:none;border:0;color:var(--muted);cursor:pointer;padding:3px;align-self:center;display:inline-flex;align-items:center;justify-content:center}
-.msg:hover .repbtn,.msg:hover .qbtn{opacity:.55}
-.msg .repbtn.has{opacity:.85;color:var(--accent)}
+/* 메시지 hover 액션 툴바(모아진 둥근 바) */
+.msgacts{display:inline-flex;align-items:center;gap:2px;align-self:center;background:var(--panel);border-radius:16px;padding:3px;box-shadow:0 1px 5px rgba(0,0,0,.16);opacity:0;transition:opacity .12s;flex-shrink:0}
+.msg:hover .msgacts{opacity:1}
+@media(hover:none){.msgacts{opacity:1}}
+.msgacts button{background:none;border:0;color:var(--muted);cursor:pointer;padding:6px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px}
+.msgacts button:hover{background:var(--hover);color:var(--accent)}
+.msgacts button .icon{width:18px;height:18px}
 /* 인라인 스레드(댓글식) */
 .threadbox{margin:2px 0 6px 40px;display:flex;flex-direction:column;gap:7px}
 .msg.me + .threadbox{margin-left:40px}
@@ -222,7 +221,8 @@ button{font-family:inherit}
 .msg .quote{margin-bottom:3px;max-width:100%}
 .msg.me .quote{background:rgba(120,120,128,.16)}
 /* 댓글 N 알약 */
-.cmtpill{display:inline-flex;align-items:center;gap:4px;background:var(--sys);color:var(--txt);border:0;border-radius:14px;padding:4px 11px 4px 9px;font-size:12.5px;font-weight:600;cursor:pointer;margin:0 0 4px 40px}
+.cmtpill{display:inline-flex;align-items:center;gap:4px;background:none;border:0;color:var(--accent);padding:2px 0;font-size:12.5px;font-weight:600;cursor:pointer;margin:0 0 4px 40px}
+.cmtpill:hover{text-decoration:underline}
 .cmtpill .icon{width:15px;height:15px;color:var(--accent)}
 @media(max-width:720px){
   .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
@@ -400,7 +400,7 @@ const SVG={
  gear:'<path fill-rule="evenodd" clip-rule="evenodd" d="M19.9 13a8 8 0 000-2l2-1.6-2-3.4-2.4.96a7.6 7.6 0 00-1.7-1L15.4 2.5h-4L11 5.06a7.6 7.6 0 00-1.7 1L6.9 5.1l-2 3.4 2 1.6a8 8 0 000 2l-2 1.6 2 3.4 2.4-.96c.52.42 1.1.76 1.7 1l.4 2.56h4l.4-2.56c.6-.24 1.18-.58 1.7-1l2.4.96 2-3.4-2-1.6zM12 15.3a3.3 3.3 0 110-6.6 3.3 3.3 0 010 6.6z"/>',
  trash:'<path d="M9.2 3h5.6l1 1.8H20v2H4v-2h4.2L9.2 3zM5.5 8.3h13l-1 11.1a2 2 0 01-2 1.8H8.5a2 2 0 01-2-1.8l-1-11.1z"/>',
  star:'<path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.92l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94L12 2.6z"/>',
- pin:'<path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.2a7 7 0 00-7 7c0 4.9 7 12.6 7 12.6s7-7.7 7-12.6a7 7 0 00-7-7zm0 9.6a2.6 2.6 0 110-5.2 2.6 2.6 0 010 5.2z"/>',
+ pin:'<path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/>',
  reply:'<path d="M4 4.5h16a1.3 1.3 0 011.3 1.3v9.4A1.3 1.3 0 0120 16.5H9.3L5 20.3v-3.8H4a1.3 1.3 0 01-1.3-1.3V5.8A1.3 1.3 0 014 4.5z"/>',
  person:'<path d="M12 12.3a4.3 4.3 0 100-8.6 4.3 4.3 0 000 8.6zM4.5 20.3c0-3.6 3.4-6.1 7.5-6.1s7.5 2.5 7.5 6.1v.5h-15v-.5z"/>',
  quote:'<path d="M9.6 8.4V4.8L3 11l6.6 6.2v-3.7c4.3 0 7.2 1.2 9.4 4.7-.3-5.4-3.4-9.8-9.4-9.8z"/>',
@@ -437,8 +437,8 @@ let threadCntRef=null, threadCounts={}, threadAll={}, openThreads=new Set(), rep
 function threadBase(k){return isDM(k)?("dm/"+k+"/thread"):("thread/"+k);}
 // 회신(인용 답장) — 본문 흐름에 인용 블록이 붙은 메시지로 전송
 let replyTo=null;
-function startReply(m){if(!m)return;replyTo={u:m.u||"",t:(m.t||(firstAtt(m)?"[첨부]":"")).slice(0,140)};const bar=el("quoteBar");el("quoteName").textContent="↩ "+replyTo.u+" 에게 회신";el("quoteText").textContent=replyTo.t;bar.style.display="flex";el("input").focus();}
-function cancelReply(){replyTo=null;el("quoteBar").style.display="none";}
+function startReply(m){if(!m)return;replyTo={u:m.u||"",t:(m.t||(firstAtt(m)?"[첨부]":"")).slice(0,140)};el("quoteName").textContent=(replyTo.u===me?"나":replyTo.u)+"에게 답장";el("quoteText").textContent=replyTo.t;el("quoteBar").style.display="flex";el("input").placeholder="답장 메시지 입력…";el("input").focus();}
+function cancelReply(){replyTo=null;el("quoteBar").style.display="none";if(!el("input").disabled)el("input").placeholder="메시지 입력…";}
 el("quoteCancel").onclick=cancelReply;
 // DM 유틸: 두 clientId로 고유 키 생성(둘만 공유), 채널과 분리
 function isDM(k){return typeof k==="string"&&k.indexOf("dm_")===0;}
@@ -590,10 +590,12 @@ function renderFeed(){
     });
     if(m.t){const b=document.createElement("div");b.className="bub";renderText(b,m.t);col.appendChild(b);}
     row.appendChild(av);row.appendChild(col);
-    const qb=document.createElement("button");qb.className="qbtn";qb.innerHTML=svgIcon("quote");qb.title="회신";qb.setAttribute("aria-label","회신(인용 답장)");qb.onclick=()=>startReply(m);row.appendChild(qb);
-    const rb=document.createElement("button");rb.className="repbtn"+((threadCounts[m.__key]||openThreads.has(m.__key))?" has":"");rb.innerHTML=svgIcon("reply");rb.title="댓글";rb.setAttribute("aria-label","댓글 달기");rb.onclick=()=>toggleThread(m.__key);row.appendChild(rb);
-    const pb=document.createElement("button");pb.className="pinbtn";pb.innerHTML=svgIcon("pin");pb.title="고정";pb.setAttribute("aria-label","메시지 고정");pb.onclick=()=>pinMsg(m);row.appendChild(pb);
-    if(mine){const db2=document.createElement("button");db2.className="delbtn";db2.innerHTML=svgIcon("trash");db2.title="삭제";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);row.appendChild(db2);}
+    const acts=document.createElement("div");acts.className="msgacts";
+    const qb=document.createElement("button");qb.innerHTML=svgIcon("quote");qb.title="답장";qb.setAttribute("aria-label","답장");qb.onclick=()=>startReply(m);acts.appendChild(qb);
+    if(!threadCounts[m.__key]){const rb=document.createElement("button");rb.innerHTML=svgIcon("reply");rb.title="댓글";rb.setAttribute("aria-label","댓글 달기");rb.onclick=()=>toggleThread(m.__key);acts.appendChild(rb);}
+    const pb=document.createElement("button");pb.innerHTML=svgIcon("pin");pb.title="고정";pb.setAttribute("aria-label","메시지 고정");pb.onclick=()=>pinMsg(m);acts.appendChild(pb);
+    if(mine){const db2=document.createElement("button");db2.innerHTML=svgIcon("trash");db2.title="삭제";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);acts.appendChild(db2);}
+    row.appendChild(acts);
     feed.appendChild(row);
     if((threadAll[m.__key]&&threadAll[m.__key].length)||openThreads.has(m.__key))feed.appendChild(renderThreadBox(m.__key));
   });
