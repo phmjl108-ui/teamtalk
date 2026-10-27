@@ -321,6 +321,8 @@ const el=id=>document.getElementById(id);
 const init=s=>(s||"?").trim()[0]||"?";
 function hash(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
 function fmtSize(b){return b<1024?b+"B":b<1048576?Math.round(b/1024)+"KB":(b/1048576).toFixed(1)+"MB";}
+// 이름 = 고유 계정. 이름을 안전한 키로 변환(특수문자·점 포함 대응) → 같은 이름은 항상 같은 노드 하나.
+function nameKey(n){return "u_"+hash(String(n||""));}
 
 let db, me, myImg=null, cur="일반", chans={"일반":1}, profiles={}, unsub=null, typingRef=null, typingTimer=null, lastType=0, pend=[], prevMeta=null, chanEdit=null, curPeer=null, dms={};
 let clientId;
@@ -383,13 +385,14 @@ function readData(f){return new Promise((res,rej)=>{const fr=new FileReader();fr
 function boot(nick){
   if(!firebase.apps.length)firebase.initializeApp(FB);
   db=firebase.database();
-  me=nick; el("myName").textContent=me;
+  me=nick; clientId=nameKey(nick); el("myName").textContent=me;
   el("input").disabled=false; el("composer").querySelector(".send").disabled=false;
   refreshAdminBtn();
   db.ref("banned").on("value",s=>{banned=s.val()||{};applyBan();});
   maybePurge();applyBan();
   db.ref("profiles").on("value",s=>{profiles=s.val()||{};refreshMyAv();if(cur)renderFeed();renderCh();});
-  db.ref("profiles/"+clientId).update({name:me,img:myImg||null});
+  // 이름 계정 노드에 이름을 반영하되, 다른 기기가 올린 최신 사진을 덮어쓰지 않도록 먼저 읽고 승계
+  db.ref("profiles/"+clientId).once("value").then(s=>{const v=s.val();if(v&&typeof v.img!=="undefined"&&v.img!==null)myImg=v.img;db.ref("profiles/"+clientId).update({name:me,img:myImg||null});}).catch(()=>{db.ref("profiles/"+clientId).update({name:me,img:myImg||null});});
   db.ref("dmIndex/"+clientId).on("value",s=>{dms=s.val()||{};syncWatchers();renderCh();});
   let opened=false;
   db.ref("channels").on("value",s=>{chans=s.val()||{};if(!Object.keys(chans).length)chans={"일반":1};syncWatchers();if(!opened){opened=true;const st=(lastCur&&chans[lastCur])?lastCur:Object.keys(chans)[0];openCh(st);}else if(!isDM(cur)&&!chans[cur]){openCh(Object.keys(chans)[0]);}renderCh();});
@@ -538,14 +541,14 @@ window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 el("nameBtn").onclick=()=>{el("pName").value=me;const pv=el("pavPreview");if(myImg){pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}else{pv.style.backgroundImage="";pv.textContent=init(me);}el("pErr").textContent="";el("profileOv").classList.add("show");};
 el("pavPreview").onclick=()=>el("profileFile").click();
 el("profileFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{myImg=await shrink(f,160,0.7);const pv=el("pavPreview");pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}catch(err){el("pErr").textContent="사진을 불러오지 못했습니다.";}};
-el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;el("myName").textContent=me;refreshAdminBtn();applyBan();try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref(msgPath(cur)).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
+el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;clientId=nameKey(me);el("myName").textContent=me;refreshAdminBtn();applyBan();syncWatchers();try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref(msgPath(cur)).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
 el("pClose").onclick=()=>el("profileOv").classList.remove("show");
 
 // 상대 프로필 보기 → 1:1 대화
 function openPeer(cid,name){
-  let pid=cid;
-  if(!pid&&name){const f=Object.entries(profiles).find(([k,v])=>v&&v.name===name);if(f)pid=f[0];}
-  const prof=(pid&&profiles[pid])||{};const nm=prof.name||name||"사용자";
+  // 신원은 이름 기준 → 이름이 있으면 이름키를, 없으면(옛 메시지) 저장된 cid를 사용
+  let pid = name ? nameKey(name) : cid;
+  const prof=(pid&&profiles[pid])||(name?(Object.values(profiles).find(v=>v&&v.name===name)||{}):{});const nm=prof.name||name||"사용자";
   const av=el("peerAv");if(prof.img){av.style.backgroundImage="url("+prof.img+")";av.textContent="";}else{av.style.backgroundImage="";av.textContent=init(nm);}
   el("peerName").textContent=nm;
   const b=el("peerDM");
@@ -793,7 +796,12 @@ function shareLink(){return location.origin+location.pathname;}
 el("shareBtn").onclick=()=>{const url=shareLink();el("qrbox").innerHTML="";try{const c=document.createElement("canvas");el("qrbox").appendChild(c);new QRious({element:c,value:url,size:200,level:"M"});}catch(e){el("qrbox").textContent="QR 생성 실패";}el("shareUrl").value=url;el("shareOv").classList.add("show");};
 el("shareClose").onclick=()=>el("shareOv").classList.remove("show");
 el("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(shareLink());el("copyBtn").textContent="복사됨 ✓";setTimeout(()=>el("copyBtn").textContent="링크 복사",1500);}catch(e){el("shareUrl").select();document.execCommand("copy");}};
-async function resolveIdentity(nick){try{const snap=await db.ref("profiles").once("value");const profs=snap.val()||{};const f=Object.entries(profs).find(([k,v])=>v&&v.name===nick);if(f){clientId=f[0];try{localStorage.setItem(LS+"_cid",clientId)}catch(e){}if(f[1]&&f[1].img)myImg=f[1].img;}}catch(e){}}
+async function resolveIdentity(nick){clientId=nameKey(nick);try{const snap=await db.ref("profiles").once("value");const profs=snap.val()||{};
+  // 이미 이름 기반 계정 노드가 있으면 그 사진을 사용
+  if(profs[clientId]&&profs[clientId].img){myImg=profs[clientId].img;return;}
+  // 없으면 같은 이름의 기존(예전 기기별) 기록 중 사진 있는 것을 승계
+  const withImg=Object.values(profs).find(v=>v&&v.name===nick&&v.img);if(withImg)myImg=withImg.img;
+}catch(e){}}
 el("connect").onclick=async()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{if(!firebase.apps.length)firebase.initializeApp(FB);db=firebase.database();await resolveIdentity(nick);const wasOnboarded=!!localStorage.getItem(LS+"_onboard");boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");if(wasOnboarded)showNews();else{try{localStorage.setItem(LS+"_news",String(NEWS_VER))}catch(e){}maybeOnboard();}if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
 el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
