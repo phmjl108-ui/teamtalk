@@ -115,6 +115,10 @@ button{font-family:inherit}
 .toast{pointer-events:auto;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border:.5px solid var(--line);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.16);padding:11px 30px 11px 14px;cursor:pointer;position:relative;animation:tin .22s ease}
 .toast .tt{font-weight:600;font-size:14px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .toast .tb{font-size:13px;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.toast .nmsg{font-size:14px;color:var(--txt);line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.toast .nmeta{display:flex;align-items:center;gap:8px}
+.toast .nname{font-size:12px;font-weight:600;color:#fff;background:var(--accent);padding:3px 11px;border-radius:999px;flex-shrink:0;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast .nch{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .toast .tx{position:absolute;top:6px;right:9px;color:var(--muted);font-size:15px;line-height:1}
 @keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .filechip{cursor:pointer}
@@ -221,8 +225,11 @@ button{font-family:inherit}
 .treplyform .ts{border:0;background:var(--accent);color:#fff;border-radius:50%;width:30px;height:30px;flex-shrink:0;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center}
 .treplyform .ts::after{content:"↑";font-size:16px;font-weight:700;line-height:1}
 /* 회신(인용 답장) */
-.quotebar{display:flex;align-items:center;gap:10px;margin:8px 12px 2px;padding:9px 14px;background:var(--bg-2);border-radius:14px}
+.quotebar{display:flex;align-items:center;gap:11px;margin:8px 12px 10px;padding:9px 14px;background:var(--bg-2);border-radius:14px}
+.quotebar .qic{display:inline-flex;align-items:center;color:var(--accent);flex-shrink:0}
+.quotebar .qic .icon{width:19px;height:19px}
 .quotebar .quote{flex:1;min-width:0;background:none;padding:0}
+.quotebar .qt{display:block;white-space:nowrap;text-overflow:ellipsis}
 .quotebar .qx{background:none;border:0;color:var(--muted);border-radius:50%;width:26px;height:26px;cursor:pointer;flex-shrink:0;font-size:15px;display:inline-flex;align-items:center;justify-content:center}
 .quotebar .qx:hover{background:var(--hover);color:var(--txt)}
 .quote{background:var(--bg-2);border-radius:12px;padding:8px 13px}
@@ -268,7 +275,7 @@ button{font-family:inherit}
   <div class="banner" id="banNote" style="display:none">🚫 현재 메시지 전송이 제한되어 있습니다.</div>
   <div class="typing" id="typing"></div>
   <div class="attachstrip" id="attachStrip"></div>
-  <div class="quotebar" id="quoteBar" style="display:none"><div class="quote"><div class="qn" id="quoteName"></div><div class="qt" id="quoteText"></div></div><button class="qx" id="quoteCancel" type="button" aria-label="회신 취소">✕</button></div>
+  <div class="quotebar" id="quoteBar" style="display:none"><span class="qic" id="quoteIc"></span><div class="quote"><div class="qn" id="quoteName"></div><div class="qt" id="quoteText"></div></div><button class="qx" id="quoteCancel" type="button" aria-label="답장 취소">✕</button></div>
   <form class="composer" id="composer">
     <button type="button" class="attach" id="attachBtn" title="이미지·파일 첨부">＋</button>
     <textarea id="input" rows="1" placeholder="메시지 입력…" autocomplete="off" disabled></textarea>
@@ -474,7 +481,7 @@ function watchKey(k,title){
     if(key&&(!lastKeyOf[k]||key>lastKeyOf[k])){
       lastKeyOf[k]=key;const viewing=(k===cur&&!document.hidden);
       if(viewing){seenKey[k]=key;unreadN[k]=0;if(!isMineMsg(msg)&&msg&&msg.t&&me&&msg.t.indexOf("@"+me)>=0)toast("멘션 · "+((msg&&msg.u)||""),msg.t,k);}
-      else if(!isMineMsg(msg)){unreadN[k]=(unreadN[k]||0)+1;notify(title+" · "+((msg&&msg.u)||""),msgPreview(msg),k);}
+      else if(!isMineMsg(msg)){unreadN[k]=(unreadN[k]||0)+1;notifyMsg((msg&&msg.u)||"",title,msgPreview(msg),k,isDM(k));}
       saveUnread();renderCh();
     }
   });
@@ -695,6 +702,26 @@ function listenTyping(name){if(typingRef)typingRef.off();typingRef=db.ref("typin
 // 알림
 function toast(title,body,ch){const w=el("toasts");if(!w)return;const d=document.createElement("div");d.className="toast";d.innerHTML='<span class="tx">×</span><div class="tt"></div><div class="tb"></div>';d.querySelector(".tt").textContent=title;d.querySelector(".tb").textContent=body||"";d.querySelector(".tx").onclick=e=>{e.stopPropagation();d.remove();};d.onclick=()=>{if(ch)openKey(ch);d.remove();};w.appendChild(d);while(w.children.length>4)w.firstChild.remove();setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},6000);}
 async function notify(title,body,ch){toast(title,body,ch);if(!("Notification"in window)||Notification.permission!=="granted")return;const opts={body:body||"",tag:"tt-"+ch,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch}};try{if(navigator.serviceWorker){const reg=await navigator.serviceWorker.ready;if(reg&&reg.showNotification){await reg.showNotification(title,opts);return;}}}catch(e){}try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();if(ch)openKey(ch);n.close();};}catch(e){}}
+// 메시지 알림: 앱 안 팝업(메시지 위 + 이름 배지 + 채널), 윈도우 알림(제목 "이름 · #채널", 내용 메시지)
+async function notifyMsg(sender,chanLabel,message,key,dm){
+  const w=el("toasts");
+  if(w){
+    const d=document.createElement("div");d.className="toast ntf";
+    d.innerHTML='<span class="tx">×</span><div class="nmsg"></div><div class="nmeta"><span class="nname"></span><span class="nch"></span></div>';
+    d.querySelector(".nmsg").textContent=message||"";
+    d.querySelector(".nname").textContent=sender||"";
+    d.querySelector(".nch").textContent=dm?"1:1 대화":chanLabel;
+    d.querySelector(".tx").onclick=e=>{e.stopPropagation();d.remove();};
+    d.onclick=()=>{if(key)openKey(key);d.remove();};
+    w.appendChild(d);while(w.children.length>4)w.firstChild.remove();
+    setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},6000);
+  }
+  if(!("Notification"in window)||Notification.permission!=="granted")return;
+  const title=dm?sender:(sender+" · "+chanLabel);
+  const opts={body:message||"",tag:"tt-"+key,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch:key}};
+  try{if(navigator.serviceWorker){const reg=await navigator.serviceWorker.ready;if(reg&&reg.showNotification){await reg.showNotification(title,opts);return;}}}catch(e){}
+  try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();if(key)openKey(key);n.close();};}catch(e){}
+}
 function updNotifBtn(){const b=el("notifBtn");if(!b)return;if(!("Notification"in window)){b.style.display="none";return;}const p=Notification.permission;if(p==="granted"){b.style.display="none";return;}b.style.display="flex";const ic=b.querySelector(".mi-ic");if(ic)ic.innerHTML=svgIcon("bell");const lb=b.querySelector(".mi-lb");if(p==="denied"){if(lb)lb.textContent="알림 차단됨";b.style.color="#FF3B30";}else{if(lb)lb.textContent="알림 켜기";b.style.color="";}}
 window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 
@@ -952,7 +979,7 @@ el("themeBtn").onclick=()=>{const n=effTheme()==="dark"?"light":"dark";document.
 if(window.matchMedia){try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(!document.documentElement.getAttribute("data-theme"))updThemeIcon();});}catch(e){}}
 el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("소곤","알림이 켜졌어요 🎉",cur);});};
 // 정적 아이콘 주입(통일된 SVG)
-try{setIcon("ham","menu");setIcon("sideClose","collapse");setIcon("moreBtn","dots");setMitemIcon("helpBtn","info");setMitemIcon("shareBtn","share");setMitemIcon("adminBtn","shield");el("admTabLog").innerHTML=svgIcon("reply")+"전체 기록";el("admTabUser").innerHTML=svgIcon("person")+"사용자";}catch(e){}
+try{setIcon("ham","menu");setIcon("sideClose","collapse");setIcon("moreBtn","dots");setIcon("quoteIc","corner");setMitemIcon("helpBtn","info");setMitemIcon("shareBtn","share");setMitemIcon("adminBtn","shield");el("admTabLog").innerHTML=svgIcon("reply")+"전체 기록";el("admTabUser").innerHTML=svgIcon("person")+"사용자";}catch(e){}
 // 더보기(⋯) 메뉴 토글 + 바깥 클릭 닫기 + 항목 클릭 시 닫기
 el("moreBtn").onclick=e=>{e.stopPropagation();el("moreMenu").classList.toggle("show");};
 el("moreMenu").addEventListener("click",()=>el("moreMenu").classList.remove("show"));
