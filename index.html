@@ -120,6 +120,9 @@ button{font-family:inherit}
 .guide{margin-bottom:14px}
 .guide .gstep{font-size:13px;line-height:1.6;color:var(--txt);margin:0 0 11px;padding-bottom:11px;border-bottom:.5px solid var(--line)}
 .guide .gnote{font-size:12.5px;line-height:1.6;color:var(--muted);margin:4px 0 0}
+.gchk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:2px 0 12px;cursor:pointer;justify-content:center}
+.gchk input{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0}
+.pnote{font-size:12px;line-height:1.5;color:var(--muted);text-align:left;margin:0 0 10px}
 .newslist{list-style:none;padding:0;margin:4px 0 14px}
 .newslist li{font-size:14px;line-height:1.5;color:var(--txt);padding:10px 2px;border-bottom:.5px solid var(--line)}
 .newslist li:last-child{border-bottom:0}
@@ -132,6 +135,13 @@ button{font-family:inherit}
 .admincard{max-width:560px;max-height:85vh;display:flex;flex-direction:column}
 .adminbar{display:flex;gap:8px;margin-bottom:10px}
 .adminbar input{flex:1;margin:0;padding:9px 12px;border:.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--txt);font-size:14px}
+.admintabs{display:flex;gap:6px;margin-bottom:10px}
+.atab{flex:1;padding:8px 10px;border:.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer}
+.atab.on{background:var(--sel);color:var(--accent);border-color:transparent}
+.urow{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:.5px solid var(--line)}
+.urow .uav{width:30px;height:30px;border-radius:50%;background:var(--accent);background-size:cover;background-position:center;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.urow .un{flex:1;min-width:0}.urow .un b{display:block;color:var(--txt)}.urow .un .uc{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.urow .umsg{font-size:12px;color:var(--muted);white-space:nowrap}
 .adminbody{flex:1;overflow:auto;max-height:58vh;border:.5px solid var(--line);border-radius:12px;padding:10px;font-size:13px;line-height:1.5;background:var(--bg)}
 .adminbody .agrp{font-weight:700;color:var(--accent);margin:12px 0 4px;position:sticky;top:-10px;background:var(--bg);padding:4px 0}
 .adminbody .arow{padding:5px 2px;border-bottom:.5px solid var(--line);word-break:break-word}
@@ -139,6 +149,24 @@ button{font-family:inherit}
 .adminbody .at{color:var(--muted);font-size:11px}
 .ment{color:var(--accent);font-weight:600}
 .msg.me .bub .ment{color:#fff;text-decoration:underline}
+.ch .star{opacity:0;font-size:13px;padding:2px 3px;border-radius:6px;cursor:pointer;flex-shrink:0;line-height:1}
+.ch:hover .star,.ch.on .star{opacity:.5}
+.ch .star.fav{opacity:1;color:#ffb300}
+.msg .repbtn{opacity:0;background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px;align-self:center;display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
+.msg:hover .repbtn{opacity:.55}
+.msg .repbtn.has{opacity:.85;color:var(--accent)}
+.threadwrap{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;flex-direction:column}
+.threadwrap.show{display:flex}
+.thead{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;border-bottom:.5px solid var(--line);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+.thead .tback{background:none;border:0;color:var(--accent);font-size:26px;line-height:1;cursor:pointer;padding:0 4px}
+.thead h3{margin:0;font-size:16px;font-weight:600;flex:1;letter-spacing:-.01em}
+.tparent{padding:12px 16px;border-bottom:.5px solid var(--line);background:var(--bg-2)}
+.tparent .pu{font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.tparent .pt{font-size:15px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+.trepl{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:3px}
+.composer #tInput{flex:1;padding:8px 14px;min-height:40px;max-height:120px;border:.5px solid var(--line);border-radius:18px;background:var(--bg);color:var(--txt);font-size:17px;font-family:inherit;line-height:1.3;resize:none;overflow-y:auto;scrollbar-width:none}
+.composer #tInput::-webkit-scrollbar{display:none;width:0;height:0}
+.composer #tInput:focus{outline:none;border-color:var(--accent)}
 @media(max-width:720px){
   .side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
   .side.open{transform:translateX(0)} .ham{display:block} .msg{max-width:86%}
@@ -166,7 +194,7 @@ button{font-family:inherit}
   </div>
   <div class="pinbar" id="pinBar" style="display:none"></div>
   <div class="feed" id="feed"></div>
-  <div class="banner" id="banNote" style="display:none">🚫 관리자에 의해 채팅이 금지되었습니다.</div>
+  <div class="banner" id="banNote" style="display:none">🚫 현재 메시지 전송이 제한되어 있습니다.</div>
   <div class="typing" id="typing"></div>
   <div class="attachstrip" id="attachStrip"></div>
   <form class="composer" id="composer">
@@ -200,6 +228,7 @@ button{font-family:inherit}
   <h3>내 프로필</h3>
   <div class="pavwrap"><div class="pav" id="pavPreview"></div></div>
   <input type="text" id="pName" placeholder="대화명">
+  <p class="pnote">💡 PC·폰 어디서든 <b>같은 대화명</b>으로 입장하면 이 프로필과 지난 대화를 그대로 이어서 쓸 수 있어요. 다른 이름으로 들어오면 다른 사용자가 됩니다.</p>
   <div class="err" id="pErr"></div>
   <button id="pSave">저장</button>
   <button class="ghost" id="pClose">닫기</button>
@@ -231,8 +260,10 @@ button{font-family:inherit}
     <p class="gstep"><b>① 앱 설치 — 아이폰 (Safari)</b><br>하단 <b>공유</b> 버튼 → <b>홈 화면에 추가</b>.</p>
     <p class="gstep"><b>① 앱 설치 — 안드로이드 (Chrome)</b><br>메뉴(⋮) → <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>.</p>
     <p class="gstep"><b>② 알림 켜기</b><br>상단 <b>🔔 알림 켜기</b> 버튼 → <b>허용</b>. (버튼이 안 보이면 이미 켜진 상태입니다.)</p>
+    <p class="gstep"><b>③ 여러 기기에서 같은 대화 쓰기</b><br>PC·폰 어디서든 <b>같은 대화명</b>으로 입장하면 내 프로필과 지난 대화를 그대로 이어서 볼 수 있어요. 다른 이름으로 들어오면 다른 사용자로 취급됩니다.</p>
     <p class="gnote">설치하고 알림을 켜면, 안 보고 있는 채널·1:1 대화에 새 메시지가 오면 <b>윈도우·폰 알림</b>으로 알려줍니다.</p>
   </div>
+  <label class="gchk" id="guideSkipRow" style="display:none"><input type="checkbox" id="guideSkip"> 다시 보지 않기 (언제든 ℹ️ 로 다시 볼 수 있어요)</label>
   <button id="guideNotif">🔔 지금 알림 켜기</button>
   <button class="ghost" id="guideData">🔒 데이터 정책 보기</button>
   <button class="ghost" id="guideClose">닫기</button>
@@ -246,7 +277,8 @@ button{font-family:inherit}
 </div></div>
 
 <div class="ov" id="adminOv"><div class="card admincard" style="text-align:left">
-  <h3 style="text-align:center">🛡️ 관리자 · 전체 기록</h3>
+  <h3 style="text-align:center">🛡️ 관리자</h3>
+  <div class="admintabs"><button type="button" id="admTabLog" class="atab on">💬 전체 기록</button><button type="button" id="admTabUser" class="atab">👥 사용자</button></div>
   <div class="adminbar"><input type="text" id="adminSearch" placeholder="검색(이름·내용)"><button class="ghost" id="adminRefresh" style="width:auto;margin:0;padding:8px 12px">새로고침</button></div>
   <div id="adminBody" class="adminbody">불러오는 중…</div>
   <button class="ghost" id="adminClose">닫기</button>
@@ -255,11 +287,11 @@ button{font-family:inherit}
 <div class="ov" id="dataOv"><div class="card" style="text-align:left">
   <h3 style="text-align:center">🔒 데이터 정책</h3>
   <div class="guide">
-    <p class="gstep"><b>어디에 저장되나요</b><br>메시지·프로필·사진·파일은 Firebase 실시간 DB에 저장됩니다. 테스트 모드(공개)라 <b>키를 아는 사람은 접근할 수 있어</b> 암호화된 비밀 대화가 아닙니다. 민감정보(주민번호·비밀번호·카드번호)는 올리지 마세요.</p>
-    <p class="gstep"><b>누가 볼 수 있나요</b><br>채널 메시지는 들어온 사람 모두, 1:1 대화는 두 당사자. 관리자(혜밍웨이)는 운영을 위해 전체 기록을 볼 수 있습니다.</p>
+    <p class="gstep"><b>어디에 저장되나요</b><br>메시지·프로필·사진·파일은 Firebase 실시간 DB에 저장됩니다.</p>
+    <p class="gstep"><b>누가 볼 수 있나요</b><br>채널 메시지는 그 채널에 들어온 사람 모두가, 1:1 대화는 두 당사자가 볼 수 있습니다.</p>
     <p class="gstep"><b>운영 시간 &amp; 자동 삭제</b><br>대화는 <b>오전 6시~오후 11시</b>에만 할 수 있습니다. <b>매일 밤 11시에 모든 대화 내용이 사라집니다.</b> 단, <b>채널 목록과 1:1 대화 목록은 유지</b>되고 대화 내용만 비워집니다. 남기고 싶은 내용은 미리 저장해 두세요.</p>
     <p class="gstep"><b>삭제</b><br>내 메시지는 삭제 버튼으로 지울 수 있고, 채널 삭제 시 그 안의 메시지도 함께 삭제됩니다. 지운 데이터는 복구되지 않습니다.</p>
-    <p class="gnote">문의나 삭제 요청은 관리자(혜밍웨이)에게 1:1 대화로 보내주세요.</p>
+    <p class="gnote">남기고 싶은 대화는 매일 밤 정리 전에 미리 저장해 두세요.</p>
   </div>
   <button class="ghost" id="dataClose">닫기</button>
 </div></div>
@@ -267,6 +299,16 @@ button{font-family:inherit}
 <div class="viewer" id="viewer">
   <div class="vbar"><span class="vname" id="viewerName"></span><a class="vdl" id="viewerDl" download>⤓ 다운로드</a><button class="vclose" id="viewerClose">✕</button></div>
   <div class="vbody" id="viewerBody"></div>
+</div>
+
+<div class="threadwrap" id="threadWrap">
+  <div class="thead"><button class="tback" id="threadBack" aria-label="뒤로">‹</button><h3>스레드</h3></div>
+  <div class="tparent" id="threadParent"></div>
+  <div class="trepl" id="threadRepl"></div>
+  <form class="composer" id="tComposer">
+    <textarea id="tInput" rows="1" placeholder="답글 입력…  (Shift+Enter 줄바꿈)" autocomplete="off"></textarea>
+    <button type="submit" class="send" aria-label="답글 보내기"></button>
+  </form>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -297,6 +339,14 @@ function isMineMsg(m){return !!(m&&(m.cid?m.cid===clientId:m.u===me));}
 function attHas(m){return !!(m&&(m.img||(m.atts&&(Array.isArray(m.atts)?m.atts.length:Object.keys(m.atts).length))));}
 function msgPreview(m){return (m&&m.t)||(m&&m.img?"사진":(attHas(m)?"첨부":""));}
 function markSeen(name){unreadN[name]=0;if(lastKeyOf[name])seenKey[name]=lastKeyOf[name];saveUnread();}
+// 즐겨찾기(개인 설정: 기기별 localStorage) — 채널 이름 또는 dm 키 저장
+let fav=new Set();try{fav=new Set(JSON.parse(localStorage.getItem(LS+"_fav")||"[]"))}catch(e){}
+function saveFav(){try{localStorage.setItem(LS+"_fav",JSON.stringify([...fav]))}catch(e){}}
+function isFav(k){return fav.has(k);}
+function toggleFav(k){if(fav.has(k))fav.delete(k);else fav.add(k);saveFav();renderCh();}
+// 스레드(메시지 하위 대화)
+let threadCntRef=null, threadMsgRef=null, threadCounts={}, curThread=null, curThreadArr=[];
+function threadBase(k){return isDM(k)?("dm/"+k+"/thread"):("thread/"+k);}
 // DM 유틸: 두 clientId로 고유 키 생성(둘만 공유), 채널과 분리
 function isDM(k){return typeof k==="string"&&k.indexOf("dm_")===0;}
 function dmKey(a,b){return "dm_"+[a,b].sort().join("__");}
@@ -347,46 +397,59 @@ function boot(nick){
 function refreshMyAv(){const p=profiles[clientId];const a=el("miniAv");if(p&&p.img){a.style.backgroundImage="url("+p.img+")";}else a.style.backgroundImage="";}
 function closeDrawer(){el("side").classList.remove("open");el("scrim").classList.remove("show");}
 
+function mkStar(k){const st=document.createElement("span");st.className="star"+(isFav(k)?" fav":"");st.textContent=isFav(k)?"★":"☆";st.title="즐겨찾기";st.setAttribute("aria-label","즐겨찾기 토글");st.onclick=e=>{e.stopPropagation();toggleFav(k);};return st;}
+function mkChannelRow(name){
+  const locked=!!chanPw(name);
+  const d=document.createElement("div");d.className="ch"+(name===cur?" on":"");
+  const nm=document.createElement("span");nm.className="nm";nm.textContent=(locked?"🔒 ":"# ")+name;
+  const ed=document.createElement("span");ed.className="act";ed.textContent="⚙";ed.title="채널 설정";ed.setAttribute("aria-label","채널 설정");
+  ed.onclick=e=>{e.stopPropagation();openChanModal(name);};
+  const del=document.createElement("span");del.className="act";del.textContent="🗑";del.title="채널 삭제";del.setAttribute("aria-label","채널 삭제");
+  del.onclick=e=>{e.stopPropagation();deleteChannel(name);};
+  d.appendChild(nm);d.appendChild(mkStar(name));d.appendChild(ed);d.appendChild(del);
+  const u=unreadOf(name);if(u>0&&name!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
+  d.onclick=()=>{openCh(name);closeDrawer();};
+  return d;
+}
+function mkDmRow(pid){
+  const key=dmKey(clientId,pid);const nm=(dms[pid]&&dms[pid].name)||"대화";
+  const d=document.createElement("div");d.className="ch"+(key===cur?" on":"");
+  const av=document.createElement("span");av.className="cav";const pr=profiles[pid];
+  if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else av.textContent=init(nm);
+  const sp=document.createElement("span");sp.className="nm";sp.textContent=nm;
+  d.appendChild(av);d.appendChild(sp);d.appendChild(mkStar(key));
+  const u=unreadOf(key);if(u>0&&key!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
+  d.onclick=()=>{openDM(pid,nm);closeDrawer();};
+  return d;
+}
+function lab(w,txt){const l=document.createElement("div");l.className="chlab";l.textContent=txt;w.appendChild(l);}
 function renderCh(){
-  const w=el("chlist");w.innerHTML='<div class="chlab">채널</div>';
-  Object.keys(chans).forEach(name=>{
-    const locked=!!chanPw(name);
-    const d=document.createElement("div");d.className="ch"+(name===cur?" on":"");
-    const nm=document.createElement("span");nm.className="nm";nm.textContent=(locked?"🔒 ":"# ")+name;
-    const ed=document.createElement("span");ed.className="act";ed.textContent="⚙";ed.title="채널 설정";
-    ed.onclick=e=>{e.stopPropagation();openChanModal(name);};
-    const del=document.createElement("span");del.className="act";del.textContent="🗑";del.title="채널 삭제";
-    del.onclick=e=>{e.stopPropagation();deleteChannel(name);};
-    d.appendChild(nm);
-    d.appendChild(ed);d.appendChild(del);
-    const u=unreadOf(name);if(u>0&&name!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
-    d.onclick=()=>{openCh(name);closeDrawer();};
-    w.appendChild(d);
-  });
-  const pids=Object.keys(dms);
-  if(pids.length){
-    const lab=document.createElement("div");lab.className="chlab";lab.textContent="다이렉트";w.appendChild(lab);
-    pids.sort((a,b)=>((dms[b].ts||0)-(dms[a].ts||0))).forEach(pid=>{
-      const key=dmKey(clientId,pid);const nm=(dms[pid]&&dms[pid].name)||"대화";
-      const d=document.createElement("div");d.className="ch"+(key===cur?" on":"");
-      const av=document.createElement("span");av.className="cav";const pr=profiles[pid];
-      if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else av.textContent=init(nm);
-      const sp=document.createElement("span");sp.className="nm";sp.textContent=nm;
-      d.appendChild(av);d.appendChild(sp);
-      const u=unreadOf(key);if(u>0&&key!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
-      d.onclick=()=>{openDM(pid,nm);closeDrawer();};
-      w.appendChild(d);
-    });
+  const w=el("chlist");w.innerHTML="";
+  const chNames=Object.keys(chans);
+  const pids=Object.keys(dms).sort((a,b)=>((dms[b].ts||0)-(dms[a].ts||0)));
+  const favChs=chNames.filter(n=>isFav(n));
+  const favDms=pids.filter(pid=>isFav(dmKey(clientId,pid)));
+  if(favChs.length||favDms.length){
+    lab(w,"⭐ 즐겨찾기");
+    favChs.forEach(n=>w.appendChild(mkChannelRow(n)));
+    favDms.forEach(pid=>w.appendChild(mkDmRow(pid)));
   }
+  lab(w,"채널");
+  chNames.filter(n=>!isFav(n)).forEach(n=>w.appendChild(mkChannelRow(n)));
+  const restDm=pids.filter(pid=>!isFav(dmKey(clientId,pid)));
+  if(restDm.length){lab(w,"다이렉트");restDm.forEach(pid=>w.appendChild(mkDmRow(pid)));}
 }
 
 let currentArr=[];
 function attachFeed(){
+  if(curThread&&curThread.conv!==cur)closeThread();
   el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
   if(unsub)unsub.off();
   const ref=db.ref(msgPath(cur)).limitToLast(300);unsub=ref;
   ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden)markSeen(cur);renderFeed();});
   if(pinRef)pinRef.off();pinRef=db.ref("pinned/"+cur);pinRef.on("value",s=>renderPinBar(s.val()));
+  if(threadCntRef)threadCntRef.off();threadCounts={};threadCntRef=db.ref(threadBase(cur));
+  threadCntRef.on("value",s=>{threadCounts={};s.forEach(p=>{let n=0;p.forEach(()=>{n++;});threadCounts[p.key]=n;});updateRepCounts();if(curThread&&curThread.conv===cur)renderThreadReplies();});
   listenTyping(cur);
 }
 function openCh(name){
@@ -431,6 +494,7 @@ function renderFeed(){
     });
     if(m.t){const b=document.createElement("div");b.className="bub";renderText(b,m.t);col.appendChild(b);}
     row.appendChild(av);row.appendChild(col);
+    const rb=document.createElement("button");rb.className="repbtn";rb.setAttribute("data-k",m.__key||"");const cnt=threadCounts[m.__key]||0;if(cnt)rb.classList.add("has");rb.innerHTML='💬<span>'+(cnt||"")+'</span>';rb.title="답글";rb.setAttribute("aria-label",cnt?("답글 "+cnt+"개 보기"):"답글 달기");rb.onclick=()=>openThread(m);row.appendChild(rb);
     const pb=document.createElement("button");pb.className="pinbtn";pb.textContent="📌";pb.title="고정";pb.setAttribute("aria-label","메시지 고정");pb.onclick=()=>pinMsg(m);row.appendChild(pb);
     if(mine){const db2=document.createElement("button");db2.className="delbtn";db2.textContent="🗑";db2.title="삭제";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);row.appendChild(db2);}
     feed.appendChild(row);
@@ -519,16 +583,20 @@ el("input").addEventListener("input",autoGrow);
 el("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(el("composer").requestSubmit)el("composer").requestSubmit();else el("composer").dispatchEvent(new Event("submit",{cancelable:true}));}});
 
 // 설치·알림 안내 가이드
-el("helpBtn").onclick=()=>el("guideOv").classList.add("show");
-el("setupGuide").onclick=()=>el("guideOv").classList.add("show");
-el("guideClose").onclick=()=>el("guideOv").classList.remove("show");
-el("guideOv").onclick=e=>{if(e.target===el("guideOv"))el("guideOv").classList.remove("show");};
-el("guideNotif").onclick=()=>{el("guideOv").classList.remove("show");if(el("notifBtn").onclick)el("notifBtn").onclick();};
-function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){localStorage.setItem(LS+"_onboard","1");setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
+let guideAuto=false;
+function openGuide(){guideAuto=false;el("guideSkipRow").style.display="none";el("guideOv").classList.add("show");}
+function closeGuide(){if(guideAuto){try{if(el("guideSkip").checked)localStorage.setItem(LS+"_onboard","1");else localStorage.removeItem(LS+"_onboard");}catch(e){}guideAuto=false;}el("guideOv").classList.remove("show");}
+el("helpBtn").onclick=openGuide;
+el("setupGuide").onclick=openGuide;
+el("guideClose").onclick=closeGuide;
+el("guideOv").onclick=e=>{if(e.target===el("guideOv"))closeGuide();};
+el("guideNotif").onclick=()=>{closeGuide();if(el("notifBtn").onclick)el("notifBtn").onclick();};
+// 신규 입장자에게만 1회 자동 노출. "다시 보지 않기"(기본 체크) 해제 시 다음 접속에 또 보여줌. 업데이트 안내와 동시에 뜨지 않음.
+function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){guideAuto=true;el("guideSkip").checked=true;el("guideSkipRow").style.display="flex";setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
 
 // 기능 업데이트 공지 (버전 올릴 때마다 모든 사용자에게 1회) — 관리자 전용 기능은 목록에 넣지 않음
-const NEWS_VER=2;
-const NEWS=["🏷️  앱 이름이 '소곤'으로 바뀌었어요","🙋  같은 이름으로 들어오면 내 프로필·대화 그대로","@  멘션하면 상대에게 알림이 가요","📌  중요한 메시지는 상단에 고정","🌙  대화는 오전 6시~밤 11시, 매일 밤 자동 정리(채널·1:1 목록은 유지)"];
+const NEWS_VER=3;
+const NEWS=["💬  메시지에 답글(스레드)을 달 수 있어요","⭐  자주 쓰는 채널·대화를 즐겨찾기에 고정","👤  같은 대화명으로 들어오면 어느 기기에서나 내 프로필·대화 그대로","📌  중요한 메시지는 상단에 고정 · @멘션 알림","🌙  대화는 오전 6시~밤 11시, 매일 밤 자동 정리(채널·1:1 목록은 유지)"];
 function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;localStorage.setItem(LS+"_news",String(NEWS_VER));const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
 el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
 el("newsOv").onclick=e=>{if(e.target===el("newsOv"))el("newsOv").classList.remove("show");};
@@ -545,7 +613,7 @@ function inWindow(){const h=new Date().getHours();return h>=OPEN_H&&h<CLOSE_H;}
 function applyBan(){
   const b=!!(banned&&banned[clientId]), off=!inWindow();
   const note=el("banNote"),inp=el("input"),snd=el("composer").querySelector(".send");
-  if(b){note.textContent="🚫 관리자에 의해 채팅이 금지되었습니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
+  if(b){note.textContent="🚫 현재 메시지 전송이 제한되어 있습니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
   else if(off){note.textContent="🌙 대화는 오전 6시~오후 11시에만 가능해요. 지난 대화는 매일 밤 11시에 사라집니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
   else if(me){note.style.display="none";inp.disabled=false;snd.disabled=false;inp.placeholder="메시지 입력…  (Shift+Enter 줄바꿈)";}
 }
@@ -557,24 +625,42 @@ async function maybePurge(){
     const tag=nightTag();
     const res=await db.ref("policy/purgedNight").transaction(c=>c===tag?undefined:tag);
     if(res.committed&&res.snapshot&&res.snapshot.val()===tag){
-      await db.ref().update({msg:null,dm:null,meta:null,pinned:null});
+      await db.ref().update({msg:null,dm:null,meta:null,pinned:null,thread:null});
     }
   }catch(e){}
 }
 
-// 관리자 전체 기록 보기
+// 관리자 전체 기록 + 사용자 목록
+let adminMode="log", adminUsers=[];
 async function openAdmin(){
   if(!isAdmin())return;
   el("adminOv").classList.add("show");const body=el("adminBody");body.textContent="불러오는 중…";
   try{
-    const [msgS,dmS]=await Promise.all([db.ref("msg").once("value"),db.ref("dm").once("value")]);
-    const msgAll=msgS.val()||{},dmAll=dmS.val()||{};adminData=[];
-    Object.keys(msgAll).forEach(ch=>{const ms=msgAll[ch]||{};Object.values(ms).forEach(m=>{if(m&&!m.sys)adminData.push({grp:"# "+ch,u:m.u,t:m.t||((m.img||m.atts)?"[첨부]":""),ts:m.ts});});});
-    Object.keys(dmAll).forEach(key=>{const ms=(dmAll[key]&&dmAll[key].msg)||{};Object.values(ms).forEach(m=>{if(m&&!m.sys)adminData.push({grp:"DM(1:1)",u:m.u,t:m.t||((m.img||m.atts)?"[첨부]":""),ts:m.ts});});});
+    const [msgS,dmS,prS]=await Promise.all([db.ref("msg").once("value"),db.ref("dm").once("value"),db.ref("profiles").once("value")]);
+    const msgAll=msgS.val()||{},dmAll=dmS.val()||{},prAll=prS.val()||{};adminData=[];
+    const cnt={};
+    Object.keys(msgAll).forEach(ch=>{const ms=msgAll[ch]||{};Object.values(ms).forEach(m=>{if(m&&!m.sys){adminData.push({grp:"# "+ch,u:m.u,t:m.t||((m.img||m.atts)?"[첨부]":""),ts:m.ts});cnt[m.u]=(cnt[m.u]||0)+1;}});});
+    Object.keys(dmAll).forEach(key=>{const ms=(dmAll[key]&&dmAll[key].msg)||{};Object.values(ms).forEach(m=>{if(m&&!m.sys){adminData.push({grp:"DM(1:1)",u:m.u,t:m.t||((m.img||m.atts)?"[첨부]":""),ts:m.ts});cnt[m.u]=(cnt[m.u]||0)+1;}});});
+    adminUsers=Object.entries(prAll).map(([cid,p])=>({cid,name:(p&&p.name)||"(이름없음)",img:(p&&p.img)||null,n:cnt[(p&&p.name)]||0})).sort((a,b)=>(b.n-a.n)||(a.name<b.name?-1:1));
     renderAdmin(el("adminSearch").value||"");
   }catch(e){body.textContent="불러오기 실패: "+e.message;}
 }
+function setAdminMode(m){adminMode=m;el("admTabLog").classList.toggle("on",m==="log");el("admTabUser").classList.toggle("on",m==="user");el("adminSearch").placeholder=m==="user"?"이름 검색":"검색(이름·내용)";renderAdmin(el("adminSearch").value||"");}
+function renderUsers(q){
+  const body=el("adminBody");body.innerHTML="";q=(q||"").toLowerCase();
+  const rows=adminUsers.filter(u=>!q||(u.name||"").toLowerCase().indexOf(q)>=0);
+  if(!rows.length){body.textContent="사용자가 없습니다.";return;}
+  const head=document.createElement("div");head.className="agrp";head.textContent="사용자 "+rows.length+"명";body.appendChild(head);
+  rows.forEach(u=>{
+    const d=document.createElement("div");d.className="urow";
+    const av=document.createElement("div");av.className="uav";if(u.img){av.style.backgroundImage="url("+u.img+")";}else av.textContent=init(u.name);
+    const nm=document.createElement("div");nm.className="un";const b=document.createElement("b");b.textContent=u.name+(u.cid===clientId?" (나)":"");const c=document.createElement("div");c.className="uc";c.textContent=u.cid;nm.appendChild(b);nm.appendChild(c);
+    const mc=document.createElement("div");mc.className="umsg";mc.textContent=u.n+"개";
+    d.appendChild(av);d.appendChild(nm);d.appendChild(mc);body.appendChild(d);
+  });
+}
 function renderAdmin(q){
+  if(adminMode==="user"){renderUsers(q);return;}
   const body=el("adminBody");body.innerHTML="";q=(q||"").toLowerCase();
   const rows=adminData.filter(r=>!q||((r.u||"").toLowerCase().indexOf(q)>=0||(r.t||"").toLowerCase().indexOf(q)>=0)).sort((a,b)=>a.grp<b.grp?-1:a.grp>b.grp?1:((a.ts||0)-(b.ts||0)));
   if(!rows.length){body.textContent="표시할 기록이 없습니다.";return;}
@@ -585,12 +671,13 @@ function renderAdmin(q){
     d.appendChild(b);d.appendChild(sp);d.appendChild(at);body.appendChild(d);
   });
 }
-el("adminBtn").onclick=openAdmin;el("adminClose").onclick=()=>el("adminOv").classList.remove("show");
+el("adminBtn").onclick=()=>{setAdminMode("log");openAdmin();};el("adminClose").onclick=()=>el("adminOv").classList.remove("show");
 el("adminRefresh").onclick=openAdmin;el("adminSearch").addEventListener("input",e=>renderAdmin(e.target.value));
+el("admTabLog").onclick=()=>setAdminMode("log");el("admTabUser").onclick=()=>setAdminMode("user");
 el("adminOv").onclick=e=>{if(e.target===el("adminOv"))el("adminOv").classList.remove("show");};
 
 // 데이터 정책
-el("guideData").onclick=()=>{el("guideOv").classList.remove("show");el("dataOv").classList.add("show");};
+el("guideData").onclick=()=>{closeGuide();el("dataOv").classList.add("show");};
 el("dataClose").onclick=()=>el("dataOv").classList.remove("show");
 el("dataOv").onclick=e=>{if(e.target===el("dataOv"))el("dataOv").classList.remove("show");};
 
@@ -600,6 +687,50 @@ function renderPinBar(pin){const bar=el("pinBar");if(!pin){bar.style.display="no
 
 // 멘션 하이라이트
 function renderText(container,text){const re=/(@[^\s@]{1,24})/g;let last=0,m;while((m=re.exec(text))){if(m.index>last)container.appendChild(document.createTextNode(text.slice(last,m.index)));const sp=document.createElement("span");sp.className="ment";sp.textContent=m[0];container.appendChild(sp);last=m.index+m[0].length;}if(last<text.length)container.appendChild(document.createTextNode(text.slice(last)));}
+
+// ===== 스레드(메시지 하위 대화) =====
+function updateRepCounts(){document.querySelectorAll("#feed .repbtn").forEach(b=>{const k=b.getAttribute("data-k");const n=threadCounts[k]||0;const sp=b.querySelector("span");if(sp)sp.textContent=n||"";b.classList.toggle("has",n>0);b.setAttribute("aria-label",n?("답글 "+n+"개 보기"):"답글 달기");});}
+function openThread(m){
+  if(!m||!m.__key||!db)return;
+  curThread={conv:cur,key:m.__key};
+  const p=el("threadParent");p.innerHTML="";
+  const pu=document.createElement("div");pu.className="pu";pu.textContent=m.u||"";p.appendChild(pu);
+  const pt=document.createElement("div");pt.className="pt";
+  if(m.t)renderText(pt,m.t);else pt.textContent=(m.img||attHas(m))?"[첨부]":"";
+  p.appendChild(pt);
+  el("threadRepl").innerHTML='<div class="empty">불러오는 중…</div>';
+  if(threadMsgRef)threadMsgRef.off();
+  threadMsgRef=db.ref(threadBase(cur)+"/"+m.__key);
+  threadMsgRef.on("value",s=>{curThreadArr=[];s.forEach(c=>{curThreadArr.push(Object.assign({__key:c.key},c.val()));});renderThreadReplies();});
+  el("threadWrap").classList.add("show");
+  setTimeout(()=>el("tInput").focus(),120);
+}
+function renderThreadReplies(){
+  const box=el("threadRepl");if(!box)return;box.innerHTML="";
+  if(!curThreadArr.length){box.innerHTML='<div class="empty">아직 답글이 없어요. 첫 답글을 남겨보세요.</div>';return;}
+  curThreadArr.forEach(m=>{
+    const mine=m.cid?m.cid===clientId:(m.u===me);
+    const row=document.createElement("div");row.className="msg"+(mine?" me":"");
+    const av=document.createElement("div");av.className="av";
+    let p=profiles[m.cid];if(!(p&&p.img)){const bn=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(bn)p=bn;}
+    if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else av.textContent=init(m.u);
+    av.onclick=()=>openPeer(m.cid,m.u);
+    const col=document.createElement("div");
+    const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;col.appendChild(meta);
+    if(m.t){const b=document.createElement("div");b.className="bub";renderText(b,m.t);col.appendChild(b);}
+    row.appendChild(av);row.appendChild(col);
+    if(mine){const d2=document.createElement("button");d2.className="delbtn";d2.textContent="🗑";d2.setAttribute("aria-label","답글 삭제");d2.onclick=()=>{if(confirm("이 답글을 삭제할까요?"))db.ref(threadBase(curThread.conv)+"/"+curThread.key+"/"+m.__key).remove();};row.appendChild(d2);}
+    box.appendChild(row);
+  });
+  box.scrollTop=box.scrollHeight;
+}
+function closeThread(){el("threadWrap").classList.remove("show");if(threadMsgRef){threadMsgRef.off();threadMsgRef=null;}curThread=null;curThreadArr=[];}
+el("threadBack").onclick=closeThread;
+el("threadWrap").addEventListener("keydown",e=>{if(e.key==="Escape")closeThread();});
+function tGrow(){const t=el("tInput");t.style.height="auto";t.style.height=Math.min(t.scrollHeight,120)+"px";}
+el("tInput").addEventListener("input",tGrow);
+el("tInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(el("tComposer").requestSubmit)el("tComposer").requestSubmit();else el("tComposer").dispatchEvent(new Event("submit",{cancelable:true}));}});
+el("tComposer").onsubmit=e=>{e.preventDefault();if(!curThread||!db)return;if(banned&&banned[clientId]){alert("현재 메시지 전송이 제한되어 있어요.");return;}if(!inWindow()){alert("대화는 오전 6시~오후 11시에만 가능해요.");return;}const v=el("tInput").value.trim();if(!v)return;db.ref(threadBase(curThread.conv)+"/"+curThread.key).push({u:me,cid:clientId,t:v,ts:Date.now()});el("tInput").value="";tGrow();};
 
 // 채널 설정 모달 (만들기 / 이름변경 / 비밀번호)
 function openChanModal(name){
@@ -631,7 +762,8 @@ el("chanSave").onclick=async()=>{
   const val=pw?{pw:hash(pw)}:(chanPw(old)?{pw:chanPw(old)}:1);
   if(nm!==old){
     const snap=await db.ref("msg/"+old).once("value");const mt=(await db.ref("meta/"+old).once("value")).val();
-    const up={};up["channels/"+nm]=val;up["channels/"+old]=null;up["msg/"+nm]=snap.val()||null;up["msg/"+old]=null;up["meta/"+nm]=mt||null;up["meta/"+old]=null;
+    const thr=(await db.ref("thread/"+old).once("value")).val();const pn=(await db.ref("pinned/"+old).once("value")).val();
+    const up={};up["channels/"+nm]=val;up["channels/"+old]=null;up["msg/"+nm]=snap.val()||null;up["msg/"+old]=null;up["meta/"+nm]=mt||null;up["meta/"+old]=null;up["thread/"+nm]=thr||null;up["thread/"+old]=null;up["pinned/"+nm]=pn||null;up["pinned/"+old]=null;
     await db.ref().update(up);
     if(unlocked.has(old)){unlocked.delete(old);}if(val&&val.pw){unlocked.add(nm);}saveUnlocked();
     unreadN[nm]=unreadN[old]||0;delete unreadN[old];if(seenKey[old]!==undefined){seenKey[nm]=seenKey[old];delete seenKey[old];}if(watchers[old]){watchers[old].ref.off();delete watchers[old];}saveUnread();
@@ -649,7 +781,7 @@ async function deleteChannel(name){
   const pw=chanPw(name);
   if(pw){if(!unlocked.has(name)){const inp=prompt('🔒 "'+name+'" 삭제하려면 비밀번호 입력');if(inp===null)return;if(hash(inp)!==pw){alert("비밀번호가 틀렸습니다.");return;}}else{if(!confirm('"'+name+'" 채널을 삭제할까요?'))return;}}
   else{if(!confirm('"'+name+'" 채널을 삭제할까요? 메시지도 모두 사라집니다.'))return;}
-  const up={};up["channels/"+name]=null;up["msg/"+name]=null;up["typing/"+name]=null;up["meta/"+name]=null;
+  const up={};up["channels/"+name]=null;up["msg/"+name]=null;up["typing/"+name]=null;up["meta/"+name]=null;up["thread/"+name]=null;up["pinned/"+name]=null;
   await db.ref().update(up);unlocked.delete(name);saveUnlocked();delete unreadN[name];delete seenKey[name];if(watchers[name]){watchers[name].ref.off();delete watchers[name];}saveUnread();
   if(cur===name)openCh(Object.keys(chans).filter(c=>c!==name)[0]||"일반");
 }
@@ -662,7 +794,7 @@ el("shareBtn").onclick=()=>{const url=shareLink();el("qrbox").innerHTML="";try{c
 el("shareClose").onclick=()=>el("shareOv").classList.remove("show");
 el("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(shareLink());el("copyBtn").textContent="복사됨 ✓";setTimeout(()=>el("copyBtn").textContent="링크 복사",1500);}catch(e){el("shareUrl").select();document.execCommand("copy");}};
 async function resolveIdentity(nick){try{const snap=await db.ref("profiles").once("value");const profs=snap.val()||{};const f=Object.entries(profs).find(([k,v])=>v&&v.name===nick);if(f){clientId=f[0];try{localStorage.setItem(LS+"_cid",clientId)}catch(e){}if(f[1]&&f[1].img)myImg=f[1].img;}}catch(e){}}
-el("connect").onclick=async()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{if(!firebase.apps.length)firebase.initializeApp(FB);db=firebase.database();await resolveIdentity(nick);const wasOnboarded=!!localStorage.getItem(LS+"_onboard");boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");if(wasOnboarded)showNews();else maybeOnboard();if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
+el("connect").onclick=async()=>{el("cfgErr").textContent="";const nick=el("nick").value.trim();if(!nick){el("cfgErr").textContent="대화명을 입력하세요.";return;}try{if(!firebase.apps.length)firebase.initializeApp(FB);db=firebase.database();await resolveIdentity(nick);const wasOnboarded=!!localStorage.getItem(LS+"_onboard");boot(nick);localStorage.setItem(LS,JSON.stringify({nick,img:myImg}));el("setup").classList.remove("show");if(wasOnboarded)showNews();else{try{localStorage.setItem(LS+"_news",String(NEWS_VER))}catch(e){}maybeOnboard();}if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().then(updNotifBtn);else updNotifBtn();}catch(e){el("cfgErr").textContent="연결 실패: "+e.message;}};
 el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 el("themeBtn").onclick=()=>{const c=document.documentElement.getAttribute("data-theme");const n=c==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}};
 el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("소곤","알림이 켜졌어요 🎉",cur);});};
