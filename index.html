@@ -698,7 +698,7 @@ el("input").addEventListener("paste",e=>{const items=e.clipboardData&&e.clipboar
 async function addFiles(files){
   for(const f of files){
     if(pend.length>=6){alert("한 번에 최대 6개까지 첨부할 수 있어요.");break;}
-    if(f.type==="image/gif"){if(f.size>5242880){alert('"'+(f.name||"GIF")+'"은 5MB를 넘어 첨부할 수 없어요.');continue;}try{pend.push({kind:"image",data:await readData(f),name:f.name||"image.gif"});}catch(err){}}
+    if(f.type==="image/gif"){try{pend.push({kind:"image",data:await readData(f),name:f.name||"image.gif"});}catch(err){}}
     else if(f.type&&f.type.indexOf("image/")===0){try{pend.push({kind:"image",data:await shrink(f,1000,0.6),name:f.name||"image.jpg"});}catch(err){}}
     else{if(f.size>1048576){alert('"'+(f.name||"파일")+'"은 1MB를 넘어 첨부할 수 없어요.');continue;}pend.push({kind:"file",data:await readData(f),name:f.name||"file",size:f.size});}
   }
