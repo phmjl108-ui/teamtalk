@@ -507,7 +507,7 @@ function boot(nick){
   el("input").disabled=false; el("composer").querySelector(".send").disabled=false;
   refreshAdminBtn();
   db.ref("banned").on("value",s=>{banned=s.val()||{};applyBan();});
-  maybePurge();applyBan();
+  maybePurge();catchUpPurge();applyBan();
   db.ref("profiles").on("value",s=>{profiles=s.val()||{};refreshMyAv();if(cur)renderFeed();renderCh();});
   // 이름 계정 노드에 이름을 반영하되, 다른 기기가 올린 최신 사진을 덮어쓰지 않도록 먼저 읽고 승계
   db.ref("profiles/"+clientId).once("value").then(s=>{const v=s.val();if(v&&typeof v.img!=="undefined"&&v.img!==null)myImg=v.img;db.ref("profiles/"+clientId).update({name:me,img:myImg||null});}).catch(()=>{db.ref("profiles/"+clientId).update({name:me,img:myImg||null});});
@@ -826,6 +826,27 @@ async function maybePurge(){
     }
   }catch(e){}
 }
+// 밤에 접속자가 없어 정리를 놓친 경우, 낮에 누군가 열면 전날(오늘 오전 6시 이전) 메시지를 따라잡아 정리
+function dayTag(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+async function catchUpPurge(){
+  if(!db||!inWindow())return;
+  try{
+    const y=new Date();y.setDate(y.getDate()-1);const lastNight=dayTag(y);const today=dayTag(new Date());
+    const pn=(await db.ref("policy/purgedNight").once("value")).val();
+    if(pn===lastNight||pn===today)return; // 지난밤 이미 정리됨
+    const res=await db.ref("policy/purgedNight").transaction(c=>(c===lastNight||c===today)?undefined:lastNight);
+    if(!res.committed)return;
+    const cut=new Date();cut.setHours(OPEN_H,0,0,0);const cutMs=cut.getTime();
+    const up={};
+    const addOld=(base,obj)=>{if(!obj)return;Object.keys(obj).forEach(k=>{const m=obj[k];if(m&&!m.sys&&(m.ts==null||m.ts<cutMs))up[base+"/"+k]=null;});};
+    const msg=(await db.ref("msg").once("value")).val()||{};Object.keys(msg).forEach(ch=>addOld("msg/"+ch,msg[ch]));
+    const dm=(await db.ref("dm").once("value")).val()||{};Object.keys(dm).forEach(k=>addOld("dm/"+k+"/msg",dm[k]&&dm[k].msg));
+    const thr=(await db.ref("thread").once("value")).val()||{};Object.keys(thr).forEach(ch=>{const ps=thr[ch]||{};Object.keys(ps).forEach(p=>addOld("thread/"+ch+"/"+p,ps[p]));});
+    const del=(await db.ref("deleted").once("value")).val()||{};addOld("deleted",del);
+    const pin=(await db.ref("pinned").once("value")).val()||{};Object.keys(pin).forEach(ch=>{const p=pin[ch];if(p&&(p.ts==null||p.ts<cutMs))up["pinned/"+ch]=null;});
+    if(Object.keys(up).length)await db.ref().update(up);
+  }catch(e){}
+}
 
 // 관리자 전체 기록 + 사용자 목록
 let adminMode="log", adminUsers=[];
@@ -1001,7 +1022,7 @@ el("input").addEventListener("focus",()=>{setTimeout(()=>{const f=el("feed");if(
 // 접근성: 아이콘 버튼 라벨 + 입력창 라벨
 try{el("attachBtn").setAttribute("aria-label","파일·이미지 첨부");el("themeBtn").setAttribute("aria-label","다크 모드 전환");el("shareBtn").setAttribute("aria-label","초대 링크 공유");el("nameBtn").setAttribute("aria-label","내 프로필");el("input").setAttribute("aria-label","메시지 입력");el("composer").querySelector(".send").setAttribute("aria-label","메시지 보내기");el("feed").setAttribute("role","log");el("feed").setAttribute("aria-live","polite");}catch(e){}
 // 운영 시간(06~23시) 및 밤 11시 대화 휘발을 1분마다 점검
-setInterval(()=>{if(me)applyBan();maybePurge();},60000);
+setInterval(()=>{if(me)applyBan();maybePurge();catchUpPurge();},60000);
 // 서비스워커: 새 버전 자동 감지 → 자동 새로고침(구버전 고착 방지)
 if("serviceWorker"in navigator){
   let reloaded=false;
