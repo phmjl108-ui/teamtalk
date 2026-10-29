@@ -457,6 +457,7 @@ try{seenKey=JSON.parse(localStorage.getItem(LS+"_seenkey")||"{}")}catch(e){}
 try{lastCur=localStorage.getItem(LS+"_cur")}catch(e){}
 function saveUnread(){try{localStorage.setItem(LS+"_unread",JSON.stringify(unreadN));localStorage.setItem(LS+"_seenkey",JSON.stringify(seenKey));}catch(e){}}
 function unreadOf(name){return unreadN[name]||0;}
+function updateAppBadge(){try{let total=0;for(const k in unreadN)total+=unreadN[k]||0;if("setAppBadge"in navigator){if(total>0)navigator.setAppBadge(total).catch(()=>{});else navigator.clearAppBadge().catch(()=>{});}}catch(e){}}
 function bumpSeq(ch){try{db.ref("meta/"+ch+"/seq").transaction(n=>(n||0)+1);}catch(e){}}
 function isMineMsg(m){return !!(m&&(m.cid?m.cid===clientId:m.u===me));}
 function attHas(m){return !!(m&&(m.img||(m.atts&&(Array.isArray(m.atts)?m.atts.length:Object.keys(m.atts).length))));}
@@ -591,6 +592,7 @@ function renderCh(){
   chNames.filter(n=>!isFav(n)).forEach(n=>w.appendChild(mkChannelRow(n)));
   const restDm=pids.filter(pid=>!isFav(dmKey(clientId,pid)));
   if(restDm.length){lab(w,"다이렉트");restDm.forEach(pid=>w.appendChild(mkDmRow(pid)));}
+  updateAppBadge();
 }
 
 let currentArr=[];
