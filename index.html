@@ -77,6 +77,10 @@ button{font-family:inherit}
 .binfo{display:flex;flex-direction:column;align-items:flex-start;gap:1px;margin-bottom:1px;flex-shrink:0;line-height:1.1}.msg.me .binfo{align-items:flex-end}
 .binfo .btime{font-size:10px;color:var(--muted-3);white-space:nowrap}
 .binfo .bunread{font-size:11px;color:#F7B500;font-weight:700;white-space:nowrap}
+.msg.delmsg{opacity:.7}
+.msg.delmsg .bub{background:rgba(255,59,48,.12);text-decoration:line-through}
+.msg.delmsg.me .bub{background:rgba(255,59,48,.18)}
+.deltag{font-size:10px;color:#FF3B30;font-weight:600;margin:0 6px 3px}.msg.me .deltag{text-align:right}
 .sysmsg{align-self:center;background:transparent;color:var(--muted);font-size:12px;font-weight:500;padding:8px 12px;max-width:85%;text-align:center}
 .typing{display:none;align-items:center;gap:7px;padding:4px 16px 2px;font-size:12px;color:var(--muted)}
 .typing.show{display:flex}
@@ -638,16 +642,19 @@ function renderCh(){
   updateAppBadge();
 }
 
-let currentArr=[], forceBottom=false;
+let currentArr=[], forceBottom=false, peek=false, deletedArr=[];
+function dmLabel(ck){try{const ids=ck.slice(3).split("__");return ids.map(id=>(profiles[id]&&profiles[id].name)||"?").join(" ↔ ");}catch(e){return "1:1 대화";}}
 function attachFeed(){
   forceBottom=true;
   openThreads=new Set();activeReply=null;replyDrafts={};
   el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
   if(unsub)unsub.off();
   const ref=db.ref(msgPath(cur)).limitToLast(300);unsub=ref;
-  ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden)markSeen(cur);renderFeed();});
+  ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden&&!peek)markSeen(cur);renderFeed();});
   if(pinRef)pinRef.off();pinRef=db.ref("pinned/"+cur);pinRef.on("value",s=>renderPinBar(s.val()));
   if(readRef)readRef.off();readMap={};readRef=db.ref("reads/"+cur);readRef.on("value",s=>{readMap=s.val()||{};renderFeed();});
+  deletedArr=[];
+  if(isAdmin()){const ck=cur;db.ref("deleted").once("value").then(s=>{if(cur!==ck)return;deletedArr=[];s.forEach(c=>{const v=c.val();if(v&&!v.sys&&v.ck===ck)deletedArr.push(Object.assign({__key:"del_"+c.key,__deleted:true},v));});renderFeed();}).catch(()=>{});}
   if(threadCntRef)threadCntRef.off();threadCounts={};threadAll={};threadCntRef=db.ref(threadBase(cur));
   threadCntRef.on("value",s=>{threadCounts={};threadAll={};s.forEach(p=>{const arr=[];p.forEach(c=>{arr.push(Object.assign({__key:c.key},c.val()));});threadAll[p.key]=arr;threadCounts[p.key]=arr.length;});renderFeed();});
   listenTyping(cur);
@@ -658,7 +665,7 @@ function openCh(name){
   if(cur&&db&&cur!==name)db.ref("typing/"+cur+"/"+clientId).remove();
   cur=name;curPeer=null;try{localStorage.setItem(LS+"_cur",name)}catch(e){}
   el("chName").textContent="# "+name;el("chName").title="채널 설정";
-  markSeen(name);renderCh();attachFeed();
+  peek=false;markSeen(name);renderCh();attachFeed();applyBan();
 }
 function openDM(peerId,peerName){
   if(!peerId||peerId===clientId){alert("자기 자신과는 1:1 대화를 할 수 없어요.");return;}
@@ -667,14 +674,17 @@ function openDM(peerId,peerName){
   cur=key;curPeer={id:peerId,name:nm};try{localStorage.setItem(LS+"_cur",key)}catch(e){}
   el("chName").textContent=nm;el("chName").title="1:1 대화";
   db.ref("dmIndex/"+clientId+"/"+peerId).update({name:nm,ts:Date.now()});
-  markSeen(key);renderCh();attachFeed();
+  peek=false;markSeen(key);renderCh();attachFeed();applyBan();
 }
+// 관리자 전용: 임의 대화(다른 사람 1:1 포함)를 흔적 없이 읽기 전용으로 열람
+function adminPeek(ck,label){if(!isAdmin()||!ck)return;if(cur&&db&&cur!==ck&&!peek)db.ref("typing/"+cur+"/"+clientId).remove();peek=true;cur=ck;curPeer=null;el("chName").textContent="👁 "+(label||"열람");el("chName").title="관리자 열람 · 흔적이 남지 않음";el("moreMenu").classList.remove("show");el("adminOv").classList.remove("show");try{el("side").classList.remove("open");}catch(e){}renderCh();attachFeed();applyBan();}
 function attArray(m){return Array.isArray(m.atts)?m.atts:(m.atts?Object.values(m.atts):[]);}
 function firstAtt(m){if(!m)return null;if(m.img)return{data:m.img,name:"image.jpg",kind:"image"};const a=attArray(m);if(a.length)return{data:a[0].data,name:a[0].name||"파일",kind:a[0].kind||"file"};return null;}
 function convMembers(){const s=new Set(Object.keys(readMap||{}));(currentArr||[]).forEach(x=>{if(x&&x.cid)s.add(x.cid);});return s;}
 function unreadOfMsg(m,members){if(!m||!m.ts)return 0;let n=0;members.forEach(cid=>{if(cid===m.cid)return;const r=readMap[cid];if(!r||!r.ts||r.ts<m.ts)n++;});return n;}
 function renderFeed(){
-  const feed=el("feed");const arr=currentArr;
+  const feed=el("feed");
+  const arr=(isAdmin()&&deletedArr.length)?currentArr.concat(deletedArr).sort((a,b)=>(a.ts||0)-(b.ts||0)):currentArr;
   const members=convMembers();
   const atBottom=forceBottom||(feed.scrollHeight-feed.scrollTop-feed.clientHeight<80);forceBottom=false;
   const talk=arr.filter(m=>!m.sys);
@@ -684,7 +694,7 @@ function renderFeed(){
   arr.forEach(m=>{
     if(m.sys){const s=document.createElement("div");s.className="sysmsg";s.textContent=m.t;feed.appendChild(s);return;}
     const mine=m.cid?m.cid===clientId:(m.u===me);
-    const row=document.createElement("div");row.className="msg"+(mine?" me":"");
+    const row=document.createElement("div");row.className="msg"+(mine?" me":"")+(m.__deleted?" delmsg":"");
     const av=document.createElement("div");av.className="av";
     let p=profiles[m.cid];
     if(!(p&&p.img)){const byName=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(byName)p=byName;}
@@ -692,6 +702,7 @@ function renderFeed(){
     av.onclick=()=>openPeer(m.cid,m.u);
     const col=document.createElement("div");
     const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;meta.onclick=()=>openPeer(m.cid,m.u);col.appendChild(meta);
+    if(m.__deleted){const dt=document.createElement("div");dt.className="deltag";dt.textContent="🗑 삭제됨 · 관리자만 보임"+(m.delBy?(" · 삭제자 "+m.delBy):"");col.appendChild(dt);}
     if(m.reply){const q=document.createElement("div");q.className="quote";const qn=document.createElement("div");qn.className="qn";qn.textContent="↩ "+(m.reply.u||"");const qt=document.createElement("div");qt.className="qt";qt.textContent=m.reply.t||"";q.appendChild(qn);q.appendChild(qt);col.appendChild(q);}
     const cnodes=[];
     if(m.img){const im=document.createElement("img");im.className="photo";im.src=m.img;im.onclick=()=>openViewer(m.img,"image.jpg","image");cnodes.push(im);}
@@ -708,12 +719,14 @@ function renderFeed(){
     cnodes.forEach((node,i)=>{if(hasInfo&&i===cnodes.length-1){const brow=document.createElement("div");brow.className="bubrow";brow.appendChild(node);brow.appendChild(info);col.appendChild(brow);}else col.appendChild(node);});
     if(hasInfo&&!cnodes.length)col.appendChild(info);
     row.appendChild(av);row.appendChild(col);
+    if(!m.__deleted&&!peek){
     const acts=document.createElement("div");acts.className="msgacts";
     const qb=document.createElement("button");qb.innerHTML=svgIcon("quote");qb.title="답장";qb.setAttribute("aria-label","답장");qb.onclick=()=>startReply(m);acts.appendChild(qb);
     if(!threadCounts[m.__key]){const rb=document.createElement("button");rb.innerHTML=svgIcon("reply");rb.title="댓글";rb.setAttribute("aria-label","댓글 달기");rb.onclick=()=>toggleThread(m.__key);acts.appendChild(rb);}
     const pb=document.createElement("button");pb.innerHTML=svgIcon("pin");pb.title="고정";pb.setAttribute("aria-label","메시지 고정");pb.onclick=()=>pinMsg(m);acts.appendChild(pb);
     if(mine||isAdmin()){const db2=document.createElement("button");db2.innerHTML=svgIcon("trash");db2.title=mine?"삭제":"삭제(관리자)";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);acts.appendChild(db2);}
     row.appendChild(acts);
+    }
     feed.appendChild(row);
     if((threadAll[m.__key]&&threadAll[m.__key].length)||openThreads.has(m.__key))feed.appendChild(renderThreadBox(m.__key));
   });
@@ -765,11 +778,11 @@ function sendInlineReply(key,inp){
   replyDrafts[key]="";inp.value="";activeReply=key;
 }
 async function deleteMsg(key){if(!key||!db)return;if(!confirm("이 메시지를 삭제할까요?"))return;
-  try{const snap=await db.ref(msgPath(cur)+"/"+key).once("value");const m=snap.val();if(m&&!m.sys)await db.ref("deleted").push(Object.assign({},m,{conv:isDM(cur)?"DM(1:1)":("# "+cur),delBy:me,delTs:Date.now()}));}catch(e){}
+  try{const snap=await db.ref(msgPath(cur)+"/"+key).once("value");const m=snap.val();if(m&&!m.sys)await db.ref("deleted").push(Object.assign({},m,{conv:isDM(cur)?"DM(1:1)":("# "+cur),ck:cur,mkey:key,delBy:me,delTs:Date.now()}));}catch(e){}
   db.ref(msgPath(cur)+"/"+key).remove();}
 
 // 전송 (텍스트 + 첨부)
-el("composer").onsubmit=e=>{e.preventDefault();if(banned&&banned[clientId]){applyBan();return;}const v=el("input").value.trim();if((!v&&!pend.length)||!db)return;const msg={u:me,cid:clientId,t:v,ts:Date.now()};if(pend.length)msg.atts=pend.map(a=>a.kind==="image"?{kind:"image",data:a.data}:a.kind==="video"?{kind:"video",data:a.data,name:a.name}:{kind:"file",data:a.data,name:a.name,size:a.size});if(replyTo)msg.reply={u:replyTo.u,t:replyTo.t};db.ref(msgPath(cur)).push(msg);const prev=v||(pend.some(a=>a.kind==="image")?"사진":pend.some(a=>a.kind==="video")?"GIF":"파일");
+el("composer").onsubmit=e=>{e.preventDefault();if(peek)return;if(banned&&banned[clientId]){applyBan();return;}const v=el("input").value.trim();if((!v&&!pend.length)||!db)return;const msg={u:me,cid:clientId,t:v,ts:Date.now()};if(pend.length)msg.atts=pend.map(a=>a.kind==="image"?{kind:"image",data:a.data}:a.kind==="video"?{kind:"video",data:a.data,name:a.name}:{kind:"file",data:a.data,name:a.name,size:a.size});if(replyTo)msg.reply={u:replyTo.u,t:replyTo.t};db.ref(msgPath(cur)).push(msg);const prev=v||(pend.some(a=>a.kind==="image")?"사진":pend.some(a=>a.kind==="video")?"GIF":"파일");
   if(isDM(cur)){const pid=curPeer?curPeer.id:dmPeerOf(cur);const t=Date.now();db.ref("dmIndex/"+clientId+"/"+pid).update({name:(curPeer&&curPeer.name)||(profiles[pid]&&profiles[pid].name)||"대화",ts:t});db.ref("dmIndex/"+pid+"/"+clientId).update({name:me,ts:t});}
   else{bumpSeq(cur);db.ref("meta/"+cur+"/last").set({u:me,t:prev.slice(0,40),ts:Date.now()});}
   pend=[];renderPend();el("input").value="";autoGrow();stopTyping();cancelReply();closeMentionPop();};
@@ -790,7 +803,7 @@ async function addFiles(files){
 function renderPend(){const s=el("attachStrip");s.innerHTML="";if(!pend.length){s.classList.remove("show");return;}s.classList.add("show");pend.forEach((a,i)=>{const chip=document.createElement("div");chip.className="pchip";if(a.kind==="image"){const im=document.createElement("img");im.src=a.data;chip.appendChild(im);}else if(a.kind==="video"){const vv=document.createElement("video");vv.src=a.data;vv.muted=true;vv.loop=true;vv.autoplay=true;vv.playsInline=true;chip.appendChild(vv);}else{const sp=document.createElement("span");sp.textContent="📎 "+a.name;chip.appendChild(sp);}const x=document.createElement("span");x.className="x";x.textContent="×";x.onclick=()=>{pend.splice(i,1);renderPend();};chip.appendChild(x);s.appendChild(chip);});}
 
 // 입력 중 표시
-el("input").addEventListener("input",()=>{if(!db||!me)return;const now=Date.now();if(now-lastType>900){lastType=now;const r=db.ref("typing/"+cur+"/"+clientId);r.set({name:me,ts:now});r.onDisconnect().remove();}clearTimeout(typingTimer);typingTimer=setTimeout(stopTyping,2500);});
+el("input").addEventListener("input",()=>{if(!db||!me||peek)return;const now=Date.now();if(now-lastType>900){lastType=now;const r=db.ref("typing/"+cur+"/"+clientId);r.set({name:me,ts:now});r.onDisconnect().remove();}clearTimeout(typingTimer);typingTimer=setTimeout(stopTyping,2500);});
 function stopTyping(){clearTimeout(typingTimer);if(db&&cur)db.ref("typing/"+cur+"/"+clientId).remove();}
 function listenTyping(name){if(typingRef)typingRef.off();typingRef=db.ref("typing/"+name);typingRef.on("value",s=>{const now=Date.now();const names=[];s.forEach(c=>{const v=c.val();if(c.key!==clientId&&v&&v.ts>now-5000)names.push(v.name);});const box=el("typing");if(!names.length){box.classList.remove("show");box.textContent="";return;}box.classList.add("show");box.innerHTML='<span class="tdots"><i></i><i></i><i></i></span>';const who=(names.length<=2?names.join(", "):names.length+"명");const t=document.createElement("span");t.textContent=who+"님이 입력 중";box.appendChild(t);});}
 
@@ -935,8 +948,9 @@ function refreshAdminBtn(){el("adminBtn").style.display=isAdmin()?"":"none";}
 const OPEN_H=6, CLOSE_H=23; // 대화 가능 06:00~23:00
 function inWindow(){const h=new Date().getHours();return h>=OPEN_H&&h<CLOSE_H;}
 function applyBan(){
-  const b=!!(banned&&banned[clientId]), off=!inWindow();
   const note=el("banNote"),inp=el("input"),snd=el("composer").querySelector(".send");
+  if(peek){note.textContent="👁 관리자 열람 모드 · 흔적이 남지 않습니다";note.style.display="";inp.disabled=true;snd.disabled=true;return;}
+  const b=!!(banned&&banned[clientId]), off=!inWindow();
   if(b){note.textContent="🚫 현재 메시지 전송이 제한되어 있습니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
   else if(off){note.textContent="🌙 대화는 오전 6시~오후 11시에만 가능해요. 지난 대화는 매일 밤 11시에 사라집니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
   else if(me){note.style.display="none";inp.disabled=false;snd.disabled=false;inp.placeholder="메시지 입력…";}
@@ -986,7 +1000,7 @@ async function openAdmin(){
     const cnt={};
     Object.keys(msgAll).forEach(ch=>{const ms=msgAll[ch]||{};Object.values(ms).forEach(m=>{if(m&&!m.sys){adminData.push({grp:"# "+ch,u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m)});cnt[m.u]=(cnt[m.u]||0)+1;}});});
     Object.keys(dmAll).forEach(key=>{const ms=(dmAll[key]&&dmAll[key].msg)||{};Object.values(ms).forEach(m=>{if(m&&!m.sys){adminData.push({grp:"DM(1:1)",u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m)});cnt[m.u]=(cnt[m.u]||0)+1;}});});
-    Object.values(delAll).forEach(m=>{if(m&&!m.sys){adminData.push({grp:m.conv||"삭제됨",u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m),deleted:true,delBy:m.delBy});}});
+    Object.values(delAll).forEach(m=>{if(m&&!m.sys){adminData.push({grp:m.conv||"삭제됨",u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m),deleted:true,delBy:m.delBy,ck:m.ck});}});
     // 이름 = 계정 → 같은 이름은 한 줄로 합침(옛 기기별 기록이 여러 노드여도 하나로)
     const byName={};
     Object.entries(prAll).forEach(([cid,p])=>{const nm=(p&&p.name)||"(이름없음)";if(!byName[nm])byName[nm]={cid:nameKey(nm),name:nm,img:(p&&p.img)||null,n:cnt[nm]||0};else if(!byName[nm].img&&p&&p.img)byName[nm].img=p.img;});
@@ -1029,6 +1043,7 @@ function renderAdmin(q){
     const rt=document.createElement("div");rt.className="rt";rt.textContent=r.t||"";rc.appendChild(rt);
     if(r.att){const vb=document.createElement("button");vb.className="aview";vb.textContent=r.att.kind==="image"?"🖼 사진 보기":r.att.kind==="video"?"🎞 GIF 보기":"📎 파일 보기";vb.onclick=()=>openViewer(r.att.data,r.att.name,r.att.kind);rc.appendChild(vb);}
     if(r.deleted){const dl=document.createElement("div");dl.className="rdel";dl.textContent="🗑 삭제됨"+(r.delBy?(" · 삭제자 "+r.delBy):"");rc.appendChild(dl);}
+    if(r.deleted&&r.ck){const gb=document.createElement("button");gb.className="aview";gb.textContent="💬 채팅에서 보기";gb.onclick=()=>{if(isDM(r.ck))adminPeek(r.ck,dmLabel(r.ck));else openCh(r.ck);el("adminOv").classList.remove("show");};rc.appendChild(gb);}
     d.appendChild(av);d.appendChild(rc);body.appendChild(d);
   });
 }
