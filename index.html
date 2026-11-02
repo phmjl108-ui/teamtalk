@@ -73,6 +73,10 @@ button{font-family:inherit}
 .filechip{display:inline-flex;align-items:center;gap:6px;background:var(--other);border:0;border-radius:14px;padding:9px 12px;font-size:14px;color:var(--txt);text-decoration:none;margin-bottom:4px;max-width:230px;word-break:break-all}
 .msg.me .filechip{background:var(--me);color:#fff}
 .meta{font-size:11px;color:var(--muted-3);margin:0 6px 2px}.msg.me .meta{text-align:right}
+.bubrow{display:flex;align-items:flex-end;gap:4px;max-width:100%}.msg.me .bubrow{flex-direction:row-reverse}
+.binfo{display:flex;flex-direction:column;align-items:flex-start;gap:1px;margin-bottom:1px;flex-shrink:0;line-height:1.1}.msg.me .binfo{align-items:flex-end}
+.binfo .btime{font-size:10px;color:var(--muted-3);white-space:nowrap}
+.binfo .bunread{font-size:11px;color:#F7B500;font-weight:700;white-space:nowrap}
 .sysmsg{align-self:center;background:transparent;color:var(--muted);font-size:12px;font-weight:500;padding:8px 12px;max-width:85%;text-align:center}
 .typing{display:none;align-items:center;gap:7px;padding:4px 16px 2px;font-size:12px;color:var(--muted)}
 .typing.show{display:flex}
@@ -255,6 +259,33 @@ button{font-family:inherit}
   .iconbtn.me{padding:7px 4px;min-width:34px}
   .top .titwrap{max-width:calc(100% - 180px)}
 }
+/* 가짜 엑셀(보스키) — 앱 테마와 무관하게 항상 밝게 */
+#bossScreen{display:none;position:fixed;inset:0;z-index:9999;background:#f3f2f1;color:#202020;font-family:"Segoe UI",-apple-system,"Malgun Gothic",sans-serif;font-size:13px;flex-direction:column;user-select:none;cursor:default}
+#bossScreen.on{display:flex}
+#bossScreen .bx-title{display:flex;align-items:center;gap:8px;background:#107C41;color:#fff;height:30px;padding:0 10px;font-size:12.5px}
+#bossScreen .bx-ico{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:#fff;color:#107C41;border-radius:3px;font-weight:800;font-size:12px;cursor:pointer}
+#bossScreen .bx-tt{font-weight:600}
+#bossScreen .bx-auto{margin-left:14px;opacity:.9;font-size:11.5px}#bossScreen .bx-auto b{color:#7CFFB0}
+#bossScreen .bx-win{margin-left:auto;display:flex;gap:16px;opacity:.95}#bossScreen .bx-win i{font-style:normal}
+#bossScreen .bx-ribbon{display:flex;gap:2px;background:#fff;border-bottom:1px solid #e1dfdd;padding:4px 8px 0;overflow:hidden;white-space:nowrap}
+#bossScreen .bx-ribbon span{padding:6px 11px;color:#444;border-radius:4px 4px 0 0;font-size:13px}
+#bossScreen .bx-ribbon span.on{color:#107C41;border-bottom:2px solid #107C41;font-weight:600}
+#bossScreen .bx-fx{display:flex;align-items:center;gap:0;background:#fff;border-bottom:1px solid #e1dfdd;height:26px;padding:0 0 0 0}
+#bossScreen .bx-name{width:84px;border-right:1px solid #e1dfdd;padding:0 8px;line-height:26px;color:#333}
+#bossScreen .bx-fxi{width:34px;text-align:center;color:#888;font-style:italic;border-right:1px solid #e1dfdd;line-height:26px}
+#bossScreen .bx-fxv{padding:0 10px;color:#333}
+#bossScreen .bx-sheet{flex:1;overflow:auto;background:#fff}
+#bossScreen table{border-collapse:collapse;width:100%;table-layout:fixed}
+#bossScreen th,#bossScreen td{border:1px solid #e1dfdd;height:22px;padding:0 6px;font-size:12.5px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bossScreen th{background:#f3f2f1;color:#555;text-align:center;font-weight:500}
+#bossScreen td.rownum,#bossScreen th.corner{background:#f3f2f1;color:#555;text-align:center;width:40px}
+#bossScreen td.num{text-align:right;font-variant-numeric:tabular-nums}
+#bossScreen td.hl{background:#e8f2ec}
+#bossScreen .bx-tabs{display:flex;align-items:center;gap:2px;background:#f3f2f1;border-top:1px solid #e1dfdd;height:26px;padding:0 8px;font-size:12px;color:#444}
+#bossScreen .bx-tabs span.on{background:#fff;font-weight:600;color:#107C41;border-radius:3px 3px 0 0}
+#bossScreen .bx-tabs span{padding:3px 10px}
+#bossScreen .bx-tabs .bx-plus{color:#888}
+#bossScreen .bx-tabs .bx-status{margin-left:auto;color:#666;font-size:11.5px}
 </style>
 </head>
 <body>
@@ -269,6 +300,7 @@ button{font-family:inherit}
     <button class="ham" id="ham" aria-label="채널 목록 열기"></button>
     <div class="titwrap"><h2 id="chName" title="채널 설정"># 일반</h2><small id="chSub"></small></div>
     <button class="iconbtn me" id="nameBtn"><span class="mini" id="miniAv"></span><span id="myName">나</span></button>
+    <button class="iconbtn" id="bossBtn" title="화면 가리기 (ESC로 복귀)" aria-label="화면 가리기"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
     <div class="topmore" id="topmore">
       <button class="iconbtn" id="moreBtn" title="더보기" aria-label="더보기"></button>
       <div class="moremenu" id="moreMenu">
@@ -409,6 +441,13 @@ button{font-family:inherit}
   <div class="vbody" id="viewerBody"></div>
 </div>
 
+<div id="bossScreen" aria-hidden="true">
+  <div class="bx-title"><span class="bx-ico" id="bxExit" title="복귀">X</span><span class="bx-tt">통합 문서1 - Excel</span><span class="bx-auto">자동 저장 <b>●</b></span><span class="bx-win"><i>—</i><i>▢</i><i>✕</i></span></div>
+  <div class="bx-ribbon"><span>파일</span><span class="on">홈</span><span>삽입</span><span>페이지 레이아웃</span><span>수식</span><span>데이터</span><span>검토</span><span>보기</span><span>도움말</span></div>
+  <div class="bx-fx"><span class="bx-name">A1</span><span class="bx-fxi">ƒx</span><span class="bx-fxv">항목</span></div>
+  <div class="bx-sheet" id="bxSheet"></div>
+  <div class="bx-tabs"><span class="on">Sheet1</span><span>Sheet2</span><span>Sheet3</span><span class="bx-plus">＋</span><span class="bx-status">준비 &nbsp;&nbsp; 셀 개수: 24 &nbsp;&nbsp; 합계: 1,284,500</span></div>
+</div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
@@ -417,6 +456,8 @@ const LS="teamtalk_fb";
 const FB={databaseURL:"https://ymx-ae932-default-rtdb.firebaseio.com"};
 const el=id=>document.getElementById(id);
 const init=s=>(s||"?").trim()[0]||"?";
+// 이름 기반 고정 색(같은 사람=항상 같은 색). 사진 없을 때 아바타 배경에 사용
+function avatarColor(s){s=(s||"").trim();if(!s)return "var(--accent)";let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}h=h>>>0;const hue=h%360,sat=52+((h>>9)&7)*2,lig=42+((h>>5)&3)*3;return "hsl("+hue+","+sat+"%,"+lig+"%)";}
 function hash(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
 function fmtSize(b){return b<1024?b+"B":b<1048576?Math.round(b/1024)+"KB":(b/1048576).toFixed(1)+"MB";}
 // 이름 = 고유 계정. 이름을 안전한 키로 변환(특수문자·점 포함 대응) → 같은 이름은 항상 같은 노드 하나.
@@ -462,7 +503,7 @@ function bumpSeq(ch){try{db.ref("meta/"+ch+"/seq").transaction(n=>(n||0)+1);}cat
 function isMineMsg(m){return !!(m&&(m.cid?m.cid===clientId:m.u===me));}
 function attHas(m){return !!(m&&(m.img||(m.atts&&(Array.isArray(m.atts)?m.atts.length:Object.keys(m.atts).length))));}
 function msgPreview(m){if(m&&m.t)return m.t;if(m&&m.img)return "사진";const a=firstAtt(m);if(a)return a.kind==="video"?"GIF":a.kind==="image"?"사진":"첨부";return "";}
-function markSeen(name){unreadN[name]=0;if(lastKeyOf[name])seenKey[name]=lastKeyOf[name];saveUnread();}
+function markSeen(name){unreadN[name]=0;if(lastKeyOf[name])seenKey[name]=lastKeyOf[name];saveUnread();try{if(db&&me&&clientId&&name)db.ref("reads/"+name+"/"+clientId).set({ts:Date.now(),name:me});}catch(e){}}
 // 즐겨찾기(개인 설정: 기기별 localStorage) — 채널 이름 또는 dm 키 저장
 let fav=new Set();try{fav=new Set(JSON.parse(localStorage.getItem(LS+"_fav")||"[]"))}catch(e){}
 function saveFav(){try{localStorage.setItem(LS+"_fav",JSON.stringify([...fav]))}catch(e){}}
@@ -548,7 +589,7 @@ function boot(nick){
   let opened=false;
   db.ref("channels").on("value",s=>{chans=s.val()||{};if(!Object.keys(chans).length)chans={"일반":1};syncWatchers();if(!opened){opened=true;const st=(lastCur&&chans[lastCur])?lastCur:Object.keys(chans)[0];openCh(st);}else if(!isDM(cur)&&!chans[cur]){openCh(Object.keys(chans)[0]);}renderCh();});
 }
-function refreshMyAv(){const p=profiles[clientId];const a=el("miniAv");if(p&&p.img){a.style.backgroundImage="url("+p.img+")";}else a.style.backgroundImage="";}
+function refreshMyAv(){const p=profiles[clientId];const a=el("miniAv");if(p&&p.img){a.style.backgroundImage="url("+p.img+")";}else{a.style.backgroundImage="";a.style.backgroundColor=avatarColor(me);}}
 function closeDrawer(){el("side").classList.remove("open");el("scrim").classList.remove("show");}
 
 function mkStar(k){const st=document.createElement("span");st.className="star"+(isFav(k)?" fav":"");st.innerHTML=svgIcon("star");st.title="즐겨찾기";st.setAttribute("aria-label","즐겨찾기 토글");st.onclick=e=>{e.stopPropagation();toggleFav(k);};return st;}
@@ -569,7 +610,7 @@ function mkDmRow(pid){
   const key=dmKey(clientId,pid);const nm=(dms[pid]&&dms[pid].name)||"대화";
   const d=document.createElement("div");d.className="ch"+(key===cur?" on":"");
   const av=document.createElement("span");av.className="cav";const pr=profiles[pid];
-  if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else av.textContent=init(nm);
+  if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else{av.textContent=init(nm);av.style.backgroundColor=avatarColor(nm);}
   const sp=document.createElement("span");sp.className="nm";sp.textContent=nm;
   d.appendChild(av);d.appendChild(sp);d.appendChild(mkStar(key));
   const u=unreadOf(key);if(u>0&&key!==cur){const bg=document.createElement("span");bg.className="badge";bg.textContent=u>99?"99+":u;d.appendChild(bg);}
@@ -595,14 +636,16 @@ function renderCh(){
   updateAppBadge();
 }
 
-let currentArr=[];
+let currentArr=[], forceBottom=false;
 function attachFeed(){
+  forceBottom=true;
   openThreads=new Set();activeReply=null;replyDrafts={};
   el("feed").innerHTML='<div class="empty">메시지를 불러오는 중…</div>';
   if(unsub)unsub.off();
   const ref=db.ref(msgPath(cur)).limitToLast(300);unsub=ref;
   ref.on("value",s=>{currentArr=[];s.forEach(c=>{currentArr.push(Object.assign({__key:c.key},c.val()));});if(!document.hidden)markSeen(cur);renderFeed();});
   if(pinRef)pinRef.off();pinRef=db.ref("pinned/"+cur);pinRef.on("value",s=>renderPinBar(s.val()));
+  if(readRef)readRef.off();readMap={};readRef=db.ref("reads/"+cur);readRef.on("value",s=>{readMap=s.val()||{};renderFeed();});
   if(threadCntRef)threadCntRef.off();threadCounts={};threadAll={};threadCntRef=db.ref(threadBase(cur));
   threadCntRef.on("value",s=>{threadCounts={};threadAll={};s.forEach(p=>{const arr=[];p.forEach(c=>{arr.push(Object.assign({__key:c.key},c.val()));});threadAll[p.key]=arr;threadCounts[p.key]=arr.length;});renderFeed();});
   listenTyping(cur);
@@ -626,8 +669,12 @@ function openDM(peerId,peerName){
 }
 function attArray(m){return Array.isArray(m.atts)?m.atts:(m.atts?Object.values(m.atts):[]);}
 function firstAtt(m){if(!m)return null;if(m.img)return{data:m.img,name:"image.jpg",kind:"image"};const a=attArray(m);if(a.length)return{data:a[0].data,name:a[0].name||"파일",kind:a[0].kind||"file"};return null;}
+function convMembers(){const s=new Set(Object.keys(readMap||{}));(currentArr||[]).forEach(x=>{if(x&&x.cid)s.add(x.cid);});return s;}
+function unreadOfMsg(m,members){if(!m||!m.ts)return 0;let n=0;members.forEach(cid=>{if(cid===m.cid)return;const r=readMap[cid];if(!r||!r.ts||r.ts<m.ts)n++;});return n;}
 function renderFeed(){
   const feed=el("feed");const arr=currentArr;
+  const members=convMembers();
+  const atBottom=forceBottom||(feed.scrollHeight-feed.scrollTop-feed.clientHeight<80);forceBottom=false;
   const talk=arr.filter(m=>!m.sys);
   el("chSub").textContent=talk.length?talk.length+"개 메시지":"첫 메시지를 남겨보세요";
   feed.innerHTML="";
@@ -639,30 +686,37 @@ function renderFeed(){
     const av=document.createElement("div");av.className="av";
     let p=profiles[m.cid];
     if(!(p&&p.img)){const byName=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(byName)p=byName;}
-    if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else av.textContent=init(m.u);
+    if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else{av.textContent=init(m.u);av.style.backgroundColor=avatarColor(m.u);}
     av.onclick=()=>openPeer(m.cid,m.u);
     const col=document.createElement("div");
     const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;meta.onclick=()=>openPeer(m.cid,m.u);col.appendChild(meta);
     if(m.reply){const q=document.createElement("div");q.className="quote";const qn=document.createElement("div");qn.className="qn";qn.textContent="↩ "+(m.reply.u||"");const qt=document.createElement("div");qt.className="qt";qt.textContent=m.reply.t||"";q.appendChild(qn);q.appendChild(qt);col.appendChild(q);}
-    if(m.img){const im=document.createElement("img");im.className="photo";im.src=m.img;im.onclick=()=>openViewer(m.img,"image.jpg","image");col.appendChild(im);}
+    const cnodes=[];
+    if(m.img){const im=document.createElement("img");im.className="photo";im.src=m.img;im.onclick=()=>openViewer(m.img,"image.jpg","image");cnodes.push(im);}
     attArray(m).forEach(a=>{
-      if(a.kind==="image"){const im=document.createElement("img");im.className="photo";im.src=a.data;im.onclick=()=>openViewer(a.data,a.name||"image.jpg","image");col.appendChild(im);}
-      else if(a.kind==="video"){const vv=document.createElement("video");vv.className="photo";vv.src=a.data;vv.muted=true;vv.loop=true;vv.autoplay=true;vv.playsInline=true;vv.setAttribute("playsinline","");vv.setAttribute("muted","");vv.onended=()=>{try{vv.currentTime=0;vv.play();}catch(e){}};vv.onclick=()=>openViewer(a.data,a.name||"anim","video");col.appendChild(vv);}
-      else{const lk=document.createElement("div");lk.className="filechip";lk.textContent="📎 "+(a.name||"파일")+(a.size?" ("+fmtSize(a.size)+")":"");lk.onclick=()=>openViewer(a.data,a.name||"파일","file");col.appendChild(lk);}
+      if(a.kind==="image"){const im=document.createElement("img");im.className="photo";im.src=a.data;im.onclick=()=>openViewer(a.data,a.name||"image.jpg","image");cnodes.push(im);}
+      else if(a.kind==="video"){const vv=document.createElement("video");vv.className="photo";vv.src=a.data;vv.muted=true;vv.loop=true;vv.autoplay=true;vv.playsInline=true;vv.setAttribute("playsinline","");vv.setAttribute("muted","");vv.onended=()=>{try{vv.currentTime=0;vv.play();}catch(e){}};vv.onclick=()=>openViewer(a.data,a.name||"anim","video");cnodes.push(vv);}
+      else{const lk=document.createElement("div");lk.className="filechip";lk.textContent="📎 "+(a.name||"파일")+(a.size?" ("+fmtSize(a.size)+")":"");lk.onclick=()=>openViewer(a.data,a.name||"파일","file");cnodes.push(lk);}
     });
-    if(m.t){const b=document.createElement("div");b.className="bub";renderText(b,m.t);col.appendChild(b);}
+    if(m.t){const b=document.createElement("div");b.className="bub";renderText(b,m.t);cnodes.push(b);}
+    const info=document.createElement("div");info.className="binfo";
+    const un=unreadOfMsg(m,members);if(un>0){const c=document.createElement("span");c.className="bunread";c.textContent=un;info.appendChild(c);}
+    if(m.ts){const tm=document.createElement("span");tm.className="btime";tm.textContent=new Date(m.ts).toLocaleTimeString("ko-KR",{hour:"numeric",minute:"2-digit"});info.appendChild(tm);}
+    const hasInfo=info.childNodes.length>0;
+    cnodes.forEach((node,i)=>{if(hasInfo&&i===cnodes.length-1){const brow=document.createElement("div");brow.className="bubrow";brow.appendChild(node);brow.appendChild(info);col.appendChild(brow);}else col.appendChild(node);});
+    if(hasInfo&&!cnodes.length)col.appendChild(info);
     row.appendChild(av);row.appendChild(col);
     const acts=document.createElement("div");acts.className="msgacts";
     const qb=document.createElement("button");qb.innerHTML=svgIcon("quote");qb.title="답장";qb.setAttribute("aria-label","답장");qb.onclick=()=>startReply(m);acts.appendChild(qb);
     if(!threadCounts[m.__key]){const rb=document.createElement("button");rb.innerHTML=svgIcon("reply");rb.title="댓글";rb.setAttribute("aria-label","댓글 달기");rb.onclick=()=>toggleThread(m.__key);acts.appendChild(rb);}
     const pb=document.createElement("button");pb.innerHTML=svgIcon("pin");pb.title="고정";pb.setAttribute("aria-label","메시지 고정");pb.onclick=()=>pinMsg(m);acts.appendChild(pb);
-    if(mine){const db2=document.createElement("button");db2.innerHTML=svgIcon("trash");db2.title="삭제";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);acts.appendChild(db2);}
+    if(mine||isAdmin()){const db2=document.createElement("button");db2.innerHTML=svgIcon("trash");db2.title=mine?"삭제":"삭제(관리자)";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);acts.appendChild(db2);}
     row.appendChild(acts);
     feed.appendChild(row);
     if((threadAll[m.__key]&&threadAll[m.__key].length)||openThreads.has(m.__key))feed.appendChild(renderThreadBox(m.__key));
   });
   if(activeReply!=null){const fi=feed.querySelector('.treplyform input[data-rk="'+activeReply+'"]');if(fi){const end=fi.value.length;fi.focus();try{fi.setSelectionRange(end,end);}catch(e){}}}
-  else feed.scrollTop=feed.scrollHeight;
+  else if(atBottom)feed.scrollTop=feed.scrollHeight;
 }
 function toggleThread(key){
   if(!key)return;
@@ -679,7 +733,7 @@ function renderThreadBox(key){
     const c=document.createElement("div");c.className="tcmt";
     const av=document.createElement("div");av.className="tav";
     let p=profiles[m.cid];if(!(p&&p.img)){const bn=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(bn)p=bn;}
-    if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else av.textContent=init(m.u);
+    if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else{av.textContent=init(m.u);av.style.backgroundColor=avatarColor(m.u);}
     av.onclick=()=>openPeer(m.cid,m.u);
     const cc=document.createElement("div");cc.className="tc";
     const nn=document.createElement("div");nn.className="tn";nn.textContent=m.u;
@@ -765,7 +819,7 @@ function updNotifBtn(){const b=el("notifBtn");if(!b)return;if(!("Notification"in
 window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 
 // 프로필
-el("nameBtn").onclick=()=>{el("pName").value=me;const pv=el("pavPreview");if(myImg){pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}else{pv.style.backgroundImage="";pv.textContent=init(me);}el("pErr").textContent="";el("profileOv").classList.add("show");};
+el("nameBtn").onclick=()=>{el("pName").value=me;const pv=el("pavPreview");if(myImg){pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}else{pv.style.backgroundImage="";pv.textContent=init(me);pv.style.backgroundColor=avatarColor(me);}el("pErr").textContent="";el("profileOv").classList.add("show");};
 el("pavPreview").onclick=()=>el("profileFile").click();
 el("profileFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{myImg=await shrink(f,160,0.7);const pv=el("pavPreview");pv.style.backgroundImage="url("+myImg+")";pv.textContent="";}catch(err){el("pErr").textContent="사진을 불러오지 못했습니다.";}};
 el("pSave").onclick=()=>{const nn=el("pName").value.trim();if(!nn){el("pErr").textContent="대화명을 입력하세요.";return;}const old=me;me=nn;clientId=nameKey(me);el("myName").textContent=me;refreshAdminBtn();applyBan();syncWatchers();try{localStorage.setItem(LS,JSON.stringify({nick:me,img:myImg}))}catch(e){}db.ref("profiles/"+clientId).update({name:me,img:myImg||null});if(old!==nn)db.ref(msgPath(cur)).push({sys:true,t:old+"님이 이름을 "+nn+"(으)로 변경했습니다",ts:Date.now()});el("profileOv").classList.remove("show");};
@@ -776,7 +830,7 @@ function openPeer(cid,name){
   // 신원은 이름 기준 → 이름이 있으면 이름키를, 없으면(옛 메시지) 저장된 cid를 사용
   let pid = name ? nameKey(name) : cid;
   const prof=(pid&&profiles[pid])||(name?(Object.values(profiles).find(v=>v&&v.name===name)||{}):{});const nm=prof.name||name||"사용자";
-  const av=el("peerAv");if(prof.img){av.style.backgroundImage="url("+prof.img+")";av.textContent="";}else{av.style.backgroundImage="";av.textContent=init(nm);}
+  const av=el("peerAv");if(prof.img){av.style.backgroundImage="url("+prof.img+")";av.textContent="";}else{av.style.backgroundImage="";av.textContent=init(nm);av.style.backgroundColor=avatarColor(nm);}
   el("peerName").textContent=nm;
   const b=el("peerDM");
   if(pid&&pid!==clientId){b.style.display="";b.onclick=()=>{el("peerOv").classList.remove("show");openDM(pid,nm);closeDrawer();};}
@@ -824,7 +878,7 @@ function renderMentionPop(){
   const w=el("mentionPop");w.innerHTML='<div class="mphd">멤버 멘션</div>';
   mentionMatches.forEach((n,i)=>{
     const d=document.createElement("div");d.className="mpi"+(i===mentionSel?" sel":"");
-    const av=document.createElement("div");av.className="mav";const pr=profiles[nameKey(n)];if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else av.textContent=init(n);
+    const av=document.createElement("div");av.className="mav";const pr=profiles[nameKey(n)];if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else{av.textContent=init(n);av.style.backgroundColor=avatarColor(n);}
     const nm=document.createElement("div");nm.className="mnm";nm.textContent=n;
     d.appendChild(av);d.appendChild(nm);
     d.onmousedown=e=>{e.preventDefault();pickMention(n);};
@@ -868,7 +922,7 @@ el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
 el("newsOv").onclick=e=>{if(e.target===el("newsOv"))el("newsOv").classList.remove("show");};
 
 // ===== 관리자(혜밍웨이) / 채팅 금지 / 고정 / 멘션 / 데이터 정책 =====
-let banned={}, adminData=[], pinRef=null;
+let banned={}, adminData=[], pinRef=null, readRef=null, readMap={};
 const ADMIN_NAME="혜밍웨이";
 function isAdmin(){return me===ADMIN_NAME;}
 function refreshAdminBtn(){el("adminBtn").style.display=isAdmin()?"":"none";}
@@ -950,7 +1004,7 @@ function renderUsers(q){
   if(!rows.length){const e=document.createElement("div");e.style.cssText="text-align:center;color:var(--muted);padding:12px";e.textContent="사용자가 없습니다.";body.appendChild(e);return;}
   rows.forEach(u=>{
     const d=document.createElement("div");d.className="urow";
-    const av=document.createElement("div");av.className="uav";if(u.img){av.style.backgroundImage="url("+u.img+")";}else av.textContent=init(u.name);
+    const av=document.createElement("div");av.className="uav";if(u.img){av.style.backgroundImage="url("+u.img+")";}else{av.textContent=init(u.name);av.style.backgroundColor=avatarColor(u.name);}
     const nm=document.createElement("div");nm.className="un";const b=document.createElement("b");b.textContent=u.name+(u.cid===clientId?" (나)":"");const c=document.createElement("div");c.className="uc";c.textContent=u.img?"프로필 사진 있음":"사진 없음";nm.appendChild(b);nm.appendChild(c);
     const mb=document.createElement("div");mb.className="umbar";const bar=document.createElement("div");bar.className="ub";bar.style.width=Math.max(4,Math.round((u.n/maxN)*60))+"px";bar.style.marginLeft="auto";const vv=document.createElement("div");vv.className="uv";vv.textContent=u.n+"개";mb.appendChild(bar);mb.appendChild(vv);
     d.appendChild(av);d.appendChild(nm);d.appendChild(mb);body.appendChild(d);
@@ -965,7 +1019,7 @@ function renderAdmin(q){
   rows.forEach(r=>{
     if(r.grp!==g){g=r.grp;const h=document.createElement("div");h.className="agrp";h.textContent=g;body.appendChild(h);}
     const d=document.createElement("div");d.className="arow"+(r.deleted?" del":"");
-    const av=document.createElement("div");av.className="rav";const pr=profiles[nameKey(r.u||"")];if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else av.textContent=init(r.u);
+    const av=document.createElement("div");av.className="rav";const pr=profiles[nameKey(r.u||"")];if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else{av.textContent=init(r.u);av.style.backgroundColor=avatarColor(r.u);}
     const rc=document.createElement("div");rc.className="rc";
     const rh=document.createElement("div");rh.className="rh";const b=document.createElement("b");b.textContent=r.u||"?";const at=document.createElement("div");at.className="at";const dt=new Date(r.ts||0);at.textContent=isNaN(dt.getTime())?"":dt.toLocaleString();rh.appendChild(b);rh.appendChild(at);rc.appendChild(rh);
     const rt=document.createElement("div");rt.className="rt";rt.textContent=r.t||"";rc.appendChild(rt);
@@ -1077,6 +1131,38 @@ try{setIcon("ham","menu");setIcon("sideClose","collapse");setIcon("moreBtn","dot
 el("moreBtn").onclick=e=>{e.stopPropagation();el("moreMenu").classList.toggle("show");};
 el("moreMenu").addEventListener("click",()=>el("moreMenu").classList.remove("show"));
 document.addEventListener("click",e=>{const m=el("moreMenu"),t=el("topmore");if(m.classList.contains("show")&&t&&!t.contains(e.target))m.classList.remove("show");});
+// ===== 보스키: 원클릭 가짜 엑셀 화면 (ESC 또는 더블클릭으로 복귀) =====
+let bossOn=false, bossBuilt=false, bossPrevTitle="";
+function buildBossSheet(){
+  const cols=["A","B","C","D","E","F","G"];
+  const data=[
+    ["항목","1월","2월","3월","4월","합계","비고"],
+    ["매출","312,000","298,500","341,200","355,800","1,307,500",""],
+    ["매출원가","184,000","171,200","198,400","205,100","758,700",""],
+    ["매출총이익","128,000","127,300","142,800","150,700","548,800",""],
+    ["판관비","62,400","60,100","68,900","71,200","262,600",""],
+    ["영업이익","65,600","67,200","73,900","79,500","286,200",""],
+    ["인건비","41,000","41,000","43,500","43,500","169,000",""],
+    ["임차료","12,000","12,000","12,000","12,000","48,000",""],
+    ["광고선전비","9,400","7,100","13,400","15,700","45,600","캠페인"],
+    ["영업이익률","21.0%","22.5%","21.7%","22.3%","21.9%",""],
+    ["현금잔액","420,000","487,200","561,100","640,600","","월말"]
+  ];
+  let h="<table><tr><th class='corner'></th>";
+  cols.forEach(c=>h+="<th>"+c+"</th>");h+="</tr>";
+  for(let r=0;r<24;r++){
+    h+="<tr><td class='rownum'>"+(r+1)+"</td>";
+    for(let c=0;c<cols.length;c++){const v=(data[r]&&data[r][c]!=null)?data[r][c]:"";const isNum=v!==""&&/^[\d,.%()\-]+$/.test(v);h+="<td class='"+(isNum?"num":"")+(r===0?" hl":"")+"'>"+v+"</td>";}
+    h+="</tr>";
+  }
+  h+="</table>";el("bxSheet").innerHTML=h;bossBuilt=true;
+}
+function showBoss(){if(!bossBuilt)buildBossSheet();bossOn=true;el("bossScreen").classList.add("on");el("bossScreen").setAttribute("aria-hidden","false");bossPrevTitle=document.title;document.title="통합 문서1 - Excel";try{el("bxSheet").scrollTop=0;}catch(e){}}
+function hideBoss(){bossOn=false;el("bossScreen").classList.remove("on");el("bossScreen").setAttribute("aria-hidden","true");if(bossPrevTitle)document.title=bossPrevTitle;}
+el("bossBtn").onclick=e=>{e.stopPropagation();showBoss();};
+el("bxExit").onclick=hideBoss;
+el("bossScreen").addEventListener("dblclick",hideBoss);
+document.addEventListener("keydown",e=>{if(bossOn&&e.key==="Escape")hideBoss();});
 updNotifBtn();
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
 updThemeIcon();
