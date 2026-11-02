@@ -860,6 +860,7 @@ function openViewer(data,name,kind){
 function closeViewer(){el("viewer").classList.remove("show");el("viewerBody").innerHTML="";}
 el("viewerClose").onclick=closeViewer;
 el("viewer").onclick=e=>{if(e.target===el("viewer"))closeViewer();};
+el("viewerBody").onclick=e=>{if(e.target===el("viewerBody"))closeViewer();};
 
 // 입력창 자동 높이 + Shift+Enter 줄바꿈 / Enter 전송
 function autoGrow(){const t=el("input");t.style.height="auto";t.style.height=Math.min(t.scrollHeight,120)+"px";}
@@ -915,8 +916,8 @@ document.querySelectorAll(".gp").forEach(t=>t.onclick=()=>{const p=t.getAttribut
 function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){guideAuto=true;el("guideSkip").checked=true;el("guideSkipRow").style.display="flex";setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
 
 // 기능 업데이트 공지 (버전 올릴 때마다 모든 사용자에게 1회) — 관리자 전용 기능은 목록에 넣지 않음
-const NEWS_VER=3;
-const NEWS=["💬  메시지에 답글(스레드)을 달 수 있어요","⭐  자주 쓰는 채널·대화를 즐겨찾기에 고정","👤  같은 대화명으로 들어오면 어느 기기에서나 내 프로필·대화 그대로","📌  중요한 메시지는 상단에 고정 · @멘션 알림","🌙  대화는 오전 6시~밤 11시, 매일 밤 자동 정리(채널·1:1 목록은 유지)"];
+const NEWS_VER=4;
+const NEWS=["🕐  메시지 보낸 시각 표시(오전/오후)","✅  카톡처럼 '안 읽은 인원 수' 표시 — 다 읽으면 사라져요","🎨  프로필 사진이 없으면 이름별 색이 자동 지정","🔔  앱으로 설치하면 아이콘에 안 읽은 수 배지","🫥  화면 가리기: 상단 👁 버튼 → 가짜 엑셀 화면, ESC로 복귀","📜  새 글이 와도, 위를 읽는 중엔 화면이 안 끌려 내려가요"];
 function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;localStorage.setItem(LS+"_news",String(NEWS_VER));const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
 el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
 el("newsOv").onclick=e=>{if(e.target===el("newsOv"))el("newsOv").classList.remove("show");};
