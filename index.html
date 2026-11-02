@@ -113,6 +113,7 @@ button{font-family:inherit}
 .card h3{margin:0 0 6px}.card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 14px}
 .card input[type=text],.card input[type=password]{width:100%;padding:12px;border:0;border-radius:10px;background:var(--bg-2);color:var(--txt);font-size:16px;margin-bottom:10px}
 .card button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;font-size:15px}
+.card button.newsnag{background:none;color:var(--muted-3);font-weight:500;font-size:13px;padding:8px;margin-top:4px}
 .card .ghost{background:var(--bg-2);color:var(--accent);border:0;margin-top:8px}
 .err{color:#d6455b;font-size:12px;margin-bottom:10px;min-height:1px}
 #qrbox{display:flex;justify-content:center;margin:6px 0 12px}#qrbox canvas{border-radius:10px}
@@ -414,6 +415,7 @@ button{font-family:inherit}
   <p style="text-align:center">이번에 이런 기능이 추가됐어요</p>
   <ul class="newslist" id="newsList"></ul>
   <button id="newsClose">확인</button>
+  <button id="newsDontShow" class="newsnag">다시 보지 않기</button>
 </div></div>
 
 <div class="ov" id="adminOv"><div class="card admincard" style="text-align:left">
@@ -918,8 +920,9 @@ function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){guideAuto=t
 // 기능 업데이트 공지 (버전 올릴 때마다 모든 사용자에게 1회) — 관리자 전용 기능은 목록에 넣지 않음
 const NEWS_VER=4;
 const NEWS=["🕐  메시지 보낸 시각 표시(오전/오후)","✅  카톡처럼 '안 읽은 인원 수' 표시 — 다 읽으면 사라져요","🎨  프로필 사진이 없으면 이름별 색이 자동 지정","🔔  앱으로 설치하면 아이콘에 안 읽은 수 배지","🫥  화면 가리기: 상단 👁 버튼 → 가짜 엑셀 화면, ESC로 복귀","📜  새 글이 와도, 위를 읽는 중엔 화면이 안 끌려 내려가요"];
-function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;localStorage.setItem(LS+"_news",String(NEWS_VER));const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
+function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
 el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
+el("newsDontShow").onclick=()=>{try{localStorage.setItem(LS+"_news",String(NEWS_VER));}catch(e){}el("newsOv").classList.remove("show");};
 el("newsOv").onclick=e=>{if(e.target===el("newsOv"))el("newsOv").classList.remove("show");};
 
 // ===== 관리자(혜밍웨이) / 채팅 금지 / 고정 / 멘션 / 데이터 정책 =====
