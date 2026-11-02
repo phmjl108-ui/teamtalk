@@ -209,6 +209,7 @@ button{font-family:inherit}
 .adminbody .arow.del{background:rgba(255,59,48,.08)}
 .adminbody .arow.del .rt{text-decoration:line-through;color:var(--muted)}
 .arow .rdel{font-size:11px;color:var(--red,#FF3B30);font-weight:600;margin-top:4px}
+.arow .rnote{font-size:11px;color:var(--muted);margin-top:4px}
 .adminbody .aview{display:inline-block;width:auto;border:0;background:var(--sys);color:var(--accent);border-radius:8px;font-size:12px;font-weight:600;padding:5px 11px;margin:6px 0 0;cursor:pointer;white-space:nowrap}
 .ment{color:var(--accent);font-weight:600}
 .msg.me .bub .ment{color:#fff;text-decoration:underline}
@@ -424,7 +425,7 @@ button{font-family:inherit}
 
 <div class="ov" id="adminOv"><div class="card admincard" style="text-align:left">
   <h3 style="text-align:center">🛡️ 관리자</h3>
-  <div class="admintabs"><button type="button" id="admTabLog" class="atab on">전체 기록</button><button type="button" id="admTabUser" class="atab">사용자</button></div>
+  <div class="admintabs"><button type="button" id="admTabLog" class="atab on">전체 기록</button><button type="button" id="admTabDel" class="atab">🗑 삭제</button><button type="button" id="admTabUser" class="atab">사용자</button></div>
   <div class="adminbar"><input type="text" id="adminSearch" placeholder="검색(이름·내용)"><button class="ghost" id="adminRefresh" style="width:auto;margin:0;padding:8px 12px">새로고침</button></div>
   <div id="adminBody" class="adminbody">불러오는 중…</div>
   <button class="ghost" id="adminClose">닫기</button>
@@ -1008,7 +1009,7 @@ async function openAdmin(){
     renderAdmin(el("adminSearch").value||"");
   }catch(e){body.textContent="불러오기 실패: "+e.message;}
 }
-function setAdminMode(m){adminMode=m;el("admTabLog").classList.toggle("on",m==="log");el("admTabUser").classList.toggle("on",m==="user");el("adminSearch").placeholder=m==="user"?"이름 검색":"검색(이름·내용)";renderAdmin(el("adminSearch").value||"");}
+function setAdminMode(m){adminMode=m;el("admTabLog").classList.toggle("on",m==="log");el("admTabDel").classList.toggle("on",m==="del");el("admTabUser").classList.toggle("on",m==="user");el("adminSearch").placeholder=m==="user"?"이름 검색":m==="del"?"삭제 메시지 검색":"검색(이름·내용)";renderAdmin(el("adminSearch").value||"");}
 function renderUsers(q){
   const body=el("adminBody");body.innerHTML="";q=(q||"").toLowerCase();
   const all=adminUsers;const rows=all.filter(u=>!q||(u.name||"").toLowerCase().indexOf(q)>=0);
@@ -1031,8 +1032,9 @@ function renderUsers(q){
 function renderAdmin(q){
   if(adminMode==="user"){renderUsers(q);return;}
   const body=el("adminBody");body.innerHTML="";q=(q||"").toLowerCase();
-  const rows=adminData.filter(r=>!q||((r.u||"").toLowerCase().indexOf(q)>=0||(r.t||"").toLowerCase().indexOf(q)>=0)).sort((a,b)=>a.grp<b.grp?-1:a.grp>b.grp?1:((a.ts||0)-(b.ts||0)));
-  if(!rows.length){body.textContent="표시할 기록이 없습니다.";return;}
+  const src=adminMode==="del"?adminData.filter(r=>r.deleted):adminData.filter(r=>!r.deleted);
+  const rows=src.filter(r=>!q||((r.u||"").toLowerCase().indexOf(q)>=0||(r.t||"").toLowerCase().indexOf(q)>=0)).sort((a,b)=>a.grp<b.grp?-1:a.grp>b.grp?1:((a.ts||0)-(b.ts||0)));
+  if(!rows.length){body.textContent=adminMode==="del"?"삭제된 메시지가 없습니다.":"표시할 기록이 없습니다.";return;}
   let g=null;
   rows.forEach(r=>{
     if(r.grp!==g){g=r.grp;const h=document.createElement("div");h.className="agrp";h.textContent=g;body.appendChild(h);}
@@ -1043,13 +1045,15 @@ function renderAdmin(q){
     const rt=document.createElement("div");rt.className="rt";rt.textContent=r.t||"";rc.appendChild(rt);
     if(r.att){const vb=document.createElement("button");vb.className="aview";vb.textContent=r.att.kind==="image"?"🖼 사진 보기":r.att.kind==="video"?"🎞 GIF 보기":"📎 파일 보기";vb.onclick=()=>openViewer(r.att.data,r.att.name,r.att.kind);rc.appendChild(vb);}
     if(r.deleted){const dl=document.createElement("div");dl.className="rdel";dl.textContent="🗑 삭제됨"+(r.delBy?(" · 삭제자 "+r.delBy):"");rc.appendChild(dl);}
-    if(r.deleted&&r.ck){const gb=document.createElement("button");gb.className="aview";gb.textContent="💬 채팅에서 보기";gb.onclick=()=>{if(isDM(r.ck))adminPeek(r.ck,dmLabel(r.ck));else openCh(r.ck);el("adminOv").classList.remove("show");};rc.appendChild(gb);}
+    if(r.deleted){let tck=r.ck;if(!tck&&r.grp&&r.grp.indexOf("# ")===0)tck=r.grp.slice(2);
+      if(tck){const gb=document.createElement("button");gb.className="aview";gb.textContent="💬 채팅에서 보기";gb.onclick=()=>{el("adminOv").classList.remove("show");adminPeek(tck,isDM(tck)?dmLabel(tck):("# "+tck));};rc.appendChild(gb);}
+      else{const nb=document.createElement("div");nb.className="rnote";nb.textContent="· 옛 1:1 삭제분은 위치 복구 불가";rc.appendChild(nb);}}
     d.appendChild(av);d.appendChild(rc);body.appendChild(d);
   });
 }
 el("adminBtn").onclick=()=>{setAdminMode("log");openAdmin();};el("adminClose").onclick=()=>el("adminOv").classList.remove("show");
 el("adminRefresh").onclick=openAdmin;el("adminSearch").addEventListener("input",e=>renderAdmin(e.target.value));
-el("admTabLog").onclick=()=>setAdminMode("log");el("admTabUser").onclick=()=>setAdminMode("user");
+el("admTabLog").onclick=()=>setAdminMode("log");el("admTabDel").onclick=()=>setAdminMode("del");el("admTabUser").onclick=()=>setAdminMode("user");
 el("adminOv").onclick=e=>{if(e.target===el("adminOv"))el("adminOv").classList.remove("show");};
 
 // 데이터 정책
