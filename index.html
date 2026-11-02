@@ -81,6 +81,7 @@ button{font-family:inherit}
 .msg.delmsg .bub{background:rgba(255,59,48,.12);text-decoration:line-through}
 .msg.delmsg.me .bub{background:rgba(255,59,48,.18)}
 .deltag{font-size:10px;color:#FF3B30;font-weight:600;margin:0 6px 3px}.msg.me .deltag{text-align:right}
+.msg.flash .bub{animation:flashhl 1.6s ease}@keyframes flashhl{0%,40%{box-shadow:0 0 0 3px rgba(255,59,48,.55)}100%{box-shadow:0 0 0 0 rgba(255,59,48,0)}}
 .sysmsg{align-self:center;background:transparent;color:var(--muted);font-size:12px;font-weight:500;padding:8px 12px;max-width:85%;text-align:center}
 .typing{display:none;align-items:center;gap:7px;padding:4px 16px 2px;font-size:12px;color:var(--muted)}
 .typing.show{display:flex}
@@ -304,6 +305,7 @@ button{font-family:inherit}
 <main class="main">
   <div class="top">
     <button class="ham" id="ham" aria-label="채널 목록 열기"></button>
+    <button class="iconbtn" id="peekBack" style="display:none" title="뒤로" aria-label="뒤로가기">←</button>
     <div class="titwrap"><h2 id="chName" title="채널 설정"># 일반</h2><small id="chSub"></small></div>
     <button class="iconbtn me" id="nameBtn"><span class="mini" id="miniAv"></span><span id="myName">나</span></button>
     <button class="iconbtn" id="bossBtn" title="화면 가리기 (ESC로 복귀)" aria-label="화면 가리기"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
@@ -655,7 +657,7 @@ function attachFeed(){
   if(pinRef)pinRef.off();pinRef=db.ref("pinned/"+cur);pinRef.on("value",s=>renderPinBar(s.val()));
   if(readRef)readRef.off();readMap={};readRef=db.ref("reads/"+cur);readRef.on("value",s=>{readMap=s.val()||{};renderFeed();});
   deletedArr=[];
-  if(isAdmin()){const ck=cur;db.ref("deleted").once("value").then(s=>{if(cur!==ck)return;deletedArr=[];s.forEach(c=>{const v=c.val();if(v&&!v.sys&&v.ck===ck)deletedArr.push(Object.assign({__key:"del_"+c.key,__deleted:true},v));});renderFeed();}).catch(()=>{});}
+  if(isAdmin()){const ck=cur;db.ref("deleted").once("value").then(s=>{if(cur!==ck)return;deletedArr=[];s.forEach(c=>{const v=c.val();if(!v||v.sys)return;const match=(v.ck===ck)||(!v.ck&&!isDM(ck)&&v.conv===("# "+ck));if(match)deletedArr.push(Object.assign({__key:"del_"+c.key,__deleted:true},v));});renderFeed();}).catch(()=>{});}
   if(threadCntRef)threadCntRef.off();threadCounts={};threadAll={};threadCntRef=db.ref(threadBase(cur));
   threadCntRef.on("value",s=>{threadCounts={};threadAll={};s.forEach(p=>{const arr=[];p.forEach(c=>{arr.push(Object.assign({__key:c.key},c.val()));});threadAll[p.key]=arr;threadCounts[p.key]=arr.length;});renderFeed();});
   listenTyping(cur);
@@ -666,7 +668,7 @@ function openCh(name){
   if(cur&&db&&cur!==name)db.ref("typing/"+cur+"/"+clientId).remove();
   cur=name;curPeer=null;try{localStorage.setItem(LS+"_cur",name)}catch(e){}
   el("chName").textContent="# "+name;el("chName").title="채널 설정";
-  peek=false;markSeen(name);renderCh();attachFeed();applyBan();
+  peek=false;el("peekBack").style.display="none";markSeen(name);renderCh();attachFeed();applyBan();
 }
 function openDM(peerId,peerName){
   if(!peerId||peerId===clientId){alert("자기 자신과는 1:1 대화를 할 수 없어요.");return;}
@@ -675,10 +677,13 @@ function openDM(peerId,peerName){
   cur=key;curPeer={id:peerId,name:nm};try{localStorage.setItem(LS+"_cur",key)}catch(e){}
   el("chName").textContent=nm;el("chName").title="1:1 대화";
   db.ref("dmIndex/"+clientId+"/"+peerId).update({name:nm,ts:Date.now()});
-  peek=false;markSeen(key);renderCh();attachFeed();applyBan();
+  peek=false;el("peekBack").style.display="none";markSeen(key);renderCh();attachFeed();applyBan();
 }
 // 관리자 전용: 임의 대화(다른 사람 1:1 포함)를 흔적 없이 읽기 전용으로 열람
-function adminPeek(ck,label){if(!isAdmin()||!ck)return;if(cur&&db&&cur!==ck&&!peek)db.ref("typing/"+cur+"/"+clientId).remove();peek=true;cur=ck;curPeer=null;el("chName").textContent="👁 "+(label||"열람");el("chName").title="관리자 열람 · 흔적이 남지 않음";el("moreMenu").classList.remove("show");el("adminOv").classList.remove("show");try{el("side").classList.remove("open");}catch(e){}renderCh();attachFeed();applyBan();}
+let jumpTs=0, peekPrevCur=null, peekPrevPeer=null;
+// 관리자: 남의 1:1 대화를 흔적 없이 읽기 전용으로 보기(뒤로가기로 복귀)
+function adminPeek(ck,label,ts){if(!isAdmin()||!ck)return;if(!peek){peekPrevCur=cur;peekPrevPeer=curPeer;}if(cur&&db&&cur!==ck&&!peek)db.ref("typing/"+cur+"/"+clientId).remove();peek=true;cur=ck;curPeer=null;jumpTs=ts||0;el("chName").textContent=label||"대화";el("chName").title="관리자 보기";el("peekBack").style.display="";el("moreMenu").classList.remove("show");el("adminOv").classList.remove("show");try{el("side").classList.remove("open");}catch(e){}renderCh();attachFeed();applyBan();}
+function exitPeek(){peek=false;el("peekBack").style.display="none";el("composer").style.display="";if(peekPrevCur){if(isDM(peekPrevCur)&&peekPrevPeer){openDM(peekPrevPeer.id,peekPrevPeer.name);}else if(peekPrevCur&&!isDM(peekPrevCur)){openCh(peekPrevCur);}else{applyBan();}}else{applyBan();}el("adminOv").classList.add("show");}
 function attArray(m){return Array.isArray(m.atts)?m.atts:(m.atts?Object.values(m.atts):[]);}
 function firstAtt(m){if(!m)return null;if(m.img)return{data:m.img,name:"image.jpg",kind:"image"};const a=attArray(m);if(a.length)return{data:a[0].data,name:a[0].name||"파일",kind:a[0].kind||"file"};return null;}
 function convMembers(){const s=new Set(Object.keys(readMap||{}));(currentArr||[]).forEach(x=>{if(x&&x.cid)s.add(x.cid);});return s;}
@@ -695,7 +700,7 @@ function renderFeed(){
   arr.forEach(m=>{
     if(m.sys){const s=document.createElement("div");s.className="sysmsg";s.textContent=m.t;feed.appendChild(s);return;}
     const mine=m.cid?m.cid===clientId:(m.u===me);
-    const row=document.createElement("div");row.className="msg"+(mine?" me":"")+(m.__deleted?" delmsg":"");
+    const row=document.createElement("div");row.className="msg"+(mine?" me":"")+(m.__deleted?" delmsg":"");row.dataset.ts=m.ts||"";
     const av=document.createElement("div");av.className="av";
     let p=profiles[m.cid];
     if(!(p&&p.img)){const byName=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(byName)p=byName;}
@@ -733,6 +738,7 @@ function renderFeed(){
   });
   if(activeReply!=null){const fi=feed.querySelector('.treplyform input[data-rk="'+activeReply+'"]');if(fi){const end=fi.value.length;fi.focus();try{fi.setSelectionRange(end,end);}catch(e){}}}
   else if(atBottom)feed.scrollTop=feed.scrollHeight;
+  if(jumpTs){const tr=feed.querySelector('.msg.delmsg[data-ts="'+jumpTs+'"]')||feed.querySelector('.msg[data-ts="'+jumpTs+'"]');if(tr){try{tr.scrollIntoView({block:"center"});}catch(e){}tr.classList.add("flash");jumpTs=0;}}
 }
 function toggleThread(key){
   if(!key)return;
@@ -950,7 +956,8 @@ const OPEN_H=6, CLOSE_H=23; // 대화 가능 06:00~23:00
 function inWindow(){const h=new Date().getHours();return h>=OPEN_H&&h<CLOSE_H;}
 function applyBan(){
   const note=el("banNote"),inp=el("input"),snd=el("composer").querySelector(".send");
-  if(peek){note.textContent="👁 관리자 열람 모드 · 흔적이 남지 않습니다";note.style.display="";inp.disabled=true;snd.disabled=true;return;}
+  if(peek){el("composer").style.display="none";note.style.display="none";return;}
+  el("composer").style.display="";
   const b=!!(banned&&banned[clientId]), off=!inWindow();
   if(b){note.textContent="🚫 현재 메시지 전송이 제한되어 있습니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
   else if(off){note.textContent="🌙 대화는 오전 6시~오후 11시에만 가능해요. 지난 대화는 매일 밤 11시에 사라집니다.";note.style.display="";inp.disabled=true;snd.disabled=true;}
@@ -1046,7 +1053,7 @@ function renderAdmin(q){
     if(r.att){const vb=document.createElement("button");vb.className="aview";vb.textContent=r.att.kind==="image"?"🖼 사진 보기":r.att.kind==="video"?"🎞 GIF 보기":"📎 파일 보기";vb.onclick=()=>openViewer(r.att.data,r.att.name,r.att.kind);rc.appendChild(vb);}
     if(r.deleted){const dl=document.createElement("div");dl.className="rdel";dl.textContent="🗑 삭제됨"+(r.delBy?(" · 삭제자 "+r.delBy):"");rc.appendChild(dl);}
     if(r.deleted){let tck=r.ck;if(!tck&&r.grp&&r.grp.indexOf("# ")===0)tck=r.grp.slice(2);
-      if(tck){const gb=document.createElement("button");gb.className="aview";gb.textContent="💬 채팅에서 보기";gb.onclick=()=>{el("adminOv").classList.remove("show");adminPeek(tck,isDM(tck)?dmLabel(tck):("# "+tck));};rc.appendChild(gb);}
+      if(tck){const gb=document.createElement("button");gb.className="aview";gb.textContent="💬 채팅에서 보기";gb.onclick=()=>{el("adminOv").classList.remove("show");if(isDM(tck)){adminPeek(tck,dmLabel(tck),r.ts);}else{jumpTs=r.ts||0;openCh(tck);}};rc.appendChild(gb);}
       else{const nb=document.createElement("div");nb.className="rnote";nb.textContent="· 옛 1:1 삭제분은 위치 복구 불가";rc.appendChild(nb);}}
     d.appendChild(av);d.appendChild(rc);body.appendChild(d);
   });
@@ -1054,6 +1061,7 @@ function renderAdmin(q){
 el("adminBtn").onclick=()=>{setAdminMode("log");openAdmin();};el("adminClose").onclick=()=>el("adminOv").classList.remove("show");
 el("adminRefresh").onclick=openAdmin;el("adminSearch").addEventListener("input",e=>renderAdmin(e.target.value));
 el("admTabLog").onclick=()=>setAdminMode("log");el("admTabDel").onclick=()=>setAdminMode("del");el("admTabUser").onclick=()=>setAdminMode("user");
+el("peekBack").onclick=exitPeek;
 el("adminOv").onclick=e=>{if(e.target===el("adminOv"))el("adminOv").classList.remove("show");};
 
 // 데이터 정책
