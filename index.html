@@ -697,7 +697,9 @@ function convMembers(){const s=new Set(Object.keys(readMap||{}));(currentArr||[]
 function unreadOfMsg(m,members){if(!m||!m.ts)return 0;let n=0;members.forEach(cid=>{if(cid===m.cid)return;const r=readMap[cid];if(!r||!r.ts||r.ts<m.ts)n++;});return n;}
 function renderFeed(){
   const feed=el("feed");
-  const arr=(isAdmin()&&deletedArr.length)?currentArr.concat(deletedArr).sort((a,b)=>(a.ts||0)-(b.ts||0)):currentArr;
+  // 라이브 메시지는 Firebase 키(전송 순서) 그대로 두고, 삭제분만 원래 자리에 끼워 넣음(ts 재정렬 금지)
+  let arr=currentArr;
+  if(isAdmin()&&deletedArr.length){arr=currentArr.slice();deletedArr.forEach(d=>{const dk=d.mkey;let idx=arr.length;for(let i=0;i<arr.length;i++){const lv=arr[i];const lk=lv.__key;const before=(dk&&lk&&lk.indexOf("del_")!==0)?(dk<lk):((d.ts||0)<(lv.ts||0));if(before){idx=i;break;}}arr.splice(idx,0,d);});}
   const members=convMembers();
   const atBottom=forceBottom||(feed.scrollHeight-feed.scrollTop-feed.clientHeight<80);forceBottom=false;
   const talk=arr.filter(m=>!m.sys);
