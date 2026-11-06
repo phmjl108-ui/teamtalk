@@ -186,6 +186,12 @@ button{font-family:inherit}
 .admintabs .atab{flex:1;padding:7px 10px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .admintabs .atab.on{background:var(--panel);color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,.14)}
 .adminbody{flex:1;overflow:auto;max-height:62vh;border:0;border-radius:12px;padding:12px;font-size:13px;line-height:1.5;background:var(--bg-2)}
+.convchips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 9px;margin:-2px 0 2px;position:sticky;top:-12px;background:var(--bg-2);z-index:2;-webkit-overflow-scrolling:touch}
+.convchips::-webkit-scrollbar{height:0}
+.convchips .convchip{flex:0 0 auto;border:0;background:var(--panel);color:var(--muted);font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.convchips .convchip.on{background:var(--accent);color:#fff}
+.adminbody .racts{display:flex;gap:6px;flex-wrap:wrap}
+.adminbody .arestore{background:rgba(52,199,89,.14);color:var(--green,#34C759)}
 /* 사용자 대시보드 */
 .astat{display:flex;gap:8px;margin-bottom:14px}
 .astatc{flex:1;background:var(--panel);border-radius:14px;padding:13px 10px;text-align:center}
@@ -1008,8 +1014,8 @@ async function openAdmin(){
     const msgAll=msgS.val()||{},dmAll=dmS.val()||{},prAll=prS.val()||{},delAll=delS.val()||{};adminData=[];
     const cnt={};
     Object.keys(msgAll).forEach(ch=>{const ms=msgAll[ch]||{};Object.values(ms).forEach(m=>{if(m&&!m.sys){adminData.push({grp:"# "+ch,u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m)});cnt[m.u]=(cnt[m.u]||0)+1;}});});
-    Object.keys(dmAll).forEach(key=>{const ms=(dmAll[key]&&dmAll[key].msg)||{};Object.values(ms).forEach(m=>{if(m&&!m.sys){adminData.push({grp:"DM(1:1)",u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m)});cnt[m.u]=(cnt[m.u]||0)+1;}});});
-    Object.values(delAll).forEach(m=>{if(m&&!m.sys){adminData.push({grp:m.conv||"삭제됨",u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m),deleted:true,delBy:m.delBy,ck:m.ck});}});
+    Object.keys(dmAll).forEach(key=>{const ms=(dmAll[key]&&dmAll[key].msg)||{};const lbl="💬 "+dmLabel(key);Object.values(ms).forEach(m=>{if(m&&!m.sys){adminData.push({grp:lbl,u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m)});cnt[m.u]=(cnt[m.u]||0)+1;}});});
+    Object.keys(delAll).forEach(k=>{const m=delAll[k];if(m&&!m.sys){adminData.push({grp:m.conv||"삭제됨",u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m),deleted:true,delBy:m.delBy,ck:m.ck,delKey:k,raw:m});}});
     // 이름 = 계정 → 같은 이름은 한 줄로 합침(옛 기기별 기록이 여러 노드여도 하나로)
     const byName={};
     Object.entries(prAll).forEach(([cid,p])=>{const nm=(p&&p.name)||"(이름없음)";if(!byName[nm])byName[nm]={cid:nameKey(nm),name:nm,img:(p&&p.img)||null,n:cnt[nm]||0};else if(!byName[nm].img&&p&&p.img)byName[nm].img=p.img;});
@@ -1017,7 +1023,8 @@ async function openAdmin(){
     renderAdmin(el("adminSearch").value||"");
   }catch(e){body.textContent="불러오기 실패: "+e.message;}
 }
-function setAdminMode(m){adminMode=m;el("admTabLog").classList.toggle("on",m==="log");el("admTabDel").classList.toggle("on",m==="del");el("admTabUser").classList.toggle("on",m==="user");el("adminSearch").placeholder=m==="user"?"이름 검색":m==="del"?"삭제 메시지 검색":"검색(이름·내용)";renderAdmin(el("adminSearch").value||"");}
+let adminConv=null;
+function setAdminMode(m){adminMode=m;adminConv=null;el("admTabLog").classList.toggle("on",m==="log");el("admTabDel").classList.toggle("on",m==="del");el("admTabUser").classList.toggle("on",m==="user");el("adminSearch").placeholder=m==="user"?"이름 검색":m==="del"?"삭제 메시지 검색":"검색(이름·내용)";renderAdmin(el("adminSearch").value||"");}
 function renderUsers(q){
   const body=el("adminBody");body.innerHTML="";q=(q||"").toLowerCase();
   const all=adminUsers;const rows=all.filter(u=>!q||(u.name||"").toLowerCase().indexOf(q)>=0);
@@ -1041,23 +1048,48 @@ function renderAdmin(q){
   if(adminMode==="user"){renderUsers(q);return;}
   const body=el("adminBody");body.innerHTML="";q=(q||"").toLowerCase();
   const src=adminMode==="del"?adminData.filter(r=>r.deleted):adminData.filter(r=>!r.deleted);
-  const rows=src.filter(r=>!q||((r.u||"").toLowerCase().indexOf(q)>=0||(r.t||"").toLowerCase().indexOf(q)>=0)).sort((a,b)=>a.grp<b.grp?-1:a.grp>b.grp?1:((a.ts||0)-(b.ts||0)));
-  if(!rows.length){body.textContent=adminMode==="del"?"삭제된 메시지가 없습니다.":"표시할 기록이 없습니다.";return;}
+  // 대화별 칩(필터) — 한 대화씩 보기
+  const groups=[...new Set(src.map(r=>r.grp))].sort((a,b)=>a<b?-1:a>b?1:0);
+  if(adminConv===null||(adminConv!=="__ALL__"&&groups.indexOf(adminConv)<0))adminConv=groups.length?groups[0]:"__ALL__";
+  const chips=document.createElement("div");chips.className="convchips";
+  const mkchip=(val,txt)=>{const c=document.createElement("button");c.className="convchip"+(adminConv===val?" on":"");c.textContent=txt;c.onclick=()=>{adminConv=val;renderAdmin(el("adminSearch").value||"");};return c;};
+  chips.appendChild(mkchip("__ALL__","전체"));
+  groups.forEach(gp=>chips.appendChild(mkchip(gp,gp)));
+  body.appendChild(chips);
+  const list=document.createElement("div");body.appendChild(list);
+  const rows=src.filter(r=>(adminConv==="__ALL__"||r.grp===adminConv)&&(!q||((r.u||"").toLowerCase().indexOf(q)>=0||(r.t||"").toLowerCase().indexOf(q)>=0))).sort((a,b)=>a.grp<b.grp?-1:a.grp>b.grp?1:((a.ts||0)-(b.ts||0)));
+  if(!rows.length){const e=document.createElement("div");e.className="agrp";e.textContent=adminMode==="del"?"삭제된 메시지가 없습니다.":"표시할 기록이 없습니다.";list.appendChild(e);return;}
   let g=null;
   rows.forEach(r=>{
-    if(r.grp!==g){g=r.grp;const h=document.createElement("div");h.className="agrp";h.textContent=g;body.appendChild(h);}
+    if(adminConv==="__ALL__"&&r.grp!==g){g=r.grp;const h=document.createElement("div");h.className="agrp";h.textContent=g;list.appendChild(h);}
     const d=document.createElement("div");d.className="arow"+(r.deleted?" del":"");
     const av=document.createElement("div");av.className="rav";const pr=profiles[nameKey(r.u||"")];if(pr&&pr.img){av.style.backgroundImage="url("+pr.img+")";}else{av.textContent=init(r.u);av.style.backgroundColor=avatarColor(r.u);}
     const rc=document.createElement("div");rc.className="rc";
     const rh=document.createElement("div");rh.className="rh";const b=document.createElement("b");b.textContent=r.u||"?";const at=document.createElement("div");at.className="at";const dt=new Date(r.ts||0);at.textContent=isNaN(dt.getTime())?"":dt.toLocaleString();rh.appendChild(b);rh.appendChild(at);rc.appendChild(rh);
     const rt=document.createElement("div");rt.className="rt";rt.textContent=r.t||"";rc.appendChild(rt);
     if(r.att){const vb=document.createElement("button");vb.className="aview";vb.textContent=r.att.kind==="image"?"🖼 사진 보기":r.att.kind==="video"?"🎞 GIF 보기":"📎 파일 보기";vb.onclick=()=>openViewer(r.att.data,r.att.name,r.att.kind);rc.appendChild(vb);}
-    if(r.deleted){const dl=document.createElement("div");dl.className="rdel";dl.textContent="🗑 삭제됨"+(r.delBy?(" · 삭제자 "+r.delBy):"");rc.appendChild(dl);}
-    if(r.deleted){let tck=r.ck;if(!tck&&r.grp&&r.grp.indexOf("# ")===0)tck=r.grp.slice(2);
-      if(tck){const gb=document.createElement("button");gb.className="aview";gb.textContent="💬 채팅에서 보기";gb.onclick=()=>{el("adminOv").classList.remove("show");if(isDM(tck)){adminPeek(tck,dmLabel(tck),r.ts);}else{setJump(r.ts);openCh(tck);}};rc.appendChild(gb);}
-      else{const nb=document.createElement("div");nb.className="rnote";nb.textContent="· 옛 1:1 삭제분은 위치 복구 불가";rc.appendChild(nb);}}
-    d.appendChild(av);d.appendChild(rc);body.appendChild(d);
+    if(r.deleted){const dl=document.createElement("div");dl.className="rdel";dl.textContent="🗑 삭제됨"+(r.delBy?(" · 삭제자 "+r.delBy):"");rc.appendChild(dl);
+      let tck=r.ck;if(!tck&&r.grp&&r.grp.indexOf("# ")===0)tck=r.grp.slice(2);
+      if(tck){const acts=document.createElement("div");acts.className="racts";
+        const gb=document.createElement("button");gb.className="aview";gb.textContent="💬 채팅에서 보기";gb.onclick=()=>{el("adminOv").classList.remove("show");if(isDM(tck)){adminPeek(tck,dmLabel(tck),r.ts);}else{setJump(r.ts);openCh(tck);}};acts.appendChild(gb);
+        const rsb=document.createElement("button");rsb.className="aview arestore";rsb.textContent="↩ 복구";rsb.onclick=()=>restoreDeleted(r,tck);acts.appendChild(rsb);
+        rc.appendChild(acts);}
+      else{const nb=document.createElement("div");nb.className="rnote";nb.textContent="· 옛 1:1 삭제분은 대화 위치가 기록돼 있지 않아 복구·이동이 안 됩니다";rc.appendChild(nb);}}
+    d.appendChild(av);d.appendChild(rc);list.appendChild(d);
   });
+}
+// 관리자: 삭제된 메시지를 원래 대화로 복구(삭제기록 제거)
+function restoreDeleted(r,tck){
+  if(!isAdmin()||!r||!r.raw||!db)return;
+  if(!tck){ // 옛 1:1: 위치키(ck) 없음 → dm 키 추정 불가. 채널만 grp로 복구, DM은 불가
+    if(r.raw.ck)tck=r.raw.ck; else if(r.grp&&r.grp.indexOf("# ")===0)tck=r.grp.slice(2);
+  }
+  if(!tck){alert("이 삭제분은 복구할 대화를 알 수 없어요(옛 1:1).");return;}
+  if(!confirm("이 메시지를 "+(isDM(tck)?"해당 1:1 대화":("# "+tck))+"에 복구할까요?"))return;
+  const m=r.raw,orig={};["u","cid","t","ts","atts","img","reply"].forEach(k=>{if(m[k]!==undefined)orig[k]=m[k];});
+  const base=msgPath(tck);
+  const done=()=>{if(r.delKey)db.ref("deleted/"+r.delKey).remove();openAdmin();};
+  try{if(m.mkey){db.ref(base+"/"+m.mkey).set(orig).then(done).catch(done);}else{db.ref(base).push(orig).then(done).catch(done);}}catch(e){alert("복구 실패: "+e.message);}
 }
 el("adminBtn").onclick=()=>{setAdminMode("log");openAdmin();};el("adminClose").onclick=()=>el("adminOv").classList.remove("show");
 el("adminRefresh").onclick=openAdmin;el("adminSearch").addEventListener("input",e=>renderAdmin(e.target.value));
