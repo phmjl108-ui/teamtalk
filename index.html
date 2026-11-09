@@ -228,10 +228,20 @@ button{font-family:inherit}
 /* 메시지 hover 액션 툴바(모아진 둥근 바) */
 .msgacts{display:inline-flex;align-items:center;gap:2px;align-self:center;background:var(--panel);border-radius:16px;padding:3px;box-shadow:0 1px 5px rgba(0,0,0,.16);opacity:0;transition:opacity .12s;flex-shrink:0}
 .msg:hover .msgacts{opacity:1}
-@media(hover:none){.msgacts{opacity:1}}
+@media(hover:none){.msgacts{display:none}.msg .bub{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}}
 .msgacts button{background:none;border:0;color:var(--muted);cursor:pointer;padding:6px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px}
 .msgacts button:hover{background:var(--hover);color:var(--accent)}
 .msgacts button .icon{width:18px;height:18px}
+.msgsheetov{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.35);display:none;align-items:flex-end;justify-content:center}
+.msgsheetov.show{display:flex}
+.msgsheet{width:100%;max-width:480px;margin:10px;background:var(--panel);border-radius:18px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.28);animation:sheetin .18s ease}
+@keyframes sheetin{from{transform:translateY(12px);opacity:.6}to{transform:none;opacity:1}}
+.msgsheet .sheetitem{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;color:var(--txt);font-size:16px;padding:15px 20px;cursor:pointer;text-align:left;border-bottom:.5px solid var(--line)}
+.msgsheet .sheetitem:active{background:var(--hover)}
+.msgsheet .sheetitem .si-ic{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.msgsheet .sheetitem .si-ic svg{width:20px;height:20px}
+.msgsheet .sheetdel{color:#FF3B30}.msgsheet .sheetdel .si-ic{color:#FF3B30}
+.msgsheet .sheetcancel{justify-content:center;color:var(--muted);font-weight:600;border-bottom:0}
 /* 인라인 스레드(댓글식) */
 .threadbox{margin:2px 0 6px 40px;display:flex;flex-direction:column;gap:7px}
 .msg.me + .threadbox{margin-left:40px}
@@ -455,6 +465,8 @@ button{font-family:inherit}
   <div class="vbar"><span class="vname" id="viewerName"></span><a class="vdl" id="viewerDl" download>⤓ 다운로드</a><button class="vclose" id="viewerClose">✕</button></div>
   <div class="vbody" id="viewerBody"></div>
 </div>
+
+<div class="msgsheetov" id="msgSheet"><div class="msgsheet" id="msgSheetInner"></div></div>
 
 <div id="bossScreen" aria-hidden="true">
   <div class="bx-title"><span class="bx-ico" id="bxExit" title="복귀">X</span><span class="bx-tt">통합 문서1 - Excel</span><span class="bx-auto">자동 저장 <b>●</b></span><span class="bx-win"><i>—</i><i>▢</i><i>✕</i></span></div>
@@ -742,6 +754,7 @@ function renderFeed(){
     if(mine||isAdmin()){const db2=document.createElement("button");db2.innerHTML=svgIcon("trash");db2.title=mine?"삭제":"삭제(관리자)";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);acts.appendChild(db2);}
     row.appendChild(acts);
     }
+    if(!m.__deleted&&!peek)attachLongPress(row,m);
     feed.appendChild(row);
     if((threadAll[m.__key]&&threadAll[m.__key].length)||openThreads.has(m.__key))feed.appendChild(renderThreadBox(m.__key));
   });
@@ -749,6 +762,29 @@ function renderFeed(){
   else if(jumpTs){const tr=feed.querySelector('.msg[data-ts="'+jumpTs+'"]');if(tr){try{tr.scrollIntoView({block:"center"});}catch(e){}tr.classList.add("flash");}}
   else if(atBottom)feed.scrollTop=feed.scrollHeight;
 }
+// 롱프레스(꾹 누르기) → 메시지 옵션 시트 (모바일)
+function attachLongPress(row,m){
+  let t=null,sx=0,sy=0;
+  const clear=()=>{if(t){clearTimeout(t);t=null;}};
+  row.addEventListener("touchstart",e=>{const p=e.touches&&e.touches[0];if(!p)return;sx=p.clientX;sy=p.clientY;clear();t=setTimeout(()=>{t=null;openMsgSheet(m);},480);},{passive:true});
+  row.addEventListener("touchmove",e=>{const p=e.touches&&e.touches[0];if(!p)return;if(Math.abs(p.clientX-sx)>10||Math.abs(p.clientY-sy)>10)clear();},{passive:true});
+  row.addEventListener("touchend",clear);row.addEventListener("touchcancel",clear);
+}
+function openMsgSheet(m){
+  if(!m||m.__deleted)return;
+  const mine=m.cid?m.cid===clientId:(m.u===me);
+  const box=el("msgSheetInner");box.innerHTML="";
+  try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+  const add=(label,icon,cls,fn)=>{const b=document.createElement("button");b.className="sheetitem"+(cls?(" "+cls):"");b.innerHTML='<span class="si-ic">'+icon+'</span><span>'+label+'</span>';b.onclick=()=>{closeMsgSheet();fn();};box.appendChild(b);};
+  add("답장",svgIcon("quote"),"",()=>startReply(m));
+  if(!threadCounts[m.__key])add("댓글",svgIcon("reply"),"",()=>toggleThread(m.__key));
+  add("고정",svgIcon("pin"),"",()=>pinMsg(m));
+  if(mine||isAdmin())add("삭제",svgIcon("trash"),"sheetdel",()=>deleteMsg(m.__key));
+  const c=document.createElement("button");c.className="sheetitem sheetcancel";c.textContent="취소";c.onclick=closeMsgSheet;box.appendChild(c);
+  el("msgSheet").classList.add("show");
+}
+function closeMsgSheet(){el("msgSheet").classList.remove("show");}
+el("msgSheet").onclick=e=>{if(e.target===el("msgSheet"))closeMsgSheet();};
 function toggleThread(key){
   if(!key)return;
   if(openThreads.has(key)){openThreads.delete(key);if(activeReply===key)activeReply=null;}
