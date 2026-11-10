@@ -138,6 +138,39 @@ button{font-family:inherit}
 .toast .nch{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .toast .tx{position:absolute;top:6px;right:9px;color:var(--muted);font-size:15px;line-height:1}
 @keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+/* 알림 설정 */
+.toasts.pos-top{top:68px;bottom:auto}
+.toast.kw{box-shadow:0 0 0 2px var(--accent),0 8px 28px rgba(0,0,0,.16)}
+.toast .kwtag{display:block;font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.toast .nreply{display:flex;gap:6px;margin-top:9px}
+.toast .nreply input{flex:1;min-width:0;border:0;background:var(--bg-2);border-radius:14px;padding:7px 12px;font-size:13px;color:var(--txt);font-family:inherit}
+.toast .nreply input:focus{outline:none;box-shadow:0 0 0 2px var(--accent)}
+.toast .nreply button{flex-shrink:0;border:0;background:var(--accent);color:#fff;border-radius:14px;padding:0 13px;font-size:13px;font-weight:600;cursor:pointer}
+.nsrow{margin-bottom:16px}
+.nsrow .nslb{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:8px;display:block}
+.nsrow .nshint{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+.seg{display:flex;flex-direction:column;gap:6px}
+.seg .segb{border:0;background:var(--bg-2);color:var(--txt);font-size:14px;font-weight:500;padding:11px 13px;border-radius:11px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:9px;width:100%}
+.seg .segb .chk{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted-3);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.seg .segb.on{background:var(--sys);color:var(--accent);font-weight:600}
+.seg .segb.on .chk{border-color:var(--accent);background:var(--accent)}
+.seg .segb.on .chk::after{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
+.seg.horiz{flex-direction:row}
+.seg.horiz .segb{flex:1;justify-content:center;text-align:center}
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg-2);border-radius:11px;padding:11px 13px}
+.swrow .swlb{font-size:14px;color:var(--txt);min-width:0}
+.swrow .swt{position:relative;width:46px;min-width:46px;height:28px;padding:0;border-radius:999px;background:var(--muted-3);border:0;cursor:pointer;flex-shrink:0;transition:background .18s}
+.swrow .swt::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.swrow .swt.on{background:var(--accent)}
+.swrow .swt.on::after{transform:translateX(18px)}
+.kwadd{display:flex;gap:6px;margin-bottom:9px}
+.kwadd input{flex:1;min-width:0;border:0;background:var(--bg-2);border-radius:11px;padding:10px 12px;font-size:14px;color:var(--txt);font-family:inherit}
+.kwadd input:focus{outline:none;box-shadow:0 0 0 2px var(--accent)}
+.kwadd button{flex-shrink:0;width:auto;border:0;background:var(--accent);color:#fff;border-radius:11px;padding:0 15px;font-size:14px;font-weight:600;cursor:pointer}
+.kwchips{display:flex;flex-wrap:wrap;gap:7px}
+.kwchips .kwc{display:inline-flex;align-items:center;gap:6px;background:var(--bg-2);color:var(--txt);font-size:13px;padding:6px 10px;border-radius:999px}
+.kwchips .kwc .x{color:var(--muted);cursor:pointer;font-size:15px;line-height:1}
+.kwchips .empty{font-size:12.5px;color:var(--muted)}
 .filechip{cursor:pointer}
 .pinbar .icon{width:15px;height:15px;flex:none}
 .atab .icon{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
@@ -332,6 +365,7 @@ button{font-family:inherit}
       <div class="moremenu" id="moreMenu">
         <button class="mitem" id="helpBtn"><span class="mi-ic"></span><span class="mi-lb">설치·알림 안내</span></button>
         <button class="mitem" id="notifBtn" style="display:none"><span class="mi-ic"></span><span class="mi-lb">알림 켜기</span></button>
+        <button class="mitem" id="notifSetBtn"><span class="mi-ic"></span><span class="mi-lb">알림 설정</span></button>
         <button class="mitem" id="shareBtn"><span class="mi-ic"></span><span class="mi-lb">초대 링크 공유</span></button>
         <button class="mitem" id="adminBtn" style="display:none"><span class="mi-ic"></span><span class="mi-lb">관리자</span></button>
         <button class="mitem" id="themeBtn"><span class="mi-ic"></span><span class="mi-lb">다크 모드</span></button>
@@ -461,6 +495,39 @@ button{font-family:inherit}
     <p class="gnote">남기고 싶은 대화는 매일 밤 정리 전에 미리 저장해 두세요.</p>
   </div>
   <button class="ghost" id="dataClose">닫기</button>
+</div></div>
+
+<div class="ov" id="notifSetOv"><div class="card" style="text-align:left">
+  <h3 style="text-align:center">🔔 알림 설정</h3>
+  <div class="nsrow">
+    <span class="nslb">표시 방법</span>
+    <div class="seg" id="nsMode">
+      <button class="segb" data-v="full"><span class="chk"></span>보낸 사람 + 메시지</button>
+      <button class="segb" data-v="sender"><span class="chk"></span>보낸 사람만</button>
+      <button class="segb" data-v="none"><span class="chk"></span>모두 보여주지 않음</button>
+    </div>
+    <div class="nshint">알림에 대화 내용을 얼마나 보여줄지 정해요. (이 기기에만 적용)</div>
+  </div>
+  <div class="nsrow">
+    <span class="nslb">표시 위치</span>
+    <div class="seg horiz" id="nsPos">
+      <button class="segb" data-v="top"><span class="chk"></span>위쪽</button>
+      <button class="segb" data-v="bottom"><span class="chk"></span>아래쪽</button>
+    </div>
+    <div class="nshint">앱 안에서 뜨는 알림 팝업 위치예요. 윈도우·폰의 시스템 알림 위치는 기기 설정에서 정해집니다.</div>
+  </div>
+  <div class="nsrow">
+    <span class="nslb">알림창 답장</span>
+    <div class="swrow"><span class="swlb">앱 알림에서 바로 답장</span><button class="swt" id="nsReply" aria-label="알림창 답장 켜기"></button></div>
+    <div class="nshint">켜면 앱 알림 팝업에 입력칸이 생겨 채팅방을 열지 않고 바로 답장할 수 있어요.</div>
+  </div>
+  <div class="nsrow">
+    <span class="nslb">키워드 알림</span>
+    <div class="kwadd"><input type="text" id="nsKwInput" placeholder="예: 회식, 공지" maxlength="20"><button id="nsKwAdd">추가</button></div>
+    <div class="kwchips" id="nsKwChips"></div>
+    <div class="nshint">메시지에 이 단어가 들어오면 '표시 방법' 설정과 상관없이 내용을 꼭 보여주고 알림을 강조해요.</div>
+  </div>
+  <button class="ghost" id="notifSetClose">닫기</button>
 </div></div>
 
 <div class="viewer" id="viewer">
@@ -868,24 +935,52 @@ function toast(title,body,ch){const w=el("toasts");if(!w)return;const d=document
 async function notify(title,body,ch){toast(title,body,ch);if(!("Notification"in window)||Notification.permission!=="granted")return;const opts={body:body||"",tag:"tt-"+ch,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch}};try{if(navigator.serviceWorker){const reg=await navigator.serviceWorker.ready;if(reg&&reg.showNotification){await reg.showNotification(title,opts);return;}}}catch(e){}try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();if(ch)openKey(ch);n.close();};}catch(e){}}
 // 메시지 알림: 앱 안 팝업(메시지 위 + 이름 배지 + 채널), 윈도우 알림(제목 "이름 · #채널", 내용 메시지)
 async function notifyMsg(sender,chanLabel,message,key,dm){
+  const kw=matchKeyword(message);          // 키워드 포함 시 설정과 무관하게 내용 표시+강조
+  const mode=kw?"full":nset.mode;
+  const showMsg=mode==="full", showSender=mode!=="none";
   const w=el("toasts");
   if(w){
-    const d=document.createElement("div");d.className="toast ntf";
+    const d=document.createElement("div");d.className="toast ntf"+(kw?" kw":"");
     d.innerHTML='<span class="tx">×</span><div class="nmsg"></div><div class="nmeta"><span class="nname"></span><span class="nch"></span></div>';
-    d.querySelector(".nmsg").textContent=message||"";
-    d.querySelector(".nname").textContent=sender||"";
-    d.querySelector(".nch").textContent=dm?"1:1 대화":chanLabel;
+    if(kw){const kt=document.createElement("div");kt.className="kwtag";kt.textContent="🔔 키워드 · "+kw;d.insertBefore(kt,d.querySelector(".nmsg"));}
+    d.querySelector(".nmsg").textContent=showMsg?(message||""):"새 메시지가 도착했어요";
+    const nameEl=d.querySelector(".nname"),chEl=d.querySelector(".nch");
+    if(showSender){nameEl.textContent=sender||"";chEl.textContent=dm?"1:1 대화":chanLabel;}
+    else{nameEl.style.display="none";chEl.textContent="소곤";}
     d.querySelector(".tx").onclick=e=>{e.stopPropagation();d.remove();};
     d.onclick=()=>{if(key)openKey(key);d.remove();};
+    if(nset.reply&&key){
+      const rf=document.createElement("div");rf.className="nreply";
+      const ri=document.createElement("input");ri.type="text";ri.placeholder="답장…";ri.setAttribute("aria-label","알림창 답장 입력");
+      const rb=document.createElement("button");rb.textContent="전송";
+      const doit=()=>{if(quickSendTo(key,ri.value)){ri.value="";d.remove();}};
+      rb.onclick=e=>{e.stopPropagation();doit();};
+      ri.onclick=e=>e.stopPropagation();
+      ri.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();doit();}};
+      rf.appendChild(ri);rf.appendChild(rb);d.appendChild(rf);
+    }
     w.appendChild(d);while(w.children.length>4)w.firstChild.remove();
-    setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},6000);
+    const ttl=nset.reply?12000:6000;
+    setTimeout(()=>{if(!d.isConnected)return;d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),300);},ttl);
   }
   if(!("Notification"in window)||Notification.permission!=="granted")return;
-  const title=dm?sender:(sender+" · "+chanLabel);
-  const opts={body:message||"",tag:"tt-"+key,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch:key}};
+  let title,body;
+  if(!showSender){title="소곤";body="새 메시지가 도착했어요";}
+  else{title=dm?sender:(sender+" · "+chanLabel);body=showMsg?(message||""):"새 메시지";}
+  if(kw)title="🔔 "+title;
+  const opts={body:body||"",tag:"tt-"+key,icon:"icon-192.png",badge:"icon-192.png",renotify:true,data:{ch:key}};
   try{if(navigator.serviceWorker){const reg=await navigator.serviceWorker.ready;if(reg&&reg.showNotification){await reg.showNotification(title,opts);return;}}}catch(e){}
   try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();if(key)openKey(key);n.close();};}catch(e){}
 }
+function renderNotifSet(){
+  document.querySelectorAll('#nsMode .segb').forEach(b=>b.classList.toggle('on',b.dataset.v===nset.mode));
+  document.querySelectorAll('#nsPos .segb').forEach(b=>b.classList.toggle('on',b.dataset.v===nset.pos));
+  const sw=el("nsReply");sw.classList.toggle('on',!!nset.reply);sw.setAttribute('aria-label',nset.reply?'알림창 답장 끄기':'알림창 답장 켜기');
+  const c=el("nsKwChips");c.innerHTML="";
+  if(!nset.keywords.length){const e=document.createElement("span");e.className="empty";e.textContent="등록된 키워드가 없어요.";c.appendChild(e);return;}
+  nset.keywords.forEach((k,i)=>{const chip=document.createElement("span");chip.className="kwc";const t=document.createElement("span");t.textContent=k;const x=document.createElement("span");x.className="x";x.textContent="×";x.title="삭제";x.onclick=()=>{nset.keywords.splice(i,1);saveNset();renderNotifSet();};chip.appendChild(t);chip.appendChild(x);c.appendChild(chip);});
+}
+function openNotifSet(){renderNotifSet();el("notifSetOv").classList.add("show");}
 function updNotifBtn(){const b=el("notifBtn");if(!b)return;if(!("Notification"in window)){b.style.display="none";return;}const p=Notification.permission;if(p==="granted"){b.style.display="none";return;}b.style.display="flex";const ic=b.querySelector(".mi-ic");if(ic)ic.innerHTML=svgIcon("bell");const lb=b.querySelector(".mi-lb");if(p==="denied"){if(lb)lb.textContent="알림 차단됨";b.style.color="#FF3B30";}else{if(lb)lb.textContent="알림 켜기";b.style.color="";}}
 window.addEventListener("focus",()=>{if(cur&&db){markSeen(cur);renderCh();}});
 
@@ -996,6 +1091,14 @@ el("newsOv").onclick=e=>{if(e.target===el("newsOv"))el("newsOv").classList.remov
 
 // ===== 관리자(혜밍웨이) / 채팅 금지 / 고정 / 멘션 / 데이터 정책 =====
 let banned={}, adminData=[], pinRef=null, readRef=null, readMap={};
+// 알림 설정(이 기기에만 저장): mode=full|sender|none, pos=top|bottom, reply, keywords[]
+let nset={mode:"full",pos:"bottom",reply:false,keywords:[]};
+const NSET_LS="sg_notif_v1";
+function loadNset(){try{const s=JSON.parse(localStorage.getItem(NSET_LS));if(s&&typeof s==="object"){nset={mode:["full","sender","none"].indexOf(s.mode)>=0?s.mode:"full",pos:s.pos==="top"?"top":"bottom",reply:!!s.reply,keywords:Array.isArray(s.keywords)?s.keywords.filter(x=>typeof x==="string"&&x.trim()).slice(0,30):[]};}}catch(e){}applyNotifPos();}
+function saveNset(){try{localStorage.setItem(NSET_LS,JSON.stringify(nset));}catch(e){}}
+function applyNotifPos(){const w=el("toasts");if(w)w.classList.toggle("pos-top",nset.pos==="top");}
+function matchKeyword(text){if(!text||!nset.keywords.length)return null;const low=(""+text).toLowerCase();for(const k of nset.keywords){if(k&&low.indexOf(k.toLowerCase())>=0)return k;}return null;}
+function quickSendTo(k,text){const v=(text||"").trim();if(!v||!db||!me)return false;if(banned&&banned[clientId]){applyBan();return false;}const msg={u:me,cid:clientId,t:v,ts:Date.now()};db.ref(msgPath(k)).push(msg);const prev=v.slice(0,40);if(isDM(k)){const pid=dmPeerOf(k);const t=Date.now();if(pid){db.ref("dmIndex/"+clientId+"/"+pid).update({name:(profiles[pid]&&profiles[pid].name)||"대화",ts:t});db.ref("dmIndex/"+pid+"/"+clientId).update({name:me,ts:t});}}else{try{bumpSeq(k);}catch(e){}db.ref("meta/"+k+"/last").set({u:me,t:prev,ts:Date.now()});}return true;}
 const ADMIN_NAME="혜밍웨이";
 function isAdmin(){return me===ADMIN_NAME;}
 function refreshAdminBtn(){el("adminBtn").style.display=isAdmin()?"":"none";}
@@ -1247,8 +1350,16 @@ el("themeBtn").onclick=()=>{const n=effTheme()==="dark"?"light":"dark";document.
 if(window.matchMedia){try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(!document.documentElement.getAttribute("data-theme"))updThemeIcon();});}catch(e){}}
 el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("소곤","알림이 켜졌어요 🎉",cur);});};
 // 정적 아이콘 주입(통일된 SVG)
-try{setIcon("ham","menu");setIcon("sideClose","collapse");setIcon("moreBtn","dots");setIcon("quoteIc","corner");setMitemIcon("helpBtn","info");setMitemIcon("shareBtn","share");setMitemIcon("adminBtn","shield");el("admTabLog").innerHTML=svgIcon("reply")+"전체 기록";el("admTabUser").innerHTML=svgIcon("person")+"사용자";}catch(e){}
+try{setIcon("ham","menu");setIcon("sideClose","collapse");setIcon("moreBtn","dots");setIcon("quoteIc","corner");setMitemIcon("helpBtn","info");setMitemIcon("notifSetBtn","gear");setMitemIcon("shareBtn","share");setMitemIcon("adminBtn","shield");el("admTabLog").innerHTML=svgIcon("reply")+"전체 기록";el("admTabUser").innerHTML=svgIcon("person")+"사용자";}catch(e){}
 // 더보기(⋯) 메뉴 토글 + 바깥 클릭 닫기 + 항목 클릭 시 닫기
+el("notifSetBtn").onclick=openNotifSet;
+el("notifSetClose").onclick=()=>el("notifSetOv").classList.remove("show");
+el("notifSetOv").onclick=e=>{if(e.target===el("notifSetOv"))el("notifSetOv").classList.remove("show");};
+document.querySelectorAll('#nsMode .segb').forEach(b=>b.onclick=()=>{nset.mode=b.dataset.v;saveNset();renderNotifSet();});
+document.querySelectorAll('#nsPos .segb').forEach(b=>b.onclick=()=>{nset.pos=b.dataset.v;saveNset();applyNotifPos();renderNotifSet();});
+el("nsReply").onclick=()=>{nset.reply=!nset.reply;saveNset();renderNotifSet();};
+el("nsKwAdd").onclick=()=>{const inp=el("nsKwInput");const v=(inp.value||"").trim();if(!v){inp.focus();return;}if(nset.keywords.length>=30){alert("키워드는 최대 30개까지예요.");return;}if(!nset.keywords.some(k=>k.toLowerCase()===v.toLowerCase())){nset.keywords.push(v);saveNset();renderNotifSet();}inp.value="";inp.focus();};
+el("nsKwInput").onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();el("nsKwAdd").onclick();}};
 el("moreBtn").onclick=e=>{e.stopPropagation();el("moreMenu").classList.toggle("show");};
 el("moreMenu").addEventListener("click",()=>el("moreMenu").classList.remove("show"));
 document.addEventListener("click",e=>{const m=el("moreMenu"),t=el("topmore");if(m.classList.contains("show")&&t&&!t.contains(e.target))m.classList.remove("show");});
@@ -1284,6 +1395,7 @@ el("bossBtn").onclick=e=>{e.stopPropagation();showBoss();};
 el("bxExit").onclick=hideBoss;
 el("bossScreen").addEventListener("dblclick",hideBoss);
 document.addEventListener("keydown",e=>{if(bossOn&&e.key==="Escape")hideBoss();});
+loadNset();
 updNotifBtn();
 try{const t=localStorage.getItem(LS+"_t");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
 updThemeIcon();
