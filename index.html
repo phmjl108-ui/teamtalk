@@ -707,7 +707,9 @@ function adminPeek(ck,label,ts){if(!isAdmin()||!ck)return;if(!peek){peekPrevCur=
 function exitPeek(){peek=false;el("peekBack").style.display="none";el("composer").style.display="";if(peekPrevCur){if(isDM(peekPrevCur)&&peekPrevPeer){openDM(peekPrevPeer.id,peekPrevPeer.name);}else if(peekPrevCur&&!isDM(peekPrevCur)){openCh(peekPrevCur);}else{applyBan();}}else{applyBan();}el("adminOv").classList.add("show");}
 function attArray(m){return Array.isArray(m.atts)?m.atts:(m.atts?Object.values(m.atts):[]);}
 function firstAtt(m){if(!m)return null;if(m.img)return{data:m.img,name:"image.jpg",kind:"image"};const a=attArray(m);if(a.length)return{data:a[0].data,name:a[0].name||"파일",kind:a[0].kind||"file"};return null;}
-function convMembers(){const s=new Set(Object.keys(readMap||{}));(currentArr||[]).forEach(x=>{if(x&&x.cid)s.add(x.cid);});return s;}
+function convMembers(){const s=new Set(Object.keys(readMap||{}));(currentArr||[]).forEach(x=>{if(x&&x.cid)s.add(x.cid);});
+  // 삭제된 계정(프로필 없음)은 멤버에서 제외 → 안읽음 카운트에 즉시 반영
+  const out=new Set();s.forEach(cid=>{if(profiles&&profiles[cid])out.add(cid);});return out.size?out:s;}
 function unreadOfMsg(m,members){if(!m||!m.ts)return 0;let n=0;members.forEach(cid=>{if(cid===m.cid)return;const r=readMap[cid];if(!r||!r.ts||r.ts<m.ts)n++;});return n;}
 function renderFeed(){
   const feed=el("feed");
