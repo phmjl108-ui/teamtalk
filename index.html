@@ -201,6 +201,8 @@ button{font-family:inherit}
 .urow .uav{width:40px;height:40px;border-radius:50%;background:var(--accent);background-size:cover;background-position:center;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
 .urow .un{flex:1;min-width:0}.urow .un b{display:block;color:var(--txt);font-size:15px}.urow .un .uc{font-size:12px;color:var(--muted);margin-top:1px}
 .urow .umbar{width:64px;flex-shrink:0;text-align:right}
+.urow .udel{flex-shrink:0;border:0;background:rgba(255,59,48,.12);color:#FF3B30;font-size:12px;font-weight:600;padding:7px 11px;border-radius:9px;cursor:pointer}
+.urow .udel:active{background:rgba(255,59,48,.22)}
 .urow .umbar .ub{height:6px;border-radius:3px;background:var(--accent);margin-bottom:3px;min-width:4px}
 .urow .umbar .uv{font-size:11px;color:var(--muted);font-weight:600}
 /* 전체 기록 카드 */
@@ -1079,8 +1081,23 @@ function renderUsers(q){
     const av=document.createElement("div");av.className="uav";if(u.img){av.style.backgroundImage="url("+u.img+")";}else{av.textContent=init(u.name);av.style.backgroundColor=avatarColor(u.name);}
     const nm=document.createElement("div");nm.className="un";const b=document.createElement("b");b.textContent=u.name+(u.cid===clientId?" (나)":"");const c=document.createElement("div");c.className="uc";c.textContent=u.img?"프로필 사진 있음":"사진 없음";nm.appendChild(b);nm.appendChild(c);
     const mb=document.createElement("div");mb.className="umbar";const bar=document.createElement("div");bar.className="ub";bar.style.width=Math.max(4,Math.round((u.n/maxN)*60))+"px";bar.style.marginLeft="auto";const vv=document.createElement("div");vv.className="uv";vv.textContent=u.n+"개";mb.appendChild(bar);mb.appendChild(vv);
-    d.appendChild(av);d.appendChild(nm);d.appendChild(mb);body.appendChild(d);
+    d.appendChild(av);d.appendChild(nm);d.appendChild(mb);
+    if(u.cid!==clientId){const del=document.createElement("button");del.className="udel";del.textContent="삭제";del.title="계정 삭제";del.setAttribute("aria-label",u.name+" 계정 삭제");del.onclick=()=>adminDeleteUser(u);d.appendChild(del);}
+    body.appendChild(d);
   });
+}
+// 관리자: 사용자 계정 삭제(프로필·DM목록·차단 제거). 메시지는 밤 정리로 사라짐.
+async function adminDeleteUser(u){
+  if(!isAdmin()||!u||!db)return;
+  if(u.cid===clientId){alert("본인 계정은 여기서 삭제할 수 없어요.");return;}
+  if(!confirm("'"+u.name+"' 계정을 삭제할까요?\n\n· 프로필(대화명·사진)이 삭제됩니다.\n· 되돌릴 수 없습니다.\n\n(주고받은 메시지는 매일 밤 자동 정리됩니다. 같은 이름으로 다시 들어오면 새 계정이 됩니다.)"))return;
+  try{
+    const snap=await db.ref("profiles").once("value");const all=snap.val()||{};const up={};
+    Object.keys(all).forEach(k=>{if(all[k]&&all[k].name===u.name)up["profiles/"+k]=null;});
+    up["dmIndex/"+u.cid]=null;up["banned/"+u.cid]=null;
+    await db.ref().update(up);
+  }catch(e){alert("삭제 실패: "+e.message);return;}
+  openAdmin();
 }
 function renderAdmin(q){
   if(adminMode==="user"){renderUsers(q);return;}
