@@ -717,6 +717,8 @@ function mkDmRow(pid){
 function lab(w,txt){const l=document.createElement("div");l.className="chlab";l.textContent=txt;w.appendChild(l);}
 function renderCh(){
   const w=el("chlist");w.innerHTML="";
+  // 삭제된 계정(프로필 없는 상대)은 DM 목록에서 숨기고 내 dmIndex에서도 정리 (프로필 로드 후에만)
+  if(db&&profiles&&profiles[clientId]){Object.keys(dms).forEach(pid=>{if(!profiles[pid]){delete dms[pid];db.ref("dmIndex/"+clientId+"/"+pid).remove();}});}
   const chNames=Object.keys(chans);
   const pids=Object.keys(dms).sort((a,b)=>((dms[b].ts||0)-(dms[a].ts||0)));
   const favChs=chNames.filter(n=>isFav(n));
@@ -1199,8 +1201,12 @@ async function adminDeleteUser(u){
   if(!confirm("'"+u.name+"' 계정을 삭제할까요?\n\n· 프로필(대화명·사진)이 삭제됩니다.\n· 되돌릴 수 없습니다.\n\n(주고받은 메시지는 매일 밤 자동 정리됩니다. 같은 이름으로 다시 들어오면 새 계정이 됩니다.)"))return;
   try{
     const snap=await db.ref("profiles").once("value");const all=snap.val()||{};const up={};
-    Object.keys(all).forEach(k=>{if(all[k]&&all[k].name===u.name)up["profiles/"+k]=null;});
+    const delCids=new Set();
+    Object.keys(all).forEach(k=>{if(all[k]&&all[k].name===u.name){up["profiles/"+k]=null;delCids.add(k);}});
+    delCids.add(u.cid);
     up["dmIndex/"+u.cid]=null;up["banned/"+u.cid]=null;
+    // 다른 사람들의 DM 목록에 남은 이 계정 참조도 제거(유령 DM 방지)
+    try{const dmS=await db.ref("dmIndex").once("value");const dmAll=dmS.val()||{};Object.keys(dmAll).forEach(owner=>{Object.keys(dmAll[owner]||{}).forEach(pid=>{if(delCids.has(pid))up["dmIndex/"+owner+"/"+pid]=null;});});}catch(e){}
     await db.ref().update(up);
   }catch(e){alert("삭제 실패: "+e.message);return;}
   openAdmin();
