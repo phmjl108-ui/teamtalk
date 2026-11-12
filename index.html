@@ -40,7 +40,10 @@ button{font-family:inherit}
 .addch{margin:0;min-height:57px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:15px;color:var(--accent);padding:0 14px;padding-bottom:env(safe-area-inset-bottom)}
 .addch:hover{background:var(--hover)}
 .addch .icon{width:17px;height:17px}
-.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.torecent{position:absolute;left:50%;bottom:78px;transform:translateX(-50%) translateY(8px);display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:8px 15px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:30}
+.torecent.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.torecent .ar{font-size:15px;line-height:1}
 .top{padding:11px 14px;border-top:env(safe-area-inset-top) solid transparent;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);display:flex;align-items:center;gap:8px;position:relative;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.05)}
 .ham{display:flex;background:none;border:0;color:var(--accent);cursor:pointer;padding:0 2px;line-height:1;align-items:center;justify-content:center}
 .ham .icon{width:25px;height:25px}
@@ -374,6 +377,7 @@ button{font-family:inherit}
   </div>
   <div class="pinbar" id="pinBar" style="display:none"></div>
   <div class="feed" id="feed"></div>
+  <button type="button" class="torecent" id="toRecent" aria-label="최근 메시지로 이동"><span class="ar">↓</span>최근 메시지</button>
   <div class="banner" id="banNote" style="display:none">🚫 현재 메시지 전송이 제한되어 있습니다.</div>
   <div class="typing" id="typing"></div>
   <div class="attachstrip" id="attachStrip"></div>
@@ -838,7 +842,11 @@ function renderFeed(){
   if(activeReply!=null){const fi=feed.querySelector('.treplyform input[data-rk="'+activeReply+'"]');if(fi){const end=fi.value.length;fi.focus();try{fi.setSelectionRange(end,end);}catch(e){}}}
   else if(jumpTs){const tr=feed.querySelector('.msg[data-ts="'+jumpTs+'"]');if(tr){try{tr.scrollIntoView({block:"center"});}catch(e){}tr.classList.add("flash");}}
   else if(atBottom)feed.scrollTop=feed.scrollHeight;
+  updateToRecent();
 }
+// 위로 스크롤했을 때만 "최근 메시지로 이동" 버튼 표시
+function updateToRecent(){const f=el("feed"),b=el("toRecent");if(!f||!b)return;const d=f.scrollHeight-f.scrollTop-f.clientHeight;b.classList.toggle("show",d>240);}
+function scrollToRecent(){const f=el("feed");if(!f)return;try{f.scrollTo({top:f.scrollHeight,behavior:"smooth"});}catch(e){f.scrollTop=f.scrollHeight;}const b=el("toRecent");if(b)b.classList.remove("show");}
 // 롱프레스(꾹 누르기) → 메시지 옵션 시트 (모바일)
 function attachLongPress(row,m){
   let t=null,sx=0,sy=0;
@@ -1088,8 +1096,8 @@ document.querySelectorAll(".gp").forEach(t=>t.onclick=()=>{const p=t.getAttribut
 function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){guideAuto=true;el("guideSkip").checked=true;el("guideSkipRow").style.display="flex";setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
 
 // 기능 업데이트 공지 (버전 올릴 때마다 모든 사용자에게 1회) — 관리자 전용 기능은 목록에 넣지 않음
-const NEWS_VER=6;
-const NEWS=["↩️  답장 말풍선을 누르면 원본 메시지로 이동(잠깐 반짝여서 알려줘요)","⚙️  알림 설정 추가 — 더보기(⋯) → 알림 설정: 표시 방법(보낸 사람·메시지 숨기기), 팝업 위치, 알림창에서 바로 답장, 키워드 알림","🕐  메시지 보낸 시각 표시(오전/오후)","✅  카톡처럼 '안 읽은 인원 수' 표시 — 다 읽으면 사라져요","🎨  프로필 사진이 없으면 이름별 색이 자동 지정","🔔  앱으로 설치하면 아이콘에 안 읽은 수 배지","🫥  화면 가리기: 상단 👁 버튼 → 가짜 엑셀 화면, ESC로 복귀","📜  새 글이 와도, 위를 읽는 중엔 화면이 안 끌려 내려가요"];
+const NEWS_VER=7;
+const NEWS=["⬇️  위로 올려보면 '최근 메시지' 버튼이 떠서 한 번에 아래로 이동","↩️  답장 말풍선을 누르면 원본 메시지로 이동(잠깐 반짝여서 알려줘요)","⚙️  알림 설정 추가 — 더보기(⋯) → 알림 설정: 표시 방법(보낸 사람·메시지 숨기기), 팝업 위치, 알림창에서 바로 답장, 키워드 알림","🕐  메시지 보낸 시각 표시(오전/오후)","✅  카톡처럼 '안 읽은 인원 수' 표시 — 다 읽으면 사라져요","🎨  프로필 사진이 없으면 이름별 색이 자동 지정","🔔  앱으로 설치하면 아이콘에 안 읽은 수 배지","🫥  화면 가리기: 상단 👁 버튼 → 가짜 엑셀 화면, ESC로 복귀","📜  새 글이 와도, 위를 읽는 중엔 화면이 안 끌려 내려가요"];
 function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
 el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
 el("newsDontShow").onclick=()=>{try{localStorage.setItem(LS+"_news",String(NEWS_VER));}catch(e){}el("newsOv").classList.remove("show");};
@@ -1417,6 +1425,8 @@ if(window.visualViewport){
   vv.addEventListener("resize",fit);vv.addEventListener("scroll",fit);fit();
 }
 el("input").addEventListener("focus",()=>{setTimeout(()=>{const f=el("feed");if(f)f.scrollTop=f.scrollHeight;el("input").scrollIntoView({block:"nearest"});},300);});
+el("feed").addEventListener("scroll",updateToRecent,{passive:true});
+el("toRecent").onclick=scrollToRecent;
 // 접근성: 아이콘 버튼 라벨 + 입력창 라벨
 try{el("attachBtn").setAttribute("aria-label","파일·이미지 첨부");el("themeBtn").setAttribute("aria-label","다크 모드 전환");el("shareBtn").setAttribute("aria-label","초대 링크 공유");el("nameBtn").setAttribute("aria-label","내 프로필");el("input").setAttribute("aria-label","메시지 입력");el("composer").querySelector(".send").setAttribute("aria-label","메시지 보내기");el("feed").setAttribute("role","log");el("feed").setAttribute("aria-live","polite");}catch(e){}
 // 운영 시간(06~23시) 및 밤 11시 대화 휘발을 1분마다 점검
