@@ -772,6 +772,9 @@ function openDM(peerId,peerName){
 // 관리자 전용: 임의 대화(다른 사람 1:1 포함)를 흔적 없이 읽기 전용으로 열람
 let jumpTs=0, jumpTimer=null, peekPrevCur=null, peekPrevPeer=null;
 function setJump(ts){jumpTs=ts||0;clearTimeout(jumpTimer);if(jumpTs)jumpTimer=setTimeout(()=>{jumpTs=0;},1800);}
+// 답장 인용 → 원본 메시지 찾기(작성자+앞 140자 일치, 답장보다 앞선 것 중 가장 가까운 것)
+function findQuoted(m){if(!m||!m.reply)return null;const ru=m.reply.u||"",rt=m.reply.t||"";let best=null;for(const om of currentArr){if(om===m||om.__deleted)continue;if((om.u||"")!==ru)continue;const qt=(om.t||(firstAtt(om)?"[첨부]":"")).slice(0,140);if(qt!==rt)continue;if(m.ts&&om.ts&&om.ts>=m.ts)continue;if(!best||((om.ts||0)>(best.ts||0)))best=om;}return best;}
+function jumpToQuoted(m){const om=findQuoted(m);if(om&&om.ts){setJump(om.ts);renderFeed();}else{toast("안내","원본 메시지를 찾을 수 없어요(정리됐거나 화면 밖).",cur);}}
 // 관리자: 남의 1:1 대화를 흔적 없이 읽기 전용으로 보기(뒤로가기로 복귀)
 function adminPeek(ck,label,ts){if(!isAdmin()||!ck)return;if(!peek){peekPrevCur=cur;peekPrevPeer=curPeer;}if(cur&&db&&cur!==ck&&!peek)db.ref("typing/"+cur+"/"+clientId).remove();peek=true;cur=ck;curPeer=null;setJump(ts);el("chName").textContent=label||"대화";el("chName").title="관리자 보기";el("peekBack").style.display="";el("moreMenu").classList.remove("show");el("adminOv").classList.remove("show");try{el("side").classList.remove("open");}catch(e){}renderCh();attachFeed();applyBan();}
 function exitPeek(){peek=false;el("peekBack").style.display="none";el("composer").style.display="";if(peekPrevCur){if(isDM(peekPrevCur)&&peekPrevPeer){openDM(peekPrevPeer.id,peekPrevPeer.name);}else if(peekPrevCur&&!isDM(peekPrevCur)){openCh(peekPrevCur);}else{applyBan();}}else{applyBan();}el("adminOv").classList.add("show");}
@@ -804,7 +807,7 @@ function renderFeed(){
     const col=document.createElement("div");
     const meta=document.createElement("div");meta.className="meta";meta.textContent=m.u;meta.onclick=()=>openPeer(m.cid,m.u);col.appendChild(meta);
     if(m.__deleted){const dt=document.createElement("div");dt.className="deltag";dt.textContent="🗑 삭제됨 · 관리자만 보임"+(m.delBy?(" · 삭제자 "+m.delBy):"");col.appendChild(dt);}
-    if(m.reply){const q=document.createElement("div");q.className="quote";const qn=document.createElement("div");qn.className="qn";qn.textContent="↩ "+(m.reply.u||"");const qt=document.createElement("div");qt.className="qt";qt.textContent=m.reply.t||"";q.appendChild(qn);q.appendChild(qt);col.appendChild(q);}
+    if(m.reply){const q=document.createElement("div");q.className="quote";q.style.cursor="pointer";q.title="원본 메시지로 이동";const qn=document.createElement("div");qn.className="qn";qn.textContent="↩ "+(m.reply.u||"");const qt=document.createElement("div");qt.className="qt";qt.textContent=m.reply.t||"";q.appendChild(qn);q.appendChild(qt);q.onclick=e=>{e.stopPropagation();jumpToQuoted(m);};col.appendChild(q);}
     const cnodes=[];
     if(m.img){const im=document.createElement("img");im.className="photo";im.src=m.img;im.onclick=()=>openViewer(m.img,"image.jpg","image");cnodes.push(im);}
     attArray(m).forEach(a=>{
@@ -1085,8 +1088,8 @@ document.querySelectorAll(".gp").forEach(t=>t.onclick=()=>{const p=t.getAttribut
 function maybeOnboard(){try{if(!localStorage.getItem(LS+"_onboard")){guideAuto=true;el("guideSkip").checked=true;el("guideSkipRow").style.display="flex";setTimeout(()=>el("guideOv").classList.add("show"),500);}}catch(e){}}
 
 // 기능 업데이트 공지 (버전 올릴 때마다 모든 사용자에게 1회) — 관리자 전용 기능은 목록에 넣지 않음
-const NEWS_VER=5;
-const NEWS=["⚙️  알림 설정 추가 — 더보기(⋯) → 알림 설정: 표시 방법(보낸 사람·메시지 숨기기), 팝업 위치, 알림창에서 바로 답장, 키워드 알림","🕐  메시지 보낸 시각 표시(오전/오후)","✅  카톡처럼 '안 읽은 인원 수' 표시 — 다 읽으면 사라져요","🎨  프로필 사진이 없으면 이름별 색이 자동 지정","🔔  앱으로 설치하면 아이콘에 안 읽은 수 배지","🫥  화면 가리기: 상단 👁 버튼 → 가짜 엑셀 화면, ESC로 복귀","📜  새 글이 와도, 위를 읽는 중엔 화면이 안 끌려 내려가요"];
+const NEWS_VER=6;
+const NEWS=["↩️  답장 말풍선을 누르면 원본 메시지로 이동(잠깐 반짝여서 알려줘요)","⚙️  알림 설정 추가 — 더보기(⋯) → 알림 설정: 표시 방법(보낸 사람·메시지 숨기기), 팝업 위치, 알림창에서 바로 답장, 키워드 알림","🕐  메시지 보낸 시각 표시(오전/오후)","✅  카톡처럼 '안 읽은 인원 수' 표시 — 다 읽으면 사라져요","🎨  프로필 사진이 없으면 이름별 색이 자동 지정","🔔  앱으로 설치하면 아이콘에 안 읽은 수 배지","🫥  화면 가리기: 상단 👁 버튼 → 가짜 엑셀 화면, ESC로 복귀","📜  새 글이 와도, 위를 읽는 중엔 화면이 안 끌려 내려가요"];
 function showNews(){try{const seen=+(localStorage.getItem(LS+"_news")||0);if(seen>=NEWS_VER)return;const ul=el("newsList");ul.innerHTML="";NEWS.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li);});setTimeout(()=>el("newsOv").classList.add("show"),450);}catch(e){}}
 el("newsClose").onclick=()=>el("newsOv").classList.remove("show");
 el("newsDontShow").onclick=()=>{try{localStorage.setItem(LS+"_news",String(NEWS_VER));}catch(e){}el("newsOv").classList.remove("show");};
