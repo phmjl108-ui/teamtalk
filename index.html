@@ -728,9 +728,21 @@ function mkPeekDmRow(conv){
   const av=document.createElement("span");av.className="cav";const pa=profiles[conv.a],pb=profiles[conv.b];const pimg=(pa&&pa.img)||(pb&&pb.img);
   if(pimg){av.style.backgroundImage="url("+pimg+")";}else{av.textContent="👁";av.style.background="var(--muted-3)";}
   const sp=document.createElement("span");sp.className="nm";sp.textContent=label;
-  d.appendChild(av);d.appendChild(sp);d.title="관리자 열람 — 상대는 모릅니다";
+  d.appendChild(av);d.appendChild(sp);
+  const del=document.createElement("span");del.className="act";del.innerHTML=svgIcon("trash");del.title="이 1:1 대화 삭제(관리자)";del.setAttribute("aria-label","1:1 대화 삭제");del.onclick=e=>{e.stopPropagation();adminDeleteConv(conv.key,label);};d.appendChild(del);
+  d.title="관리자 열람 — 상대는 모릅니다";
   d.onclick=()=>{adminPeek(conv.key,label,0,false);closeDrawer();};
   return d;
+}
+// 관리자: 1:1 대화 전체 삭제(메시지·스레드·양쪽 목록·읽음·고정·입력중)
+async function adminDeleteConv(key,label){
+  if(!isAdmin()||!key||!db)return;
+  if(!confirm("이 1:1 대화를 삭제할까요?\n\n· "+(label||"")+"\n· 두 사람 목록에서 사라지고, 주고받은 내용도 삭제됩니다.\n· 되돌릴 수 없습니다."))return;
+  const ids=key.slice(3).split("__");const up={};
+  up["dm/"+key]=null;up["dmIndex/"+ids[0]+"/"+ids[1]]=null;up["dmIndex/"+ids[1]+"/"+ids[0]]=null;
+  up["reads/"+key]=null;up["pinned/"+key]=null;up["typing/"+key]=null;
+  try{await db.ref().update(up);}catch(e){alert("삭제 실패: "+e.message);return;}
+  if(peek&&cur===key)exitPeek();
 }
 function lab(w,txt){const l=document.createElement("div");l.className="chlab";l.textContent=txt;w.appendChild(l);}
 function renderCh(){
@@ -750,9 +762,16 @@ function renderCh(){
   chNames.filter(n=>!isFav(n)).forEach(n=>w.appendChild(mkChannelRow(n)));
   const restDm=pids.filter(pid=>!isFav(dmKey(clientId,pid)));
   if(restDm.length){lab(w,"다이렉트");restDm.forEach(pid=>w.appendChild(mkDmRow(pid)));}
-  // 관리자: 내가 안 낀 다른 사람들의 1:1 (몰래 열람)
+  // 관리자: 내가 안 낀 다른 사람들의 1:1 (몰래 열람). 레거시 계정 대비 이름으로도 본인 제외 + 같은 두 사람 중복 합치기
   if(isAdmin()&&allConvs.length){
-    const others=allConvs.filter(c=>c.a!==clientId&&c.b!==clientId).sort((a,b)=>((b.ts||0)-(a.ts||0)));
+    const seenPair={};
+    const others=allConvs.slice().sort((a,b)=>((b.ts||0)-(a.ts||0))).filter(c=>{
+      if(c.a===clientId||c.b===clientId)return false;
+      const na=dmNameOf(c.a),nb=dmNameOf(c.b);
+      if(na===me||nb===me)return false;
+      const pk=[na,nb].sort().join("\u0001");if(seenPair[pk])return false;seenPair[pk]=1;
+      return true;
+    });
     if(others.length){lab(w,"👁 다른 1:1 (관리자)");others.forEach(c=>w.appendChild(mkPeekDmRow(c)));}
   }
   updateAppBadge();
