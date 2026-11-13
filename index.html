@@ -835,7 +835,13 @@ function renderFeed(){
     if(mine||isAdmin()){const db2=document.createElement("button");db2.innerHTML=svgIcon("trash");db2.title=mine?"삭제":"삭제(관리자)";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);acts.appendChild(db2);}
     row.appendChild(acts);
     }
-    if(!m.__deleted&&!peek)attachLongPress(row,m);
+    else if(!m.__deleted&&peek&&isAdmin()){
+    // 열람 중(1:1 몰래보기)에도 관리자는 삭제만 가능
+    const acts=document.createElement("div");acts.className="msgacts";
+    const db2=document.createElement("button");db2.innerHTML=svgIcon("trash");db2.title="삭제(관리자)";db2.setAttribute("aria-label","메시지 삭제");db2.onclick=()=>deleteMsg(m.__key);acts.appendChild(db2);
+    row.appendChild(acts);
+    }
+    if(!m.__deleted&&(!peek||isAdmin()))attachLongPress(row,m);
     feed.appendChild(row);
     if((threadAll[m.__key]&&threadAll[m.__key].length)||openThreads.has(m.__key))feed.appendChild(renderThreadBox(m.__key));
   });
@@ -861,9 +867,9 @@ function openMsgSheet(m){
   const box=el("msgSheetInner");box.innerHTML="";
   try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
   const add=(label,icon,cls,fn)=>{const b=document.createElement("button");b.className="sheetitem"+(cls?(" "+cls):"");b.innerHTML='<span class="si-ic">'+icon+'</span><span>'+label+'</span>';b.onclick=()=>{closeMsgSheet();fn();};box.appendChild(b);};
-  add("답장",svgIcon("quote"),"",()=>startReply(m));
-  if(!threadCounts[m.__key])add("댓글",svgIcon("reply"),"",()=>toggleThread(m.__key));
-  add("고정",svgIcon("pin"),"",()=>pinMsg(m));
+  if(!peek)add("답장",svgIcon("quote"),"",()=>startReply(m));
+  if(!peek&&!threadCounts[m.__key])add("댓글",svgIcon("reply"),"",()=>toggleThread(m.__key));
+  if(!peek)add("고정",svgIcon("pin"),"",()=>pinMsg(m));
   if(mine||isAdmin())add("삭제",svgIcon("trash"),"sheetdel",()=>deleteMsg(m.__key));
   const c=document.createElement("button");c.className="sheetitem sheetcancel";c.textContent="취소";c.onclick=closeMsgSheet;box.appendChild(c);
   el("msgSheet").classList.add("show");
