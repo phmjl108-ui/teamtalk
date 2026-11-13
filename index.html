@@ -687,6 +687,8 @@ function boot(nick){
   // 이름 계정 노드에 이름을 반영하되, 다른 기기가 올린 최신 사진을 덮어쓰지 않도록 먼저 읽고 승계
   db.ref("profiles/"+clientId).once("value").then(s=>{const v=s.val();if(v&&typeof v.img!=="undefined"&&v.img!==null)myImg=v.img;db.ref("profiles/"+clientId).update({name:me,img:myImg||null});}).catch(()=>{db.ref("profiles/"+clientId).update({name:me,img:myImg||null});});
   db.ref("dmIndex/"+clientId).on("value",s=>{dms=s.val()||{};syncWatchers();renderCh();});
+  // 관리자: 시스템의 모든 1:1 대화를 사이드바에서 열람할 수 있게 전체 dmIndex 구독
+  if(isAdmin())db.ref("dmIndex").on("value",s=>{const all=s.val()||{};const seen={};allConvs=[];dmNameHint={};Object.keys(all).forEach(o=>{Object.keys(all[o]||{}).forEach(p=>{const e=all[o][p]||{};if(e.name)dmNameHint[p]=e.name;const key=dmKey(o,p);if(seen[key])return;seen[key]=1;const ids=key.slice(3).split("__");const t1=((all[o]||{})[p]||{}).ts||0,t2=((all[p]||{})[o]||{}).ts||0;allConvs.push({key:key,a:ids[0],b:ids[1],ts:Math.max(t1,t2)});});});renderCh();});
   let opened=false;
   db.ref("channels").on("value",s=>{chans=s.val()||{};if(!Object.keys(chans).length)chans={"일반":1};syncWatchers();if(!opened){opened=true;const st=(lastCur&&chans[lastCur])?lastCur:Object.keys(chans)[0];openCh(st);}else if(!isDM(cur)&&!chans[cur]){openCh(Object.keys(chans)[0]);}renderCh();});
 }
@@ -718,6 +720,18 @@ function mkDmRow(pid){
   d.onclick=()=>{openDM(pid,nm);closeDrawer();};
   return d;
 }
+// 관리자: 내가 안 낀 1:1 대화 행(누르면 몰래 열람)
+function dmNameOf(id){return (profiles[id]&&profiles[id].name)||dmNameHint[id]||"(삭제된 사용자)";}
+function mkPeekDmRow(conv){
+  const label=dmNameOf(conv.a)+" ↔ "+dmNameOf(conv.b);
+  const d=document.createElement("div");d.className="ch peekrow"+(conv.key===cur?" on":"");
+  const av=document.createElement("span");av.className="cav";const pa=profiles[conv.a],pb=profiles[conv.b];const pimg=(pa&&pa.img)||(pb&&pb.img);
+  if(pimg){av.style.backgroundImage="url("+pimg+")";}else{av.textContent="👁";av.style.background="var(--muted-3)";}
+  const sp=document.createElement("span");sp.className="nm";sp.textContent=label;
+  d.appendChild(av);d.appendChild(sp);d.title="관리자 열람 — 상대는 모릅니다";
+  d.onclick=()=>{adminPeek(conv.key,label,0,false);closeDrawer();};
+  return d;
+}
 function lab(w,txt){const l=document.createElement("div");l.className="chlab";l.textContent=txt;w.appendChild(l);}
 function renderCh(){
   const w=el("chlist");w.innerHTML="";
@@ -736,6 +750,11 @@ function renderCh(){
   chNames.filter(n=>!isFav(n)).forEach(n=>w.appendChild(mkChannelRow(n)));
   const restDm=pids.filter(pid=>!isFav(dmKey(clientId,pid)));
   if(restDm.length){lab(w,"다이렉트");restDm.forEach(pid=>w.appendChild(mkDmRow(pid)));}
+  // 관리자: 내가 안 낀 다른 사람들의 1:1 (몰래 열람)
+  if(isAdmin()&&allConvs.length){
+    const others=allConvs.filter(c=>c.a!==clientId&&c.b!==clientId).sort((a,b)=>((b.ts||0)-(a.ts||0)));
+    if(others.length){lab(w,"👁 다른 1:1 (관리자)");others.forEach(c=>w.appendChild(mkPeekDmRow(c)));}
+  }
   updateAppBadge();
 }
 
@@ -774,14 +793,14 @@ function openDM(peerId,peerName){
   peek=false;el("peekBack").style.display="none";markSeen(key);renderCh();attachFeed();applyBan();
 }
 // 관리자 전용: 임의 대화(다른 사람 1:1 포함)를 흔적 없이 읽기 전용으로 열람
-let jumpTs=0, jumpTimer=null, peekPrevCur=null, peekPrevPeer=null;
+let jumpTs=0, jumpTimer=null, peekPrevCur=null, peekPrevPeer=null, peekFromAdmin=true, allConvs=[], dmNameHint={};
 function setJump(ts){jumpTs=ts||0;clearTimeout(jumpTimer);if(jumpTs)jumpTimer=setTimeout(()=>{jumpTs=0;},1800);}
 // 답장 인용 → 원본 메시지 찾기(작성자+앞 140자 일치, 답장보다 앞선 것 중 가장 가까운 것)
 function findQuoted(m){if(!m||!m.reply)return null;const ru=m.reply.u||"",rt=m.reply.t||"";let best=null;for(const om of currentArr){if(om===m||om.__deleted)continue;if((om.u||"")!==ru)continue;const qt=(om.t||(firstAtt(om)?"[첨부]":"")).slice(0,140);if(qt!==rt)continue;if(m.ts&&om.ts&&om.ts>=m.ts)continue;if(!best||((om.ts||0)>(best.ts||0)))best=om;}return best;}
 function jumpToQuoted(m){const om=findQuoted(m);if(om&&om.ts){setJump(om.ts);renderFeed();}else{toast("안내","원본 메시지를 찾을 수 없어요(정리됐거나 화면 밖).",cur);}}
 // 관리자: 남의 1:1 대화를 흔적 없이 읽기 전용으로 보기(뒤로가기로 복귀)
-function adminPeek(ck,label,ts){if(!isAdmin()||!ck)return;if(!peek){peekPrevCur=cur;peekPrevPeer=curPeer;}if(cur&&db&&cur!==ck&&!peek)db.ref("typing/"+cur+"/"+clientId).remove();peek=true;cur=ck;curPeer=null;setJump(ts);el("chName").textContent=label||"대화";el("chName").title="관리자 보기";el("peekBack").style.display="";el("moreMenu").classList.remove("show");el("adminOv").classList.remove("show");try{el("side").classList.remove("open");}catch(e){}renderCh();attachFeed();applyBan();}
-function exitPeek(){peek=false;el("peekBack").style.display="none";el("composer").style.display="";if(peekPrevCur){if(isDM(peekPrevCur)&&peekPrevPeer){openDM(peekPrevPeer.id,peekPrevPeer.name);}else if(peekPrevCur&&!isDM(peekPrevCur)){openCh(peekPrevCur);}else{applyBan();}}else{applyBan();}el("adminOv").classList.add("show");}
+function adminPeek(ck,label,ts,fromPanel){if(!isAdmin()||!ck)return;if(!peek){peekPrevCur=cur;peekPrevPeer=curPeer;peekFromAdmin=(fromPanel!==false);}if(cur&&db&&cur!==ck&&!peek)db.ref("typing/"+cur+"/"+clientId).remove();peek=true;cur=ck;curPeer=null;setJump(ts);el("chName").textContent=label||"대화";el("chName").title="관리자 보기";el("peekBack").style.display="";el("moreMenu").classList.remove("show");el("adminOv").classList.remove("show");try{el("side").classList.remove("open");}catch(e){}renderCh();attachFeed();applyBan();}
+function exitPeek(){peek=false;el("peekBack").style.display="none";el("composer").style.display="";if(peekPrevCur){if(isDM(peekPrevCur)&&peekPrevPeer){openDM(peekPrevPeer.id,peekPrevPeer.name);}else if(peekPrevCur&&!isDM(peekPrevCur)){openCh(peekPrevCur);}else{applyBan();}}else{applyBan();}if(peekFromAdmin)el("adminOv").classList.add("show");}
 function attArray(m){return Array.isArray(m.atts)?m.atts:(m.atts?Object.values(m.atts):[]);}
 function firstAtt(m){if(!m)return null;if(m.img)return{data:m.img,name:"image.jpg",kind:"image"};const a=attArray(m);if(a.length)return{data:a[0].data,name:a[0].name||"파일",kind:a[0].kind||"file"};return null;}
 function convMembers(){const s=new Set(Object.keys(readMap||{}));(currentArr||[]).forEach(x=>{if(x&&x.cid)s.add(x.cid);});
