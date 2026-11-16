@@ -686,6 +686,8 @@ function boot(nick){
   db.ref("profiles").on("value",s=>{profiles=s.val()||{};refreshMyAv();if(cur)renderFeed();renderCh();});
   // 이름 계정 노드에 이름을 반영하되, 다른 기기가 올린 최신 사진을 덮어쓰지 않도록 먼저 읽고 승계
   db.ref("profiles/"+clientId).once("value").then(s=>{const v=s.val();if(v&&typeof v.img!=="undefined"&&v.img!==null)myImg=v.img;db.ref("profiles/"+clientId).update({name:me,img:myImg||null});}).catch(()=>{db.ref("profiles/"+clientId).update({name:me,img:myImg||null});});
+  // 이름=계정: 같은 이름의 레거시(옛 기기) 중복 프로필 정리 → 정식(clientId) 하나만 남김(사진은 승계)
+  db.ref("profiles").once("value").then(s=>{const all=s.val()||{};const canon=all[clientId]||{};const dups=Object.keys(all).filter(k=>k!==clientId&&all[k]&&all[k].name===me);if(!dups.length)return;const up={};if(!(canon&&canon.img)&&!myImg){const src=dups.find(k=>all[k]&&all[k].img);if(src){myImg=all[src].img;up["profiles/"+clientId]={name:me,img:myImg};try{refreshMyAv();if(cur)renderFeed();}catch(e){}}}dups.forEach(k=>up["profiles/"+k]=null);db.ref().update(up);}).catch(()=>{});
   db.ref("dmIndex/"+clientId).on("value",s=>{dms=s.val()||{};syncWatchers();renderCh();});
   // 관리자: 시스템의 모든 1:1 대화를 사이드바에서 열람할 수 있게 전체 dmIndex 구독
   if(isAdmin())db.ref("dmIndex").on("value",s=>{const all=s.val()||{};const seen={};allConvs=[];dmNameHint={};Object.keys(all).forEach(o=>{Object.keys(all[o]||{}).forEach(p=>{const e=all[o][p]||{};if(e.name)dmNameHint[p]=e.name;const key=dmKey(o,p);if(seen[key])return;seen[key]=1;const ids=key.slice(3).split("__");const t1=((all[o]||{})[p]||{}).ts||0,t2=((all[p]||{})[o]||{}).ts||0;allConvs.push({key:key,a:ids[0],b:ids[1],ts:Math.max(t1,t2)});});});renderCh();});
@@ -843,7 +845,7 @@ function renderFeed(){
     const row=document.createElement("div");row.className="msg"+(mine?" me":"")+(m.__deleted?" delmsg":"");row.dataset.ts=m.ts||"";
     const av=document.createElement("div");av.className="av";
     let p=profiles[m.cid];
-    if(!(p&&p.img)){const byName=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(byName)p=byName;}
+    if(!(p&&p.img)){const cp=profiles[nameKey(m.u)];if(cp&&cp.img)p=cp;else{const byName=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(byName)p=byName;}}
     if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else{av.textContent=init(m.u);av.style.backgroundColor=avatarColor(m.u);}
     av.onclick=()=>openPeer(m.cid,m.u);
     const col=document.createElement("div");
@@ -928,7 +930,7 @@ function renderThreadBox(key){
   (threadAll[key]||[]).forEach(m=>{
     const c=document.createElement("div");c.className="tcmt";
     const av=document.createElement("div");av.className="tav";
-    let p=profiles[m.cid];if(!(p&&p.img)){const bn=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(bn)p=bn;}
+    let p=profiles[m.cid];if(!(p&&p.img)){const cp=profiles[nameKey(m.u)];if(cp&&cp.img)p=cp;else{const bn=Object.values(profiles).find(x=>x&&x.name===m.u&&x.img);if(bn)p=bn;}}
     if(p&&p.img){av.style.backgroundImage="url("+p.img+")";}else{av.textContent=init(m.u);av.style.backgroundColor=avatarColor(m.u);}
     av.onclick=()=>openPeer(m.cid,m.u);
     const cc=document.createElement("div");cc.className="tc";
@@ -1221,7 +1223,7 @@ async function openAdmin(){
     Object.keys(delAll).forEach(k=>{const m=delAll[k];if(m&&!m.sys){adminData.push({grp:m.conv||"삭제됨",u:m.u,t:m.t||(firstAtt(m)?"[첨부]":""),ts:m.ts,att:firstAtt(m),deleted:true,delBy:m.delBy,ck:m.ck,delKey:k,raw:m});}});
     // 이름 = 계정 → 같은 이름은 한 줄로 합침(옛 기기별 기록이 여러 노드여도 하나로)
     const byName={};
-    Object.entries(prAll).forEach(([cid,p])=>{const nm=(p&&p.name)||"(이름없음)";if(!byName[nm])byName[nm]={cid:nameKey(nm),name:nm,img:(p&&p.img)||null,n:cnt[nm]||0};else if(!byName[nm].img&&p&&p.img)byName[nm].img=p.img;});
+    Object.entries(prAll).forEach(([cid,p])=>{const nm=(p&&p.name)||"(이름없음)";const canon=nameKey(nm);if(!byName[nm])byName[nm]={cid:canon,name:nm,img:null,n:cnt[nm]||0};if(p&&p.img&&(cid===canon||!byName[nm].img))byName[nm].img=p.img;});
     adminUsers=Object.values(byName).sort((a,b)=>(b.n-a.n)||(a.name<b.name?-1:1));
     renderAdmin(el("adminSearch").value||"");
   }catch(e){body.textContent="불러오기 실패: "+e.message;}
