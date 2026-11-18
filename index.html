@@ -1467,10 +1467,10 @@ try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.nick){myImg=s.img||null
 // 모바일: 키보드가 올라오면 앱 높이를 줄여 입력창이 키보드 위에 보이게
 if(window.visualViewport){
   const vv=window.visualViewport;
-  const fit=()=>{document.body.style.height=vv.height+"px";};
+  const fit=()=>{const st=document.body.style;st.position="fixed";st.left="0";st.right="0";st.top=vv.offsetTop+"px";st.height=vv.height+"px";};
   vv.addEventListener("resize",fit);vv.addEventListener("scroll",fit);fit();
 }
-el("input").addEventListener("focus",()=>{setTimeout(()=>{const f=el("feed");if(f)f.scrollTop=f.scrollHeight;el("input").scrollIntoView({block:"nearest"});},300);});
+el("input").addEventListener("focus",()=>{setTimeout(()=>{const f=el("feed");if(f)f.scrollTop=f.scrollHeight;},300);});
 el("feed").addEventListener("scroll",updateToRecent,{passive:true});
 el("toRecent").onclick=scrollToRecent;
 // 접근성: 아이콘 버튼 라벨 + 입력창 라벨
