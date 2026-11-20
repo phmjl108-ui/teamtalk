@@ -56,7 +56,6 @@ button{font-family:inherit}
 .moremenu.show{display:flex}
 .mitem{display:flex;align-items:center;gap:12px;background:none;border:0;color:var(--txt);font-size:14px;padding:11px 12px;border-radius:10px;cursor:pointer;text-align:left;width:100%}
 .mitem:hover{background:var(--hover)}
-#reloadBtn{display:none}@media(max-width:720px){#reloadBtn{display:flex}}
 .mitem .mi-ic{display:inline-flex;align-items:center;color:var(--accent);flex-shrink:0}
 .mitem .mi-ic .icon{width:20px;height:20px}
 .top h2{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1414,7 +1413,7 @@ el("connect").onclick=async()=>{el("cfgErr").textContent="";const nick=el("nick"
 el("nick").addEventListener("keydown",e=>{if(e.key==="Enter")el("connect").click();});
 function effTheme(){const d=document.documentElement.getAttribute("data-theme");if(d)return d;return (window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";}
 function updThemeIcon(){const dark=effTheme()==="dark";const b=el("themeBtn");if(!b)return;const ic=b.querySelector(".mi-ic");if(ic)ic.innerHTML=svgIcon(dark?"sun":"moon");const lb=b.querySelector(".mi-lb");if(lb)lb.textContent=dark?"라이트 모드":"다크 모드";}
-el("reloadBtn").onclick=()=>location.reload();
+el("reloadBtn").onclick=async()=>{try{if(navigator.serviceWorker){const r=await navigator.serviceWorker.getRegistration();if(r)await Promise.race([r.update(),new Promise(x=>setTimeout(x,2000))]);}}catch(e){}location.reload();};
 el("themeBtn").onclick=()=>{const n=effTheme()==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem(LS+"_t",n)}catch(e){}updThemeIcon();};
 if(window.matchMedia){try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(!document.documentElement.getAttribute("data-theme"))updThemeIcon();});}catch(e){}}
 el("notifBtn").onclick=()=>{if(!("Notification"in window)){alert("이 브라우저는 알림을 지원하지 않습니다.");return;}if(Notification.permission==="denied"){alert("알림이 차단돼 있어요.\n주소창 왼쪽 자물쇠(또는 ⓘ) → 알림 → 허용 으로 바꾼 뒤 새로고침하세요.");return;}Notification.requestPermission().then(()=>{updNotifBtn();if(Notification.permission==="granted")notify("소곤","알림이 켜졌어요 🎉",cur);});};
