@@ -1,0 +1,16 @@
+name: 소곤 밤 11시 대화 정리
+on:
+  schedule:
+    - cron: "0 14 * * *"   # 매일 14:00 UTC = 한국 23:00
+  workflow_dispatch: {}
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 대화 삭제 + 정리 표시(한 번의 쓰기)
+        run: |
+          TAG=$(TZ=Asia/Seoul date +%Y-%-m-%-d)
+          BODY="{\"msg\":null,\"dm\":null,\"meta\":null,\"pinned\":null,\"thread\":null,\"deleted\":null,\"policy/purgedNight\":\"$TAG\"}"
+          CODE=$(curl -s -o /tmp/out -w "%{http_code}" -X PATCH -d "$BODY" "https://ymx-ae932-default-rtdb.firebaseio.com/.json")
+          cat /tmp/out; echo; echo "HTTP $CODE"
+          test "$CODE" = "200"
