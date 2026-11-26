@@ -1193,29 +1193,30 @@ async function maybePurge(){
   if(!db||inWindow())return;
   try{
     const tag=nightTag();
-    const res=await db.ref("policy/purgedNight").transaction(c=>c===tag?undefined:tag);
-    if(res.committed&&res.snapshot&&res.snapshot.val()===tag){
-      await db.ref().update({msg:null,dm:null,meta:null,pinned:null,thread:null,deleted:null});
-    }
+    const pn=(await db.ref("policy/purgedNight").once("value")).val();
+    if(pn===tag)return;
+    // 정리 표시와 삭제를 한 번의 쓰기로 처리 → 중간에 끊겨도 '표시만 되고 안 지워짐'이 생기지 않음
+    await db.ref().update({msg:null,dm:null,meta:null,pinned:null,thread:null,deleted:null,"policy/purgedNight":tag});
   }catch(e){}
 }
 // 밤에 접속자가 없어 정리를 놓친 경우, 낮에 누군가 열면 전날(오늘 오전 6시 이전) 메시지를 따라잡아 정리
 function dayTag(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+// 표시를 믿지 않고, 실제로 오늘 오전 6시 이전 메시지가 남아 있으면 지움(푸시 키 시간 접두어로 오래된 것만 조회 → 가벼움)
+const PK_CH="-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+function keyAt(ms){let k="";for(let i=0;i<8;i++){k=PK_CH.charAt(ms%64)+k;ms=Math.floor(ms/64);}return k;}
+async function shallowKeys(path){try{const r=await fetch(FB.databaseURL+"/"+path+".json?shallow=true");const j=await r.json();return j&&typeof j==="object"?Object.keys(j):[];}catch(e){return [];}}
+let lastCatchUp=0;
 async function catchUpPurge(){
   if(!db||!inWindow())return;
+  if(Date.now()-lastCatchUp<10*60000)return;lastCatchUp=Date.now();
   try{
-    const y=new Date();y.setDate(y.getDate()-1);const lastNight=dayTag(y);const today=dayTag(new Date());
-    const pn=(await db.ref("policy/purgedNight").once("value")).val();
-    if(pn===lastNight||pn===today)return; // 지난밤 이미 정리됨
-    const res=await db.ref("policy/purgedNight").transaction(c=>(c===lastNight||c===today)?undefined:lastNight);
-    if(!res.committed)return;
-    const cut=new Date();cut.setHours(OPEN_H,0,0,0);const cutMs=cut.getTime();
+    const cut=new Date();cut.setHours(OPEN_H,0,0,0);const cutMs=cut.getTime();const ck=keyAt(cutMs+5*60000); // 키는 기기 시계 오차가 있어 여유를 두고, 실제 판정은 ts로
     const up={};
-    const addOld=(base,obj)=>{if(!obj)return;Object.keys(obj).forEach(k=>{const m=obj[k];if(m&&!m.sys&&(m.ts==null||m.ts<cutMs))up[base+"/"+k]=null;});};
-    const msg=(await db.ref("msg").once("value")).val()||{};Object.keys(msg).forEach(ch=>addOld("msg/"+ch,msg[ch]));
-    const dm=(await db.ref("dm").once("value")).val()||{};Object.keys(dm).forEach(k=>addOld("dm/"+k+"/msg",dm[k]&&dm[k].msg));
-    const thr=(await db.ref("thread").once("value")).val()||{};Object.keys(thr).forEach(ch=>{const ps=thr[ch]||{};Object.keys(ps).forEach(p=>addOld("thread/"+ch+"/"+p,ps[p]));});
-    const del=(await db.ref("deleted").once("value")).val()||{};addOld("deleted",del);
+    const sweep=async base=>{const s=await db.ref(base).orderByKey().endAt(ck).once("value");s.forEach(c=>{const m=c.val();if(m&&!m.sys&&(m.ts==null||m.ts<cutMs))up[base+"/"+c.key]=null;});};
+    for(const ch of await shallowKeys("msg"))await sweep("msg/"+ch);
+    for(const k of await shallowKeys("dm"))await sweep("dm/"+k+"/msg");
+    for(const ch of await shallowKeys("thread"))for(const p of await shallowKeys("thread/"+ch))await sweep("thread/"+ch+"/"+p);
+    await sweep("deleted");
     const pin=(await db.ref("pinned").once("value")).val()||{};Object.keys(pin).forEach(ch=>{const p=pin[ch];if(p&&(p.ts==null||p.ts<cutMs))up["pinned/"+ch]=null;});
     if(Object.keys(up).length)await db.ref().update(up);
   }catch(e){}
